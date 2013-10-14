@@ -7,6 +7,7 @@ description: Holds the repository git abstraction class
 import os
 import subprocess
 import json
+import re
 class Git():
     """
     Git():
@@ -19,7 +20,7 @@ class Git():
     \\"commit_hash\\": \\"%H\\",\
     \\"commit_hash_abbreviated\\": \\"%h\\",\
     \\"tree_hash\\": \\"%T\\",\
-    \\"tree_hash_abbreviated\\":\\"%t\\",\
+    \\"tree_hash_abbreviated\\": \\"%t\\",\
     \\"parent_hashes\\": \\"%P\\",\
     \\"parent_hashes_abbreviated\\": \\"%p\\",\
     \\"author_name\\": \\"%an\\",\
@@ -49,8 +50,36 @@ class Git():
         
         # Get rid of newlines, screws up json parsing. Remove head/end clutter
         log = log.replace( '\\n', '' )
-        log = '[' + log[2:-2] + ']'
-        
-        #Convert the JSON to a native dictonary and return it
-        parsedLog = json.loads( log )
-        return parsedLog
+        log = log[3:-3] 
+
+        # List of json objects
+        json_list = []
+
+        # Serialize each object to JSON format
+        commitList = log.split("},{")
+        for commit in commitList:
+            #commit = commit.replace('    ','')
+            # Remove invalid json escape characters
+            commit = commit.replace('\\x', '\\u00')
+
+            # Remove quotes in JSON properties
+            propValues = commit.split(',    "')
+            commitFixed = ""
+            for propValue in propValues:
+                props = propValue.split('": "')
+                propStr = ''
+                for prop in props:
+                    propStr = propStr + '"' + prop.replace('"','') + '":'
+              
+                commitFixed = commitFixed + "," + propStr[0:-1]
+     
+         
+            commitFixed = commitFixed[1:].replace('    ','')
+
+            # Handle all other invalid escape sequences
+            regex = re.compile(r'\\(?![/u"])')
+            commitFixed = regex.sub(r"\\\\",commitFixed)
+
+            json_list.append(json.loads('{' + commitFixed + '}'))
+    
+        return json_list
