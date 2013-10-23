@@ -43,7 +43,7 @@ class Git():
         log(): NoneType -> Dictonary
         description: a very basic abstraction for using git in python.
         """
-        os.chdir( self.path )
+        os.chdir( self.repo.path )
         
         # Spawn a git process and convert the output to a string
         log = str( subprocess.check_output( self.LOG_CMD, shell=True ) )

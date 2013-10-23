@@ -32,6 +32,9 @@ class Commit(Base):
     subject = Column(String)
     committer_name  = Column(String)
     
+    # Many-to-One Relation to repositories table
+    repository_id = Column(String)
+    
     def __init__(self, commitDict):
         """
         __init__(): Dictonary -> NoneType
@@ -44,6 +47,3 @@ class Commit(Base):
             self.author_name, 
             self.author_date, 
             self.subject)
-
-# Init the database
-#Base.metadata.create_all(engine) 
