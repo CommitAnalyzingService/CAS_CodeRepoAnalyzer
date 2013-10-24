@@ -28,8 +28,11 @@ in the DSN string.
 
 ##Usage
 In a terminal, type `python scan.py [option]` to scan the repository table for 
-repositories that neeed to be downloaded the commits and store them in a 
-database.
+repositories that need to be downloaded and then store the commits in the
+database
+
+On Windows, `casr` can be used in the project directory instead of 
+`python scan.py`
 ###Options
 `initDb` - Create all the tables
 
