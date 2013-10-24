@@ -1,7 +1,8 @@
 CAS Reader
 ==========
 
-A git repository commit parser that inserts  each commit into a  PostgreSQL table.
+A git repository commit parser that inserts  each commit into a  PostgreSQL 
+table.
 
 ##Installation
 Clone this repository in to an empty directory 
@@ -12,16 +13,24 @@ Clone this repository in to an empty directory
 * Git > 1.7
 
 ###Pip Packages
-Install the following packages by doing `pip install `  and then the package name
+Install the following packages by doing `pip install `  and then the package 
+name
 
 * SQL Alchemy (sqlalchemy)
 * Py-PostgreSQL (py-postgresql)
 
 ###Database Setup
-1. In `db.py`, set the desired username/password for the database you are using in the DSN string.
-2. Set up the database for the first time by running the script like normal (see Quick Start below), but with
-the last line in `commit.py` uncommented. The next time you run the script, be sure to re-comment it out.
+1. In `db.py`, set the desired username/password for the database you are using 
+in the DSN string.
+2. Set up the database for the first time by running the script like normal 
+(see *Usage* below), but with
+`[option]` parameter set to `initDb`
 
-##Quick Start
-In a terminal, type `python readRepo.py "path/to/repo"` to parse the commits and store them in a database.
+##Usage
+In a terminal, type `python scan.py [option]` to scan the repository table for 
+repositories that neeed to be downloaded the commits and store them in a 
+database.
+###Options
+`initDb` - Create all the tables
 
+`testRepos` - Makes dummy repository data entries to test the script.

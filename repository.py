@@ -18,7 +18,6 @@ class Repository(Base):
     id = Column(String, primary_key=True)
     name = Column(String)
     url = Column(String)
-    path = Column(String, nullable=True)
     
     #TODO: Make these DateTime fields, (SQLAlchemy blows up when I tried it)
     creation_date = Column(String)
@@ -32,11 +31,6 @@ class Repository(Base):
         self.id = str(uuid.uuid1())
         self.creation_date = str(datetime.now().replace(microsecond=0))
         self.__dict__.update(repoDict)
-        print(self.__dict__)
-            
+    
     def __repr__(self):
-        return "<Repository('%s','%s', '%s', '%s')>" % \
-            (self.id,
-            self.name, 
-            self.url, 
-            self.creation_date)
+        return "<Repository: %s - %s>" % (self.name, self.id)

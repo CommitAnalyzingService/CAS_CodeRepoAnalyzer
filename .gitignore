@@ -34,3 +34,8 @@ nosetests.xml
 .mr.developer.cfg
 .project
 .pydevproject
+
+# CAS Reader
+/CASRepos/git/*
+!.gitkeep
+CASReader.log
