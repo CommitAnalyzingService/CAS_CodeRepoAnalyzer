@@ -5,6 +5,7 @@ date: October 2013
 description: Holds the commit abstraction class and ORM
 """
 from db import *
+#from sqlalchemy import *
 
 class Commit(Base):
     """
@@ -23,7 +24,7 @@ class Commit(Base):
     parent_hashes = Column(String)
     commit_hash_abbreviated = Column(String)
     tree_hash = Column(String)
-    author_date_unix_timestamp  = Column(String)
+    author_date_unix_timestamp  = Column(Integer)
     author_date_relative  = Column(String)
     author_date_rfc2822_style  = Column(String)
     committer_date  = Column(String)
@@ -31,6 +32,21 @@ class Commit(Base):
     author_date  = Column(String)
     subject = Column(String)
     committer_name  = Column(String)
+    contains_bug = Column(Boolean, unique=False, default=False)
+    ns = Column(Float, unique=False, default=0)
+    nd = Column(Float, unique=False, default=0)
+    nf = Column(Float, unique=False, default=0)
+    entrophy = Column(Float, unique=False, default=0)
+    la = Column(Float, unique=False, default=0)
+    ld = Column(Float, unique=False, default=0)
+    fileschanged = Column(Float, unique=False, default=0)
+    lt = Column(Float, unique=False, default=0)
+    ndev = Column(Float, unique=False, default=0)
+    age = Column(Float, unique=False, default=0)
+    nuc = Column(Float, unique=False, default=0)
+    exp = Column(Float, unique=False, default=0)
+    rexo = Column(Float, unique=False, default=0)
+    sexp = Column(Float, unique=False, default=0)
     
     # Many-to-One Relation to repositories table
     repository_id = Column(String)
