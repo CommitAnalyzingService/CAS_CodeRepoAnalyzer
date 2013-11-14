@@ -19,9 +19,9 @@ class Repository(Base):
     name = Column(String)
     url = Column(String)
     
-    creation_date = Column(DateTime)
-    ingestion_date = Column(DateTime)
-    analysis_date = Column(DateTime)
+    creation_date = Column(String)
+    ingestion_date = Column(String)
+    analysis_date = Column(String)
     
     def __init__(self, repoDict):
         """
