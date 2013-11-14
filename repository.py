@@ -19,10 +19,9 @@ class Repository(Base):
     name = Column(String)
     url = Column(String)
     
-    #TODO: Make these DateTime fields, (SQLAlchemy blows up when I tried it)
-    creation_date = Column(String)
-    ingestion_date = Column(String)
-    analysis_date = Column(String)
+    creation_date = Column(DateTime)
+    ingestion_date = Column(DateTime)
+    analysis_date = Column(DateTime)
     
     def __init__(self, repoDict):
         """
