@@ -9,6 +9,7 @@ import sys
 from datetime import datetime, timedelta
 from commit import Commit
 from repository import *
+from metrics import *
 from localrepository import *
 
 
