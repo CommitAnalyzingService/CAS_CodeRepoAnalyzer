@@ -1,13 +1,17 @@
+import os
+import subprocess
+import json
+import logging
+import math         # Required for the math.log function
+
+
 """
 file: repository.py
 authors: Ben Grawi <bjg1568@rit.edu>, Christoffer Rosen <cbr4830@rit.edu>
 date: October 2013
 description: Holds the repository git abstraction class
 """
-import os
-import subprocess
-import json
-import logging
+
 class Git():
     """
     Git():
@@ -91,15 +95,20 @@ class Git():
 
 
             # Data structures to keep track of info needed for stats
-            subsystemsSeen = [] 
-            directoriesSeen = []
+
+            subsystemsSeen = []                         # List of system names seen
+            directoriesSeen = []                        # List of directory names seen
+            locModifiedPerFile = []                     # List of modified loc in each file seen 
 
             # Stats variables 
+
             la = 0                                      # lines added
             ld = 0                                      # lines deleted
             nf = 0                                      # Number of modified files
             ns = 0                                      # Number of modified subsystems
             nd = 0                                      # number of modified directories
+            totalLOCModified = 0                        # Total modified LOC across all files
+            entrophy = 0                                # entrophy: distrubtion of modified code across each file
 
             filesSeen = ""                              # files seen in change/commit
 
@@ -112,14 +121,27 @@ class Git():
 
                 # Get stats
                 fileStat = stat.split("\\t")
-                fileLa = int(fileStat[0])                
-                fileLd = int(fileStat[1])
+
+                # catch the git "-" line changes
+                try:
+                    fileLa = int(fileStat[0])                
+                    fileLd = int(fileStat[1])
+                except:
+                    fileLa = 0
+                    fileLd = 0
+
+
                 fileName = fileStat[2]
+                totalModified = fileLa + fileLd
+
+                # To caclualte entrophy
+                locModifiedPerFile.append(totalModified)
+                totalLOCModified += totalModified
 
                 # Get metrics data structures required
                 fileDirs = fileName.split("/")
 
-                if(len(fileDirs) == 1):
+                if( len(fileDirs) == 1 ):
                     subsystem = "root"
                     directory = "root"
                  
@@ -127,21 +149,16 @@ class Git():
                     subsystem = fileDirs[0]
                     directory = "/".join(fileDirs[0:-1])
 
-               # print(fileName + "\n")
-               # print("subsystem: " + subsystem + "\n")
-               # print("directory: " + directory + "\n***\n")
+                if( subsystem not in subsystemsSeen ):
+                    subsystemsSeen.append( subsystem )
 
-
-                if(subsystem not in subsystemsSeen):
-                    subsystemsSeen.append(subsystem)
-
-                if(directory not in directoriesSeen):
-                    directoriesSeen.append(directory)
+                if( directory not in directoriesSeen ):
+                    directoriesSeen.append( directory )
 
                 # Update file-level metrics
                 la += fileLa 
                 ld += fileLd
-                nf ++ 1
+                nf += 1
                 filesSeen += fileName + ","
 
             # End stats loop
@@ -150,13 +167,20 @@ class Git():
             ns = len(subsystemsSeen)
             nd = len(directoriesSeen)
 
+            # Update entrophy
+            for fileLocMod in locModifiedPerFile:
+                if (fileLocMod != 0 ):
+                    avg = fileLocMod/totalLOCModified
+                    entrophy -= ( avg * math.log( avg,2 ) )
+
             # Add stat properties to the commit object
-            commitObject += ',"la":"' + str(la) + '\"'
-            commitObject += ',"ld":"' + str(ld) + '\"'
+            commitObject += ',"la":"' + str( la ) + '\"'
+            commitObject += ',"ld":"' + str( ld ) + '\"'
             commitObject += ',"fileschanged":"' + filesSeen[0:-1] + '\"'
-            commitObject += ',"nf":"' + str(nf) + '\"'
-            commitObject += ',"ns":"' + str(ns) + '\"'
-            commitObject += ',"nd":"' + str(nd) + '\"'
+            commitObject += ',"nf":"' + str( nf ) + '\"'
+            commitObject += ',"ns":"' + str( ns ) + '\"'
+            commitObject += ',"nd":"' + str( nd ) + '\"'
+            commitObject += ',"entrophy":"' + str( entrophy ) + '\"'
 
             # Remove first comma and extra space
             commitObject = commitObject[1:].replace('    ','')                      
