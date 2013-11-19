@@ -55,9 +55,6 @@ class Git():
         log = str( subprocess.check_output(cmd + self.LOG_FORMAT, shell=True ) )
         log = log[2:-1]   # Remove head/end clutter
 
-        print(log)
-        print("\n\n")
-
         # List of json objects
         json_list = []
         
@@ -92,33 +89,81 @@ class Git():
                 # End property loop
             # End pretty info loop
 
-            # Next do the commit stats 
+
+            # Data structures to keep track of info needed for stats
+            subsystemsSeen = [] 
+            directoriesSeen = []
+
+            # Stats variables 
             la = 0                                      # lines added
             ld = 0                                      # lines deleted
+            nf = 0                                      # Number of modified files
+            ns = 0                                      # Number of modified subsystems
+            nd = 0                                      # number of modified directories
+
             filesSeen = ""                              # files seen in change/commit
 
             stats = statCommit.split("\\n")
             for stat in stats:
+
+                # Check that we are only looking at file stat (i.e., remove extra newlines)
                 if( stat == ' ' or stat == '' ):
                     continue
 
+                # Get stats
                 fileStat = stat.split("\\t")
                 fileLa = int(fileStat[0])                
                 fileLd = int(fileStat[1])
                 fileName = fileStat[2]
 
+                # Get metrics data structures required
+                fileDirs = fileName.split("/")
+
+                if(len(fileDirs) == 1):
+                    subsystem = "root"
+                    directory = "root"
+                 
+                else:
+                    subsystem = fileDirs[0]
+                    directory = "/".join(fileDirs[0:-1])
+
+               # print(fileName + "\n")
+               # print("subsystem: " + subsystem + "\n")
+               # print("directory: " + directory + "\n***\n")
+
+
+                if(subsystem not in subsystemsSeen):
+                    subsystemsSeen.append(subsystem)
+
+                if(directory not in directoriesSeen):
+                    directoriesSeen.append(directory)
+
+                # Update file-level metrics
                 la += fileLa 
                 ld += fileLd
+                nf ++ 1
                 filesSeen += fileName + ","
 
-                #TODO we need to save file info into the files table?
             # End stats loop
+
+            # Update commit-level metrics
+            ns = len(subsystemsSeen)
+            nd = len(directoriesSeen)
+
+            # Add stat properties to the commit object
             commitObject += ',"la":"' + str(la) + '\"'
             commitObject += ',"ld":"' + str(ld) + '\"'
             commitObject += ',"fileschanged":"' + filesSeen[0:-1] + '\"'
-            commitObject = commitObject[1:].replace('    ','')                      # Remove first comma and extra space
+            commitObject += ',"nf":"' + str(nf) + '\"'
+            commitObject += ',"ns":"' + str(ns) + '\"'
+            commitObject += ',"nd":"' + str(nd) + '\"'
 
+            # Remove first comma and extra space
+            commitObject = commitObject[1:].replace('    ','')                      
+
+            # Add commit object to json_list
             json_list.append(json.loads('{' + commitObject + '}'))
+
         # End commit loop
 
         logging.info('Done getting/parsing git commits.')
