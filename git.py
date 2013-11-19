@@ -1,6 +1,6 @@
 """
 file: repository.py
-author: Ben Grawi <bjg1568@rit.edu>
+authors: Ben Grawi <bjg1568@rit.edu>, Christoffer Rosen <cbr4830@rit.edu>
 date: October 2013
 description: Holds the repository git abstraction class
 """
@@ -16,33 +16,23 @@ class Git():
     description: a very basic abstraction for using git in python.
     """
     # Two backslashes to allow one backslash to be passed in the command.
-    LOG_FORMAT = '--pretty=format:\"{\
+    # This is given as a command line option to git for formatting output.
+    # Numstat is used to get statistics for each commit
+
+    # A commit mesasge in git is done such that first line is treated as the subject,
+    # and the rest is treated as the message. We combine them under field commit_message
+    LOG_FORMAT = '--pretty=format:\" CAS_READER_STARTPRETTY\
     \\"commit_hash\\"CAS_READER_PROP_DELIMITER: \\"%H\\",CAS_READER_PROP_DELIMITER2\
-    \\"commit_hash_abbreviated\\"CAS_READER_PROP_DELIMITER: \\"%h\\",CAS_READER_PROP_DELIMITER2\
-    \\"tree_hash\\"CAS_READER_PROP_DELIMITER: \\"%T\\",CAS_READER_PROP_DELIMITER2\
-    \\"tree_hash_abbreviated\\"CAS_READER_PROP_DELIMITER: \\"%t\\",CAS_READER_PROP_DELIMITER2\
-    \\"parent_hashes\\"CAS_READER_PROP_DELIMITER: \\"%P\\",CAS_READER_PROP_DELIMITER2\
-    \\"parent_hashes_abbreviated\\"CAS_READER_PROP_DELIMITER: \\"%p\\",CAS_READER_PROP_DELIMITER2\
     \\"author_name\\"CAS_READER_PROP_DELIMITER: \\"%an\\",CAS_READER_PROP_DELIMITER2\
     \\"author_email\\"CAS_READER_PROP_DELIMITER: \\"%ae\\",CAS_READER_PROP_DELIMITER2\
     \\"author_date\\"CAS_READER_PROP_DELIMITER: \\"%ad\\",CAS_READER_PROP_DELIMITER2\
-    \\"author_date_rfc2822_style\\"CAS_READER_PROP_DELIMITER: \\"%aD\\",CAS_READER_PROP_DELIMITER2\
-    \\"author_date_relative\\"CAS_READER_PROP_DELIMITER: \\"%ar\\",CAS_READER_PROP_DELIMITER2\
     \\"author_date_unix_timestamp\\"CAS_READER_PROP_DELIMITER: \\"%at\\",CAS_READER_PROP_DELIMITER2\
-    \\"author_date_iso_8601\\"CAS_READER_PROP_DELIMITER: \\"%ai\\",CAS_READER_PROP_DELIMITER2\
-    \\"committer_name\\"CAS_READER_PROP_DELIMITER: \\"%cn\\",CAS_READER_PROP_DELIMITER2\
-    \\"committer_email\\"CAS_READER_PROP_DELIMITER: \\"%ce\\",CAS_READER_PROP_DELIMITER2\
-    \\"committer_date\\"CAS_READER_PROP_DELIMITER: \\"%cd\\",CAS_READER_PROP_DELIMITER2\
-    \\"committer_date_relative\\"CAS_READER_PROP_DELIMITER: \\"%cr\\",CAS_READER_PROP_DELIMITER2\
-    \\"commit_message\\"CAS_READER_PROP_DELIMITER: \\"%b\\",CAS_READER_PROP_DELIMITER2\
-    \\"subject\\"CAS_READER_PROP_DELIMITER: \\"%s\\"\
-    }CAS_READER_JSON_DELIMITER,\"'
+    \\"commit_message\\"CAS_READER_PROP_DELIMITER: \\"%s%b\\"\
+    CAS_READER_STOPPRETTY \" --numstat'
     
-    CLONE_CMD = 'git clone --no-checkout {!s} {!s}'
-    
-    PULL_CMD = 'git pull origin master'
-    
-    REPO_DIRECTORY = "/CASRepos/git/"
+    CLONE_CMD = 'git clone --no-checkout {!s} {!s}'     # git clone command w/o downloading src code
+    PULL_CMD = 'git pull origin master'                 # git pull command 
+    REPO_DIRECTORY = "/CASRepos/git/"                   # directory in which to store repositories
     
     
     def log(self, repo, firstSync):
@@ -63,10 +53,10 @@ class Git():
             cmd = 'git log '
         
         log = str( subprocess.check_output(cmd + self.LOG_FORMAT, shell=True ) )
-        
-        # Get rid of newlines, screws up json parsing. Remove head/end clutter
-        log = log.replace( '\\n', '' )
-        log = log[3:-3] 
+        log = log[2:-1]   # Remove head/end clutter
+
+        print(log)
+        print("\n\n")
 
         # List of json objects
         json_list = []
@@ -74,31 +64,67 @@ class Git():
         # Make sure there are commits to parse
         if len(log) == 0:
             return []
-        
-        # JSON won't be able to read as is - clean each commit and append to json_list
-        commitList = log.split("}CAS_READER_JSON_DELIMITER,{")
-        for commit in commitList:
-          
-            # Remove invalid json escape characters
-            commit = commit.replace('\\x', '\\u00')
 
-            # Remove quotes in JSON properties
-            propValues = commit.split(',CAS_READER_PROP_DELIMITER2    "')
-            commitFixed = ""
-            for propValue in propValues:
+        commitList = log.split("CAS_READER_STARTPRETTY") 
+        for commit in commitList:
+            commit = commit.replace('\\x', '\\u00')   # Remove invalid json escape characters
+            splitCommitStat = commit.split("CAS_READER_STOPPRETTY")  # split the commit info and its stats
+
+            # The first split will contain an empty list
+            if(len(splitCommitStat) < 2):
+                continue
+
+            prettyCommit = splitCommitStat[0]
+            statCommit = splitCommitStat[1]
+
+            commitObject = ""
+
+            # Start with the commit info (i.e., commit hash, author, date, subject, etc)
+            prettyInfo = prettyCommit.split(',CAS_READER_PROP_DELIMITER2    "')
+            for propValue in prettyInfo:
                 props = propValue.split('"CAS_READER_PROP_DELIMITER: "')
                 propStr = ''
                 for prop in props:
-                    prop = prop.replace('\\','') # json doesn't like escapes..
+                    prop = prop.replace('\\','').replace("\\n", '')  # avoid escapes & newlines for JSON formatting
                     propStr = propStr + '"' + prop.replace('"','') + '":'
-              
-                commitFixed = commitFixed + "," + propStr[0:-1]
-     
-         
-            commitFixed = commitFixed[1:].replace('    ','')
-            json_list.append(json.loads('{' + commitFixed + '}'))
+
+                commitObject += "," + propStr[0:-1]
+                # End property loop
+            # End pretty info loop
+
+            # Next do the commit stats 
+            la = 0                                      # lines added
+            ld = 0                                      # lines deleted
+            filesSeen = ""                              # files seen in change/commit
+
+            stats = statCommit.split("\\n")
+            for stat in stats:
+                if( stat == ' ' or stat == '' ):
+                    continue
+
+                fileStat = stat.split("\\t")
+                fileLa = int(fileStat[0])                
+                fileLd = int(fileStat[1])
+                fileName = fileStat[2]
+
+                la += fileLa 
+                ld += fileLd
+                filesSeen += fileName + ","
+
+                #TODO we need to save file info into the files table?
+            # End stats loop
+            commitObject += ',"la":"' + str(la) + '\"'
+            commitObject += ',"ld":"' + str(ld) + '\"'
+            commitObject += ',"fileschanged":"' + filesSeen[0:-1] + '\"'
+            commitObject = commitObject[1:].replace('    ','')                      # Remove first comma and extra space
+
+            json_list.append(json.loads('{' + commitObject + '}'))
+        # End commit loop
+
         logging.info('Done getting/parsing git commits.')
         return json_list
+
+     
     def clone(self, repo):
         """
         clone(repo): Repository -> String
@@ -122,6 +148,7 @@ class Git():
 
         # TODO: only return true on success, else return false
         return True
+
     def pull(self, repo):
         """
         pull(repo): Repository -> String
