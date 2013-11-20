@@ -4,6 +4,7 @@ author: Ben Grawi <bjg1568@rit.edu>
 date: October 2013
 description: Sets up the logging information for the CAS Reader
 """
+from config import config
 import logging as root_logging
 
 # Set up the logger
@@ -13,7 +14,7 @@ logger.setLevel(root_logging.INFO)
 
 logger_format = root_logging.Formatter('%(asctime)s %(levelname)s: %(message)s')
 
-logging_file_handler = root_logging.FileHandler('CASReader.log')
+logging_file_handler = root_logging.FileHandler(config['logging']['filename'])
 logging_file_handler.setLevel(root_logging.INFO)
 logging_file_handler.setFormatter(logger_format)
 logger.addHandler(logging_file_handler)
