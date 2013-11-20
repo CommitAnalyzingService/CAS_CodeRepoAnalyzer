@@ -39,3 +39,4 @@ nosetests.xml
 /CASRepos/git/*
 !.gitkeep
 CASReader.log
+config.json
