@@ -41,6 +41,8 @@ class Git():
     CLONE_CMD = 'git clone --no-checkout {!s} {!s}'     # git clone command w/o downloading src code
     PULL_CMD = 'git pull origin master'                 # git pull command 
     REPO_DIRECTORY = "/CASRepos/git/"                   # directory in which to store repositories
+
+    correctiveWords = ['fix','bug','wrong','problem']   #TODO: we should read this from a flat file to allow easy modification
     
     
     def log(self, repo, firstSync):
@@ -74,8 +76,9 @@ class Git():
         commitFiles = {} 
 
         # vars required for stats
-        author = ""
-        unixTimeStamp = 0
+        author = ""                                 # author of commit
+        unixTimeStamp = 0                           # timestamp of commit
+        fix = False                                 # whether or not the change is a defect fix
 
         commitList = log.split("CAS_READER_STARTPRETTY") 
         for commit in commitList:
@@ -108,6 +111,12 @@ class Git():
                 if(values[0] == '"author_date_unix_timestamp"'):
                     unixTimeStamp = values[1].replace('"','')
 
+                # Check if it is a 'fix' commit
+                if(values[0] == '"commit_message"'):
+                    for word in self.correctiveWords: 
+                        if word.lower() in values[1].lower():
+                            fix = True
+
                 commitObject += "," + propStr[0:-1]
                 # End property loop
             # End pretty info loop
@@ -136,8 +145,9 @@ class Git():
 
             totalLOCModified = 0                        # Total modified LOC across all files
             filesSeen = ""                              # files seen in change/commit
-
+            print(fix)
             stats = statCommit.split("\\n")
+
             for stat in stats:
 
                 # Check that we are only looking at file stat (i.e., remove extra newlines)
@@ -174,6 +184,8 @@ class Git():
                     if prevChanged not in fileAges:
                         nuc += 1
 
+                    # Convert age to days instead of seconds
+                    age += ( (int(unixTimeStamp) - int(prevChanged)) / 86400 )    
                     fileAges.append(prevChanged)
 
                     # Update the file info
@@ -196,10 +208,6 @@ class Git():
                 # To caclualte entrophy
                 locModifiedPerFile.append(totalModified)
                 totalLOCModified += totalModified
-
-                print(lt)
-                print(authors)
-                print(fileAges)
 
                 # Get metrics data structures required
                 fileDirs = fileName.split("/")
@@ -231,6 +239,7 @@ class Git():
             nd = len(directoriesSeen)
             ndev = len(authors)
             lt = lt / nf
+            age = age / nf
 
             # Update entrophy
             for fileLocMod in locModifiedPerFile:
@@ -248,6 +257,9 @@ class Git():
             commitObject += ',"entrophy":"' + str(  entrophy ) + '\"'
             commitObject += ',"ndev":"' + str( ndev ) + '\"'
             commitObject += ',"lt":"' + str( lt ) + '\"'
+            commitObject += ',"fix":"' + str( fix ) + '\"'
+            commitObject += ',"nuc":"' + str( nuc ) + '\"'
+            commitObject += ',"age":"' + str( age ) + '\"'
 
             # Remove first comma and extra space
             commitObject = commitObject[1:].replace('    ','')                      
