@@ -2,7 +2,9 @@ import os
 import subprocess
 import json
 import logging
-import math         # Required for the math.log function
+import math                              # Required for the math.log function
+from commitFile import *                 # Represents a file
+import time
 
 
 """
@@ -21,10 +23,12 @@ class Git():
     """
     # Two backslashes to allow one backslash to be passed in the command.
     # This is given as a command line option to git for formatting output.
-    # Numstat is used to get statistics for each commit
 
     # A commit mesasge in git is done such that first line is treated as the subject,
     # and the rest is treated as the message. We combine them under field commit_message
+
+    # We want the log in ascending order, so we call --reverse
+    # Numstat is used to get statistics for each commit
     LOG_FORMAT = '--pretty=format:\" CAS_READER_STARTPRETTY\
     \\"commit_hash\\"CAS_READER_PROP_DELIMITER: \\"%H\\",CAS_READER_PROP_DELIMITER2\
     \\"author_name\\"CAS_READER_PROP_DELIMITER: \\"%an\\",CAS_READER_PROP_DELIMITER2\
@@ -32,7 +36,7 @@ class Git():
     \\"author_date\\"CAS_READER_PROP_DELIMITER: \\"%ad\\",CAS_READER_PROP_DELIMITER2\
     \\"author_date_unix_timestamp\\"CAS_READER_PROP_DELIMITER: \\"%at\\",CAS_READER_PROP_DELIMITER2\
     \\"commit_message\\"CAS_READER_PROP_DELIMITER: \\"%s%b\\"\
-    CAS_READER_STOPPRETTY \" --numstat'
+    CAS_READER_STOPPRETTY \" --numstat --reverse '
     
     CLONE_CMD = 'git clone --no-checkout {!s} {!s}'     # git clone command w/o downloading src code
     PULL_CMD = 'git pull origin master'                 # git pull command 
@@ -41,7 +45,7 @@ class Git():
     
     def log(self, repo, firstSync):
         """
-        log(): Repository, Boolean -> Dictionary
+        log(): Repository, Boolean -> Dictionary                                                                                                                                              
         arguments: repo Repository: the repository to clone
                    firstSync Boolean: whether to sync all commits or after the
             ingestion date
@@ -66,6 +70,13 @@ class Git():
         if len(log) == 0:
             return []
 
+        # keep track of file changes
+        commitFiles = {} 
+
+        # vars required for stats
+        author = ""
+        unixTimeStamp = 0
+
         commitList = log.split("CAS_READER_STARTPRETTY") 
         for commit in commitList:
             commit = commit.replace('\\x', '\\u00')   # Remove invalid json escape characters
@@ -89,6 +100,14 @@ class Git():
                     prop = prop.replace('\\','').replace("\\n", '')  # avoid escapes & newlines for JSON formatting
                     propStr = propStr + '"' + prop.replace('"','') + '":'
 
+                values = propStr[0:-1].split(":")
+
+                if(values[0] == '"author_name"'):
+                    author = values[1].replace('"', '')
+
+                if(values[0] == '"author_date_unix_timestamp"'):
+                    unixTimeStamp = values[1].replace('"','')
+
                 commitObject += "," + propStr[0:-1]
                 # End property loop
             # End pretty info loop
@@ -99,6 +118,8 @@ class Git():
             subsystemsSeen = []                         # List of system names seen
             directoriesSeen = []                        # List of directory names seen
             locModifiedPerFile = []                     # List of modified loc in each file seen 
+            authors = []                                # List of all unique authors seen for each file
+            fileAges = []                               # List of the ages for each file in a commit
 
             # Stats variables 
 
@@ -107,9 +128,13 @@ class Git():
             nf = 0                                      # Number of modified files
             ns = 0                                      # Number of modified subsystems
             nd = 0                                      # number of modified directories
-            totalLOCModified = 0                        # Total modified LOC across all files
-            entrophy = 0                                # entrophy: distrubtion of modified code across each file
+            entrophy = 0                                # entrophy: distriubtion of modified code across each file
+            lt = 0                                      # lines of code in each file (sum) before the commit
+            ndev = 0                                    # the number of developers that modifed the files in a commit
+            age = 0                                     # the average time interval between the last and current change
+            nuc = 0                                     # the number of unique changes to the modified files
 
+            totalLOCModified = 0                        # Total modified LOC across all files
             filesSeen = ""                              # files seen in change/commit
 
             stats = statCommit.split("\\n")
@@ -134,9 +159,47 @@ class Git():
                 fileName = fileStat[2]
                 totalModified = fileLa + fileLd
 
+                if(fileName in commitFiles):
+                    prevFileChanged = commitFiles[fileName]
+                    prevLOC = getattr(prevFileChanged, 'loc')
+                    prevAuthors = getattr(prevFileChanged, 'authors')
+                    prevChanged = getattr(prevFileChanged, 'lastchanged')
+
+                    lt += prevLOC
+
+                    for prevAuthor in prevAuthors:
+                        if prevAuthor not in authors:
+                            authors.append(prevAuthor)
+
+                    if prevChanged not in fileAges:
+                        nuc += 1
+
+                    fileAges.append(prevChanged)
+
+                    # Update the file info
+                    setattr(prevFileChanged, 'loc', prevLOC + fileLa - fileLd) 
+                    setattr(prevFileChanged, 'authors', authors)
+                    setattr(prevFileChanged, 'lastchanged', unixTimeStamp)
+
+                else: 
+
+                    if(author not in authors):
+                        authors.append(author)
+
+                    if(unixTimeStamp not in fileAges):
+                        fileAges.append(unixTimeStamp)
+
+                    fileObject = CommitFile(fileName, fileLa - fileLd, authors, unixTimeStamp)
+                    commitFiles[fileName] = fileObject
+
+
                 # To caclualte entrophy
                 locModifiedPerFile.append(totalModified)
                 totalLOCModified += totalModified
+
+                print(lt)
+                print(authors)
+                print(fileAges)
 
                 # Get metrics data structures required
                 fileDirs = fileName.split("/")
@@ -166,6 +229,8 @@ class Git():
             # Update commit-level metrics
             ns = len(subsystemsSeen)
             nd = len(directoriesSeen)
+            ndev = len(authors)
+            lt = lt / nf
 
             # Update entrophy
             for fileLocMod in locModifiedPerFile:
@@ -180,7 +245,9 @@ class Git():
             commitObject += ',"nf":"' + str( nf ) + '\"'
             commitObject += ',"ns":"' + str( ns ) + '\"'
             commitObject += ',"nd":"' + str( nd ) + '\"'
-            commitObject += ',"entrophy":"' + str( entrophy ) + '\"'
+            commitObject += ',"entrophy":"' + str(  entrophy ) + '\"'
+            commitObject += ',"ndev":"' + str( ndev ) + '\"'
+            commitObject += ',"lt":"' + str( lt ) + '\"'
 
             # Remove first comma and extra space
             commitObject = commitObject[1:].replace('    ','')                      
