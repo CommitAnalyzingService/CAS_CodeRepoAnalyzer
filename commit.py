@@ -35,7 +35,7 @@ class Commit(Base):
     age = Column(Float, unique=False, default=0)
     nuc = Column(Float, unique=False, default=0)
     exp = Column(Float, unique=False, default=0)
-    rexo = Column(Float, unique=False, default=0)
+    rexp = Column(Float, unique=False, default=0)
     sexp = Column(Float, unique=False, default=0)
     
     # Many-to-One Relation to repositories table

@@ -14,8 +14,8 @@ class LocalRepository():
     Repository():
     description: Abstracts the actions done on a repository
     """
-    repo = None
-    adapter = None
+    repo = None                     
+    adapter = None                  
     def __init__(self, repo):
         """
         __init__(path): String -> NoneType
@@ -24,7 +24,7 @@ class LocalRepository():
         self.repo = repo
         
         # Temporary until other Repo types are added
-        self.adapter = Git
+        self.adapter = Git      
         
         self.commits = {}
     

@@ -42,7 +42,7 @@ class Git():
     PULL_CMD = 'git pull origin master'                 # git pull command 
     REPO_DIRECTORY = "/CASRepos/git/"                   # directory in which to store repositories
 
-    correctiveWords = ['fix','bug','wrong','problem']   #TODO: we should read this from a flat file to allow easy modification
+    correctiveWords = ['fix','bug']   #TODO: we should read this from a flat file to allow easy modification
     
     
     def log(self, repo, firstSync):
@@ -72,17 +72,22 @@ class Git():
         if len(log) == 0:
             return []
 
-        # keep track of file changes
+        # keep track of ALL file changes
         commitFiles = {} 
 
-        # vars required for stats
-        author = ""                                 # author of commit
-        unixTimeStamp = 0                           # timestamp of commit
-        fix = False                                 # whether or not the change is a defect fix
+        # Keep track of ALL developer experience
+        devExperience = {}
 
         commitList = log.split("CAS_READER_STARTPRETTY") 
         for commit in commitList:
+            
+            # vars required for stats
+            author = ""                                 # author of commit
+            unixTimeStamp = 0                           # timestamp of commit
+            fix = False                                 # whether or not the change is a defect fix
+
             commit = commit.replace('\\x', '\\u00')   # Remove invalid json escape characters
+
             splitCommitStat = commit.split("CAS_READER_STOPPRETTY")  # split the commit info and its stats
 
             # The first split will contain an empty list
@@ -116,6 +121,7 @@ class Git():
                     for word in self.correctiveWords: 
                         if word.lower() in values[1].lower():
                             fix = True
+                            break
 
                 commitObject += "," + propStr[0:-1]
                 # End property loop
@@ -142,10 +148,12 @@ class Git():
             ndev = 0                                    # the number of developers that modifed the files in a commit
             age = 0                                     # the average time interval between the last and current change
             nuc = 0                                     # the number of unique changes to the modified files
+            exp = 0                                     # number of changes made by author previously
+            rexp = 0                                    # experience weighted by age of files ( 1 / (n + 1))
+            sexp = 0                                    # changes made previous by author in same subsystem
 
             totalLOCModified = 0                        # Total modified LOC across all files
             filesSeen = ""                              # files seen in change/commit
-            print(fix)
             stats = statCommit.split("\\n")
 
             for stat in stats:
@@ -223,6 +231,26 @@ class Git():
                 if( subsystem not in subsystemsSeen ):
                     subsystemsSeen.append( subsystem )
 
+                if( author in devExperience ):
+                    experiences = devExperience[author]
+                    exp += sum(experiences.values())
+
+                    if( subsystem in experiences ):
+                        sexp = experiences[subsystem]
+                        experiences[subsystem] += 1
+                    else:
+                        experiences[subsystem] = 1
+
+                    try:
+                        rexp += (1 / (age) + 1)
+                    except:
+                        rexp += 0
+
+                else:
+                    devExperience[author] = {subsystem: 1}
+            
+
+
                 if( directory not in directoriesSeen ):
                     directoriesSeen.append( directory )
 
@@ -234,12 +262,17 @@ class Git():
 
             # End stats loop
 
+            if( nf < 1):
+                continue
+                
             # Update commit-level metrics
             ns = len(subsystemsSeen)
             nd = len(directoriesSeen)
             ndev = len(authors)
             lt = lt / nf
             age = age / nf
+            exp = exp / nf
+            rexp = rexp / nf
 
             # Update entrophy
             for fileLocMod in locModifiedPerFile:
@@ -260,6 +293,9 @@ class Git():
             commitObject += ',"fix":"' + str( fix ) + '\"'
             commitObject += ',"nuc":"' + str( nuc ) + '\"'
             commitObject += ',"age":"' + str( age ) + '\"'
+            commitObject += ',"exp":"' + str( exp ) + '\"'
+            commitObject += ',"rexp":"' + str( rexp ) + '\"'
+            commitObject += ',"sexp":"' + str( sexp ) + '\"'
 
             # Remove first comma and extra space
             commitObject = commitObject[1:].replace('    ','')                      
