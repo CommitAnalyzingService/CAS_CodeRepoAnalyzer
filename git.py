@@ -44,7 +44,180 @@ class Git():
 
     correctiveWords = ['fix','bug']   #TODO: we should read this from a flat file to allow easy modification
     
-    
+    def getCommitStatsProperties( stats, commitFiles, devExperience, author, unixTimeStamp ):
+        """ 
+        getCommitStatsProperties
+        Helper method for log. Caclulates statistics for each change/commit and
+        returns them as a comma seperated string. Log will add these to the commit object
+        properties
+
+        @param stats            These are the stats given by --numstat as an array
+        @param commitFiles      These are all tracked commit files 
+        @param devExperience    These are all tracked developer experiences
+        @param author           The author of the commit
+        @param unixTimeStamp    Time of the commit
+        """
+
+        statProperties = ""
+
+        # Data structures to keep track of info needed for stats
+        subsystemsSeen = []                         # List of system names seen
+        directoriesSeen = []                        # List of directory names seen
+        locModifiedPerFile = []                     # List of modified loc in each file seen 
+        authors = []                                # List of all unique authors seen for each file
+        fileAges = []                               # List of the ages for each file in a commit
+
+        # Stats variables 
+        la = 0                                      # lines added
+        ld = 0                                      # lines deleted
+        nf = 0                                      # Number of modified files
+        ns = 0                                      # Number of modified subsystems
+        nd = 0                                      # number of modified directories
+        entrophy = 0                                # entrophy: distriubtion of modified code across each file
+        lt = 0                                      # lines of code in each file (sum) before the commit
+        ndev = 0                                    # the number of developers that modifed the files in a commit
+        age = 0                                     # the average time interval between the last and current change
+        nuc = 0                                     # the number of unique changes to the modified files
+        exp = 0                                     # number of changes made by author previously
+        rexp = 0                                    # experience weighted by age of files ( 1 / (n + 1))
+        sexp = 0                                    # changes made previous by author in same subsystem
+        totalLOCModified = 0                        # Total modified LOC across all files
+        filesSeen = ""                              # files seen in change/commit
+
+        for stat in stats:
+
+            # Check that we are only looking at file stat (i.e., remove extra newlines)
+            if( stat == ' ' or stat == '' ):
+                continue
+
+            fileStat = stat.split("\\t")
+
+            # catch the git "-" line changes
+            try:
+                fileLa = int(fileStat[0])                
+                fileLd = int(fileStat[1])
+            except:
+                fileLa = 0
+                fileLd = 0
+
+
+            fileName = fileStat[2]
+            totalModified = fileLa + fileLd
+
+            if(fileName in commitFiles):
+                prevFileChanged = commitFiles[fileName]
+                prevLOC = getattr(prevFileChanged, 'loc')
+                prevAuthors = getattr(prevFileChanged, 'authors')
+                prevChanged = getattr(prevFileChanged, 'lastchanged')
+                lt += prevLOC
+
+                for prevAuthor in prevAuthors:
+                    if prevAuthor not in authors:
+                        authors.append(prevAuthor)
+
+                if prevChanged not in fileAges:
+                    nuc += 1
+
+                # Convert age to days instead of seconds
+                age += ( (int(unixTimeStamp) - int(prevChanged)) / 86400 )    
+                fileAges.append(prevChanged)
+
+                # Update the file info
+                setattr(prevFileChanged, 'loc', prevLOC + fileLa - fileLd) 
+                setattr(prevFileChanged, 'authors', authors)
+                setattr(prevFileChanged, 'lastchanged', unixTimeStamp)
+
+            else: 
+
+                if(author not in authors):
+                    authors.append(author)
+
+                if(unixTimeStamp not in fileAges):
+                    fileAges.append(unixTimeStamp)
+
+                fileObject = CommitFile(fileName, fileLa - fileLd, authors, unixTimeStamp)
+                commitFiles[fileName] = fileObject
+
+            locModifiedPerFile.append(totalModified) # Required for entrphy
+            totalLOCModified += totalModified
+            fileDirs = fileName.split("/")
+
+            if( len(fileDirs) == 1 ):
+                subsystem = "root"
+                directory = "root"
+            else:
+                subsystem = fileDirs[0]
+                directory = "/".join(fileDirs[0:-1])
+
+            if( subsystem not in subsystemsSeen ):
+                subsystemsSeen.append( subsystem )
+
+            if( author in devExperience ):
+                experiences = devExperience[author]
+                exp += sum(experiences.values())
+
+                if( subsystem in experiences ):
+                    sexp = experiences[subsystem]
+                    experiences[subsystem] += 1
+                else:
+                    experiences[subsystem] = 1
+
+                try:
+                    rexp += (1 / (age) + 1)
+                except:
+                    rexp += 0
+
+            else:
+                devExperience[author] = {subsystem: 1}
+        
+            if( directory not in directoriesSeen ):
+                directoriesSeen.append( directory )
+
+            # Update file-level metrics
+            la += fileLa 
+            ld += fileLd
+            nf += 1
+            filesSeen += fileName + ","
+
+        # End stats loop
+
+        if( nf < 1):
+            return ""
+
+        # Update commit-level metrics
+        ns = len(subsystemsSeen)
+        nd = len(directoriesSeen)
+        ndev = len(authors)
+        lt = lt / nf
+        age = age / nf
+        exp = exp / nf
+        rexp = rexp / nf
+
+        # Update entrophy
+        for fileLocMod in locModifiedPerFile:
+            if (fileLocMod != 0 ):
+                avg = fileLocMod/totalLOCModified
+                entrophy -= ( avg * math.log( avg,2 ) )
+
+        # Add stat properties to the commit object
+        statProperties += ',"la":"' + str( la ) + '\"'
+        statProperties += ',"ld":"' + str( ld ) + '\"'
+        statProperties += ',"fileschanged":"' + filesSeen[0:-1] + '\"'
+        statProperties += ',"nf":"' + str( nf ) + '\"'
+        statProperties += ',"ns":"' + str( ns ) + '\"'
+        statProperties += ',"nd":"' + str( nd ) + '\"'
+        statProperties += ',"entrophy":"' + str(  entrophy ) + '\"'
+        statProperties += ',"ndev":"' + str( ndev ) + '\"'
+        statProperties += ',"lt":"' + str( lt ) + '\"'
+        statProperties += ',"nuc":"' + str( nuc ) + '\"'
+        statProperties += ',"age":"' + str( age ) + '\"'
+        statProperties += ',"exp":"' + str( exp ) + '\"'
+        statProperties += ',"rexp":"' + str( rexp ) + '\"'
+        statProperties += ',"sexp":"' + str( sexp ) + '\"'
+
+        return statProperties
+    # End stats
+
     def log(self, repo, firstSync):
         """
         log(): Repository, Boolean -> Dictionary                                                                                                                                              
@@ -80,8 +253,7 @@ class Git():
 
         commitList = log.split("CAS_READER_STARTPRETTY") 
         for commit in commitList:
-            
-            # vars required for stats
+
             author = ""                                 # author of commit
             unixTimeStamp = 0                           # timestamp of commit
             fix = False                                 # whether or not the change is a defect fix
@@ -96,7 +268,6 @@ class Git():
 
             prettyCommit = splitCommitStat[0]
             statCommit = splitCommitStat[1]
-
             commitObject = ""
 
             # Start with the commit info (i.e., commit hash, author, date, subject, etc)
@@ -127,188 +298,23 @@ class Git():
                 # End property loop
             # End pretty info loop
 
-
-            # Data structures to keep track of info needed for stats
-
-            subsystemsSeen = []                         # List of system names seen
-            directoriesSeen = []                        # List of directory names seen
-            locModifiedPerFile = []                     # List of modified loc in each file seen 
-            authors = []                                # List of all unique authors seen for each file
-            fileAges = []                               # List of the ages for each file in a commit
-
-            # Stats variables 
-
-            la = 0                                      # lines added
-            ld = 0                                      # lines deleted
-            nf = 0                                      # Number of modified files
-            ns = 0                                      # Number of modified subsystems
-            nd = 0                                      # number of modified directories
-            entrophy = 0                                # entrophy: distriubtion of modified code across each file
-            lt = 0                                      # lines of code in each file (sum) before the commit
-            ndev = 0                                    # the number of developers that modifed the files in a commit
-            age = 0                                     # the average time interval between the last and current change
-            nuc = 0                                     # the number of unique changes to the modified files
-            exp = 0                                     # number of changes made by author previously
-            rexp = 0                                    # experience weighted by age of files ( 1 / (n + 1))
-            sexp = 0                                    # changes made previous by author in same subsystem
-
-            totalLOCModified = 0                        # Total modified LOC across all files
-            filesSeen = ""                              # files seen in change/commit
+            # Get the stat properties
             stats = statCommit.split("\\n")
+            commitObject += self.getCommitStatsProperties(stats, commitFiles, devExperience, author, unixTimeStamp)
 
-            for stat in stats:
-
-                # Check that we are only looking at file stat (i.e., remove extra newlines)
-                if( stat == ' ' or stat == '' ):
-                    continue
-
-                # Get stats
-                fileStat = stat.split("\\t")
-
-                # catch the git "-" line changes
-                try:
-                    fileLa = int(fileStat[0])                
-                    fileLd = int(fileStat[1])
-                except:
-                    fileLa = 0
-                    fileLd = 0
-
-
-                fileName = fileStat[2]
-                totalModified = fileLa + fileLd
-
-                if(fileName in commitFiles):
-                    prevFileChanged = commitFiles[fileName]
-                    prevLOC = getattr(prevFileChanged, 'loc')
-                    prevAuthors = getattr(prevFileChanged, 'authors')
-                    prevChanged = getattr(prevFileChanged, 'lastchanged')
-
-                    lt += prevLOC
-
-                    for prevAuthor in prevAuthors:
-                        if prevAuthor not in authors:
-                            authors.append(prevAuthor)
-
-                    if prevChanged not in fileAges:
-                        nuc += 1
-
-                    # Convert age to days instead of seconds
-                    age += ( (int(unixTimeStamp) - int(prevChanged)) / 86400 )    
-                    fileAges.append(prevChanged)
-
-                    # Update the file info
-                    setattr(prevFileChanged, 'loc', prevLOC + fileLa - fileLd) 
-                    setattr(prevFileChanged, 'authors', authors)
-                    setattr(prevFileChanged, 'lastchanged', unixTimeStamp)
-
-                else: 
-
-                    if(author not in authors):
-                        authors.append(author)
-
-                    if(unixTimeStamp not in fileAges):
-                        fileAges.append(unixTimeStamp)
-
-                    fileObject = CommitFile(fileName, fileLa - fileLd, authors, unixTimeStamp)
-                    commitFiles[fileName] = fileObject
-
-
-                # To caclualte entrophy
-                locModifiedPerFile.append(totalModified)
-                totalLOCModified += totalModified
-
-                # Get metrics data structures required
-                fileDirs = fileName.split("/")
-
-                if( len(fileDirs) == 1 ):
-                    subsystem = "root"
-                    directory = "root"
-                 
-                else:
-                    subsystem = fileDirs[0]
-                    directory = "/".join(fileDirs[0:-1])
-
-                if( subsystem not in subsystemsSeen ):
-                    subsystemsSeen.append( subsystem )
-
-                if( author in devExperience ):
-                    experiences = devExperience[author]
-                    exp += sum(experiences.values())
-
-                    if( subsystem in experiences ):
-                        sexp = experiences[subsystem]
-                        experiences[subsystem] += 1
-                    else:
-                        experiences[subsystem] = 1
-
-                    try:
-                        rexp += (1 / (age) + 1)
-                    except:
-                        rexp += 0
-
-                else:
-                    devExperience[author] = {subsystem: 1}
-            
-
-
-                if( directory not in directoriesSeen ):
-                    directoriesSeen.append( directory )
-
-                # Update file-level metrics
-                la += fileLa 
-                ld += fileLd
-                nf += 1
-                filesSeen += fileName + ","
-
-            # End stats loop
-
-            if( nf < 1):
-                continue
-                
-            # Update commit-level metrics
-            ns = len(subsystemsSeen)
-            nd = len(directoriesSeen)
-            ndev = len(authors)
-            lt = lt / nf
-            age = age / nf
-            exp = exp / nf
-            rexp = rexp / nf
-
-            # Update entrophy
-            for fileLocMod in locModifiedPerFile:
-                if (fileLocMod != 0 ):
-                    avg = fileLocMod/totalLOCModified
-                    entrophy -= ( avg * math.log( avg,2 ) )
-
-            # Add stat properties to the commit object
-            commitObject += ',"la":"' + str( la ) + '\"'
-            commitObject += ',"ld":"' + str( ld ) + '\"'
-            commitObject += ',"fileschanged":"' + filesSeen[0:-1] + '\"'
-            commitObject += ',"nf":"' + str( nf ) + '\"'
-            commitObject += ',"ns":"' + str( ns ) + '\"'
-            commitObject += ',"nd":"' + str( nd ) + '\"'
-            commitObject += ',"entrophy":"' + str(  entrophy ) + '\"'
-            commitObject += ',"ndev":"' + str( ndev ) + '\"'
-            commitObject += ',"lt":"' + str( lt ) + '\"'
+             # Update whether commit was a fix or not
             commitObject += ',"fix":"' + str( fix ) + '\"'
-            commitObject += ',"nuc":"' + str( nuc ) + '\"'
-            commitObject += ',"age":"' + str( age ) + '\"'
-            commitObject += ',"exp":"' + str( exp ) + '\"'
-            commitObject += ',"rexp":"' + str( rexp ) + '\"'
-            commitObject += ',"sexp":"' + str( sexp ) + '\"'
 
             # Remove first comma and extra space
             commitObject = commitObject[1:].replace('    ','')                      
 
             # Add commit object to json_list
             json_list.append(json.loads('{' + commitObject + '}'))
-
         # End commit loop
 
         logging.info('Done getting/parsing git commits.')
         return json_list
 
-     
     def clone(self, repo):
         """
         clone(repo): Repository -> String
