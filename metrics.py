@@ -38,8 +38,8 @@ class Metrics(Base):
     nucnonbuggy = Column(Float, unique=False, default=0)
     expbuggy = Column(Float, unique=False, default=0)
     expnonbuggy = Column(Float, unique=False, default=0)
-    rexononbuggy = Column(Float, unique=False, default=0)
-    rexonbuggy = Column(Float, unique=False, default=0)
+    rexpnonbuggy = Column(Float, unique=False, default=0)
+    rexpbuggy = Column(Float, unique=False, default=0)
     sexpbuggy = Column(Float, unique=False, default=0)
     sexpnonbuggy = Column(Float, unique=False, default=0)
     
