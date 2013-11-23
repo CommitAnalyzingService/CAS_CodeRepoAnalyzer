@@ -13,6 +13,7 @@ appropriate credentials and settings to match the environment.
 * Pip for Python Version > 3.3
 * Git > 1.7
 * rpy2
+* R
 
 ###Pip Packages
 Install the following packages by doing `pip install `  and then the package 
