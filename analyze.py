@@ -43,6 +43,7 @@ if len(reposToAnalyze) > 0:
 		corrective_commits = (session.query(Commit)
 					.filter( Commit.repository_id == repo.id )
 					.filter( Commit.fix == "True") 
+					.filter( Commit.repository_id == repo_id)
 					.order_by( Commit.author_date_unix_timestamp.asc())
 					.all()
 					)
