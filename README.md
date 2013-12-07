@@ -13,6 +13,7 @@ appropriate credentials and settings to match the environment.
 * Pip for Python Version > 3.3
 * Git > 1.7
 * rpy2
+* R
 
 ###Pip Packages
 Install the following packages by doing `pip install `  and then the package 
@@ -23,8 +24,8 @@ name
 * rpy2
 
 ###First-Time Database Setup
-Set up the database for the first time by running the script like normal 
-(see *Usage* below), but with
+Set up the database for the first time by running the scan.py included in the CAS_Reader
+repo like normal (see *Usage* below), but with
 `[option]` parameter set to `initDb`
 
 ##Usage
