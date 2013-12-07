@@ -112,6 +112,7 @@ class MetricsGenerator:
 		Helper function for the method calculateMedians.
 		Takes in a metric and returns a string property of the results
 		"""
+		median_props = ""
 
 		try:
 			# R functions to be used
@@ -120,8 +121,6 @@ class MetricsGenerator:
 
 			metric_buggy = getattr(self, metric + "_buggy")
 			metric_nonbuggy = getattr(self, metric + "_nonbuggy")
-
-			median_props = ""
 
 			# First check p-values, if signficant then calculate median
 			pvalue = self.wilcoxFn(robjects.FloatVector(metric_buggy), robjects.FloatVector(metric_nonbuggy))[2][0]
@@ -136,7 +135,7 @@ class MetricsGenerator:
 
 		except:
 			print("Skipping metric: " + metric + 
-				"Please make sure you have run the latest CAS_Reader")
+				". Please make sure you have run the latest CAS_Reader")
 
 		return median_props
 
