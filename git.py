@@ -86,11 +86,14 @@ class Git():
 
         for stat in stats:
 
-            # Check that we are only looking at file stat (i.e., remove extra newlines)
             if( stat == ' ' or stat == '' ):
                 continue
 
             fileStat = stat.split("\\t")
+
+             # Check that we are only looking at file stat (i.e., remove extra newlines)
+            if( len(fileStat) < 2):
+                continue
 
             # catch the git "-" line changes
             try:
@@ -100,8 +103,9 @@ class Git():
                 fileLa = 0
                 fileLd = 0
 
+            # Remove oddities in filename so we can process it
+            fileName = (fileStat[2].replace("'",'').replace('"','').replace("\\",""))
 
-            fileName = fileStat[2]
             totalModified = fileLa + fileLd
 
             if(fileName in commitFiles):
@@ -253,7 +257,6 @@ class Git():
 
         commitList = log.split("CAS_READER_STARTPRETTY") 
         for commit in commitList:
-
             author = ""                                 # author of commit
             unixTimeStamp = 0                           # timestamp of commit
             fix = False                                 # whether or not the change is a defect fix
