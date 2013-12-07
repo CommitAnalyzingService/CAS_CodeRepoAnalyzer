@@ -113,25 +113,30 @@ class MetricsGenerator:
 		Takes in a metric and returns a string property of the results
 		"""
 
-		# R functions to be used
-		medianFn = robjects.r['median']
-		wilcoxFn = robjects.r['wilcox.test']
+		try:
+			# R functions to be used
+			medianFn = robjects.r['median']
+			wilcoxFn = robjects.r['wilcox.test']
 
-		metric_buggy = getattr(self, metric + "_buggy")
-		metric_nonbuggy = getattr(self, metric + "_nonbuggy")
+			metric_buggy = getattr(self, metric + "_buggy")
+			metric_nonbuggy = getattr(self, metric + "_nonbuggy")
 
-		median_props = ""
+			median_props = ""
 
-		# First check p-values, if signficant then calculate median
-		pvalue = self.wilcoxFn(robjects.FloatVector(metric_buggy), robjects.FloatVector(metric_nonbuggy))[2][0]
-		if pvalue >= self.psig:
-			buggy_median = self.medianFn(robjects.FloatVector(metric_buggy))
-			nonbuggy_median = self.medianFn(robjects.FloatVector(metric_nonbuggy))
-			median_props += '"' + metric + 'buggy":"' + str(buggy_median[0]) + '", '
-			median_props += '"' + metric + 'nonbuggy":"' + str(nonbuggy_median[0]) + '", '
-		else:
-			median_props += '"' + metric + 'buggy":"-1", '
-			median_props += '"' + metric + 'nonbuggy":"-1", '
+			# First check p-values, if signficant then calculate median
+			pvalue = self.wilcoxFn(robjects.FloatVector(metric_buggy), robjects.FloatVector(metric_nonbuggy))[2][0]
+			if pvalue >= self.psig:
+				buggy_median = self.medianFn(robjects.FloatVector(metric_buggy))
+				nonbuggy_median = self.medianFn(robjects.FloatVector(metric_nonbuggy))
+				median_props += '"' + metric + 'buggy":"' + str(buggy_median[0]) + '", '
+				median_props += '"' + metric + 'nonbuggy":"' + str(nonbuggy_median[0]) + '", '
+			else:
+				median_props += '"' + metric + 'buggy":"-1", '
+				median_props += '"' + metric + 'nonbuggy":"-1", '
+
+		except:
+			print("Skipping metric: " + metric + 
+				"Please make sure you have run the latest CAS_Reader")
 
 		return median_props
 
