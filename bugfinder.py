@@ -5,6 +5,7 @@ date: November 2013
 description: Identifies buggy commits
 """
 
+import re
 from commit import *
 
 class BugFinder: 
@@ -13,7 +14,7 @@ class BugFinder:
 	description: Finds commits that are buggy
 	"""
 
-	def __init__(self, allCommits, correctiveCommits):
+	def __init__(self, allCommits, correctiveCommits, issueTracker):
 		"""
 		Constructor
 
@@ -22,18 +23,56 @@ class BugFinder:
 		"""
 		self.allCommits = allCommits
 		self.correctiveCommits = correctiveCommits
+		self.issueTracker = issueTracker
+
+	def findIssueOpened(self, correctiveCommit):
+		"""
+		findIssueIds()
+		If the commit links to a issue in the issue tracker, returns
+		the date of oldest open issue found otherwise returns none
+		"""
+		issue_opened = None
+
+		if(self.issueTracker is None or hasattr(self.issueTracker, "getDateOpened") == False):
+			return None
+
+		idMatch = re.compile('#[\d]+')
+		issue_ids = idMatch.findall(correctiveCommit.commit_message)
+		issue_ids = [issue_id.strip('#') for issue_id in issue_ids] # Remove the '#' from ids
+
+		if len(issue_ids) > 0:
+			issue_opened = self.issueTracker.getDateOpened(issue_ids[0])
+			# Use the oldest open bug
+			for issue_id in issue_ids:
+				curr_issue_opened = self.issueTracker.getDateOpened(issue_id)
+
+				# Verify that an issue was found.
+				if curr_issue_opened is not None:
+					if int(curr_issue_opened) < int(issue_opened):
+						issue_opened = curr_issue_opened
+
+		return issue_opened
 
 	def searchForBuggyCommit(self, correctiveCommit):
 		"""
 		Finds the buggy commit based on the bug fixing commit 
-		Helper method for markBuggyCommits.
+		Helper method for markBuggyCommits. If commti links to an 
+		issue tracker, we check files changed prior to this date. 
+		Otherwise, me only check date prior to the fix.
 
 		@param correctiveCommits: the bug fixing commit
 		"""
+		bug_introduced_prior = correctiveCommit.author_date_unix_timestamp
+		issue_opened = self.findIssueOpened(correctiveCommit) 
+
+		if issue_opened is not None:
+			bug_introduced_prior = issue_opened
+
 		correctiveFiles = correctiveCommit.fileschanged.split(",")
+
 		for commit in self.allCommits:
 
-			if commit.author_date_unix_timestamp < correctiveCommit.author_date_unix_timestamp:
+			if int(commit.author_date_unix_timestamp) < int(bug_introduced_prior):
 				commitFiles = commit.fileschanged.split(",")
 
 				for commitFile in commitFiles:
@@ -55,6 +94,7 @@ class BugFinder:
 			if buggyCommit is not -1:
 				buggyCommit.contains_bug = True
 			#else: 
-				# We should probably log it..
+				#print("Cound not find the bug inducing commit for: " + 
+					#	correctiveCommit.commit_message)
 		
 			

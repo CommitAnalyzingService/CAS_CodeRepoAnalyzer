@@ -33,15 +33,15 @@ class GithubIssueTracker:
 		Gets the date the issue number was opened in unix time
 		If issue cannot be found, returns null.
 		"""
+		date = None
 
 		try:
 			r = requests.get(self.request_url + "/" + self.owner + "/" + 
 				self.repo + "/issues/" + issueNumber)
-			data = r.json()
-			date = dateutil.parser.parse(data.get('created_at')).timestamp()
 
+			data = r.json()
+			date = (dateutil.parser.parse(data.get('created_at'))).timestamp()
 		except:
-			date = None
+			pass
 
 		return date
-

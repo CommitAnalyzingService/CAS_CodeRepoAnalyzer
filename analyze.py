@@ -13,6 +13,7 @@ from repository import *
 from commit import *
 from bugfinder import *
 from metricsgenerator import *
+from githubissuetracker import *
 
 # Latest time to analyze repo (1 Day)
 refresh_date = str(datetime.utcnow() - timedelta(days=1))
@@ -48,8 +49,19 @@ if len(reposToAnalyze) > 0:
 					.all()
 					)
 
+		# Issue Tracker 
+
+		# If using github, for now we just assume use of github issue tracker
+		if("github" in repo.url):
+			github_info = repo.url.split("https://github.com/")[1].split("/")
+			owner = github_info[0]
+			repo = github_info[1][0:-4] # Remove the .git
+			issue_tracker = GithubIssueTracker(owner,repo)
+		else:
+			issue_tracker = None
+
 		# Find and mark the buggy commits
-		bug_finder = BugFinder(all_commits, corrective_commits)
+		bug_finder = BugFinder(all_commits, corrective_commits, issue_tracker)
 		bug_finder.markBuggyCommits()
 
 		# Generate the metrics
