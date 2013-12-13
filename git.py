@@ -38,8 +38,8 @@ class Git():
     \\"commit_message\\"CAS_READER_PROP_DELIMITER: \\"%s%b\\"\
     CAS_READER_STOPPRETTY \" --numstat --reverse '
     
-    CLONE_CMD = 'git clone --bare {!s} {!s}'     # git clone command w/o downloading src code
-    PULL_CMD = 'git fetch origin master'         # git pull command 
+    CLONE_CMD = 'git clone -q --mirror {!s} {!s}'     # git clone command w/o downloading src code
+    FETCH_CMD = 'git fetch -q origin master:master'         # git fetch command 
     REPO_DIRECTORY = "/CASRepos/git/"            # directory in which to store repositories
 
     correctiveWords = ['fix','bug']   #TODO: we should read this from a flat file to allow easy modification
@@ -241,7 +241,7 @@ class Git():
         
         log = str( subprocess.check_output(cmd + self.LOG_FORMAT, shell=True ) )
         log = log[2:-1]   # Remove head/end clutter
-
+        
         # List of json objects
         json_list = []
         
@@ -354,8 +354,8 @@ class Git():
         os.chdir(os.path.dirname(__file__) + self.REPO_DIRECTORY + repo.id)
         # Run the pull command and return the results
         logging.info('Git fetching repo: '+ str(repo) )
-        pullResult = str(subprocess.check_output( 
-                  self.PULL_CMD,
+        fetchResult = str(subprocess.check_output( 
+                  self.FETCH_CMD,
                   shell=True ) )
         logging.info('Done fetching.')
         #logging.debug("Git pull result:\n" + cloneResult)
