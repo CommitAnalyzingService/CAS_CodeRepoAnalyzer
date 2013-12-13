@@ -49,9 +49,9 @@ class LocalRepository():
         """
         path = os.path.dirname(__file__) + self.adapter.REPO_DIRECTORY + self.repo.id
         self.repo.ingestion_date = str(datetime.now().replace(microsecond=0))
-        # See if repo has already been downloaded, if it is pull, if not clone
+        # See if repo has already been downloaded, if it is fetch, if not clone
         if os.path.isdir(path):
-            self.adapter.pull(self.adapter, self.repo)
+            self.adapter.fetch(self.adapter, self.repo)
             firstSync = False
         else:
             self.adapter.clone(self.adapter, self.repo)

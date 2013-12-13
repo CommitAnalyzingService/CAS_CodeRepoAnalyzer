@@ -38,9 +38,9 @@ class Git():
     \\"commit_message\\"CAS_READER_PROP_DELIMITER: \\"%s%b\\"\
     CAS_READER_STOPPRETTY \" --numstat --reverse '
     
-    CLONE_CMD = 'git clone --no-checkout {!s} {!s}'     # git clone command w/o downloading src code
-    PULL_CMD = 'git pull origin master'                 # git pull command 
-    REPO_DIRECTORY = "/CASRepos/git/"                   # directory in which to store repositories
+    CLONE_CMD = 'git clone --bare {!s} {!s}'     # git clone command w/o downloading src code
+    PULL_CMD = 'git fetch origin master'         # git pull command 
+    REPO_DIRECTORY = "/CASRepos/git/"            # directory in which to store repositories
 
     correctiveWords = ['fix','bug']   #TODO: we should read this from a flat file to allow easy modification
     
@@ -342,9 +342,9 @@ class Git():
         # TODO: only return true on success, else return false
         return True
 
-    def pull(self, repo):
+    def fetch(self, repo):
         """
-        pull(repo): Repository -> String
+        fetch(repo): Repository -> String
         description:Takes the current repo and pulls it into the
             `clone_directory/the_repo_id`
         arguments: repo Repository: the repository to pull
@@ -353,11 +353,11 @@ class Git():
         # Go to the repo directory
         os.chdir(os.path.dirname(__file__) + self.REPO_DIRECTORY + repo.id)
         # Run the pull command and return the results
-        logging.info('Git pulling repo: '+ str(repo) )
+        logging.info('Git fetching repo: '+ str(repo) )
         pullResult = str(subprocess.check_output( 
                   self.PULL_CMD,
                   shell=True ) )
-        logging.info('Done pulling.')
+        logging.info('Done fetching.')
         #logging.debug("Git pull result:\n" + cloneResult)
 
         # TODO: only return true on success, else return false
