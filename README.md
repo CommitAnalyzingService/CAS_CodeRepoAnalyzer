@@ -14,6 +14,8 @@ appropriate credentials and settings to match the environment.
 * Git > 1.7
 * rpy2
 * R
+* requests
+* dateutil 
 
 ###Pip Packages
 Install the following packages by doing `pip install `  and then the package 
@@ -22,6 +24,8 @@ name
 * SQL Alchemy (sqlalchemy)
 * Py-PostgreSQL (py-postgresql)
 * rpy2
+* requests
+* dateutil
 
 ###First-Time Database Setup
 Set up the database for the first time by running the scan.py included in the CAS_Reader
