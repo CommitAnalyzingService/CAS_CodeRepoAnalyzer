@@ -14,6 +14,9 @@ from commit import *
 from bugfinder import *
 from metricsgenerator import *
 from githubissuetracker import *
+from caslogging import logging
+
+logging.info('Starting CASAnalyzer')
 
 # Latest time to analyze repo (1 Day)
 refresh_date = str(datetime.utcnow() - timedelta(days=1))
@@ -30,6 +33,8 @@ if len(reposToAnalyze) > 0:
 	for repo in reposToAnalyze:
 		repo_name = repo.name
 		repo_id = repo.id
+
+		logging.info('Analyzing ' + repo_name)
 
 		repo.analysis_date = str(datetime.now().replace(microsecond=0))
 
@@ -65,11 +70,14 @@ if len(reposToAnalyze) > 0:
 		bug_finder.markBuggyCommits()
 
 		# Generate the metrics
+		logging.info('Generating metrics... ' + repo_name)
 		metrics_generator = MetricsGenerator(repo_name, all_commits)
 		metrics_generator.generateMetrics()
 
 		# Update database of commits that were buggy & analysis date
 		session.commit() 
+else:
+	logging.info('Nothing to do. Done')
 
 
 

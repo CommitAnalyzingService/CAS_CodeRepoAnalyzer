@@ -9,6 +9,7 @@ for getting the dates issues were opened.
 """
 
 import requests, json, dateutil.parser, time
+from caslogging import logging
 
 class GithubIssueTracker:
 	"""
@@ -45,10 +46,12 @@ class GithubIssueTracker:
 
 		if r.status_code >= 400:
 			msg = data.get('message')
-			print("Failed to authenticate issue tracker: \n" +msg)
+			logging.error("Failed to authenticate issue tracker: \n" +msg)
 			return # Exit
 		else:
 			self.auth_token = data.get("token")
+			requests_left = r.headers.get('x-ratelimit-remaining')
+			logging.info("Analyzer has " + requests_left + " issue tracker calls left this hour")
 
 
 	def getDateOpened(self, issueNumber):
@@ -80,12 +83,12 @@ class GithubIssueTracker:
 		# Check for other error codes
 		elif r.status_code >= 400:
 			msg = data.get('message')
-			print("ISSUE TRACKER FAILURE: \n" + msg)
+			logging.error("ISSUE TRACKER FAILURE: \n" + msg)
 			return None
 		else:
 			try:
 				date = (dateutil.parser.parse(data.get('created_at'))).timestamp()
 				return date
 			except:
-				print("ISSUE TRACKER FAILURE: Could not get created_at from github issues API")
+				logging.error("ISSUE TRACKER FAILURE: Could not get created_at from github issues API")
 				return None
