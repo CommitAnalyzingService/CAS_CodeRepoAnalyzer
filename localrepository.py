@@ -14,8 +14,9 @@ class LocalRepository():
     Repository():
     description: Abstracts the actions done on a repository
     """
-    repo = None                     
-    adapter = None                  
+    repo = None
+    adapter = None
+    start_date = None
     def __init__(self, repo):
         """
         __init__(path): String -> NoneType
@@ -37,8 +38,9 @@ class LocalRepository():
         # TODO: Error checking.
         firstSync = self.syncRepoFiles()
         self.syncCommits(firstSync)
-
-        return self.repo
+        
+        # Set the date AFTER it has been ingested and synced.
+        self.repo.ingestion_date = self.start_date
     
     def syncRepoFiles(self):
         """
@@ -47,15 +49,18 @@ class LocalRepository():
             injestion date accordingly
         returns: Boolean - if this is the first sync
         """
+        # Cache the start date to set later
+        self.start_date = str(datetime.now().replace(microsecond=0))
+        
         path = os.path.dirname(__file__) + self.adapter.REPO_DIRECTORY + self.repo.id
-        self.repo.ingestion_date = str(datetime.now().replace(microsecond=0))
-        # See if repo has already been downloaded, if it is pull, if not clone
+        # See if repo has already been downloaded, if it is fetch, if not clone
         if os.path.isdir(path):
-            self.adapter.pull(self.adapter, self.repo)
+            self.adapter.fetch(self.adapter, self.repo)
             firstSync = False
         else:
             self.adapter.clone(self.adapter, self.repo)
             firstSync = True
+        
         return firstSync
 
     def syncCommits(self, firstSync):
