@@ -44,6 +44,7 @@ class BugFinder:
 			issue_opened = self.issueTracker.getDateOpened(issue_ids[0])
 			# Use the oldest open bug
 			for issue_id in issue_ids:
+				logging.info('Searching for issue id: ' + issue_id)
 				curr_issue_opened = self.issueTracker.getDateOpened(issue_id)
 
 				# Verify that an issue was found.

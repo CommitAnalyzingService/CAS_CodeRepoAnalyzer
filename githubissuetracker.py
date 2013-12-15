@@ -42,6 +42,17 @@ class GithubIssueTracker:
 		s.auth = ("cas-user", "riskykiwi1")
 		payload = {"scopes": ["repo"]}
 		r = s.get(self.request_auth, params=payload)
+
+		if r.headers.get('x-ratelimit-remaining') == '0':
+			logging.info("Github quota limit hit -- waiting")
+
+			# Wait up to a hour until we can continue..
+			while r.headers.get('x-ratelimit-remaining') == '0':
+				time.sleep(600) # Wait 10 minutes and try again
+				r = requests.get(self.request_repos + "/" + self.owner + "/" + 
+					self.repo + "/issues/" + issueNumber, headers=header)
+				data = r.json()
+
 		data = r.json()[0]
 
 		if r.status_code >= 400:
@@ -70,11 +81,11 @@ class GithubIssueTracker:
 		if r.status_code == 403:
 
 			# Check the api quota 
-			if r.headers.get('x-ratelimit-remaining') == 0:
-				print("STATUS: github quota limit hit -- waiting")
+			if r.headers.get('x-ratelimit-remaining') == '0':
+				logging.info("Github quota limit hit -- waiting")
 
 				# Wait up to a hour until we can continue..
-				while r.headers.get('x-ratelimit-remaining') == 0:
+				while r.headers.get('x-ratelimit-remaining') == '0':
 					time.sleep(600) # Wait 10 minutes and try again
 					r = requests.get(self.request_repos + "/" + self.owner + "/" + 
 						self.repo + "/issues/" + issueNumber, headers=header)
