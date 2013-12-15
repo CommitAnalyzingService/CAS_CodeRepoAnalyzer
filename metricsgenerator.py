@@ -59,8 +59,8 @@ class MetricsGenerator:
 		self.medianFn = robjects.r['median']
 		self.wilcoxFn = robjects.r['wilcox.test']
 
-		# A p-value less than this is highly unlikely and thus these metrics will be thrown out
-		self.psig = 0.1
+		# A p-value
+		self.psig = 0.0
 
 	def generateMetrics(self):
 		"""

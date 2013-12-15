@@ -7,6 +7,7 @@ description: Identifies buggy commits
 
 import re
 from commit import *
+from caslogging import logging
 
 class BugFinder: 
 	"""
@@ -69,12 +70,12 @@ class BugFinder:
 		if issue_opened is not None:
 			bug_introduced_prior = issue_opened
 
-		correctiveFiles = correctiveCommit.fileschanged.split(",")
+		correctiveFiles = correctiveCommit.fileschanged.split(",CAS_DELIMITER,")
 
 		for commit in self.allCommits:
 
 			if int(commit.author_date_unix_timestamp) < int(bug_introduced_prior):
-				commitFiles = commit.fileschanged.split(",")
+				commitFiles = commit.fileschanged.split(",CAS_DELIMITER,")
 
 				for commitFile in commitFiles:
 					# This introudced the bug!

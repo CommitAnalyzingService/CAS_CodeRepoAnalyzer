@@ -49,8 +49,7 @@ class GithubIssueTracker:
 			# Wait up to a hour until we can continue..
 			while r.headers.get('x-ratelimit-remaining') == '0':
 				time.sleep(600) # Wait 10 minutes and try again
-				r = requests.get(self.request_repos + "/" + self.owner + "/" + 
-					self.repo + "/issues/" + issueNumber, headers=header)
+				r = s.get(self.request_auth, params=payload)
 				data = r.json()
 
 		data = r.json()[0]
