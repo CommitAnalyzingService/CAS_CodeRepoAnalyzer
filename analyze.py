@@ -15,6 +15,7 @@ from bugfinder import *
 from metricsgenerator import *
 from githubissuetracker import *
 from caslogging import logging
+from notifier import *
 
 logging.info('Starting CASAnalyzer')
 
