@@ -29,10 +29,16 @@ reposToAnalyze = (session.query(Repository)
                   .all()
                   )
 
+# CHANGE WITH YOUR OWN VALUES
+notifier = Notifier("GMAIL USER", "GMAIL PASSWORD")
+
 if len(reposToAnalyze) > 0:
 	for repo in reposToAnalyze:
 		repo_name = repo.name
 		repo_id = repo.id
+
+		# Add if applicable subscriber
+		notifier.addSubscribers(['cbr4830@rit.edu'])
 
 		logging.info('Analyzing ' + repo_name)
 
@@ -76,6 +82,9 @@ if len(reposToAnalyze) > 0:
 
 		# Update database of commits that were buggy & analysis date
 		session.commit() 
+
+		# Notify any subscribers of repo that it has been analyzed 
+		notifier.notify()
 else:
 	logging.info('Nothing to do. Done')
 
