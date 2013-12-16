@@ -16,6 +16,7 @@ from metricsgenerator import *
 from githubissuetracker import *
 from caslogging import logging
 from notifier import *
+from config import config
 
 logging.info('Starting CASAnalyzer')
 
@@ -30,8 +31,10 @@ reposToAnalyze = (session.query(Repository)
                   .all()
                   )
 
-# CHANGE WITH YOUR OWN VALUES
-notifier = Notifier("GMAIL USER", "GMAIL PASSWORD")
+# Create the Notifier
+gmail_user = config['gmail']['user']
+gmail_pass = config['gmail']['pass']
+notifier = Notifier(gmail_user, gmail_pass)
 
 if len(reposToAnalyze) > 0:
 	for repo in reposToAnalyze:

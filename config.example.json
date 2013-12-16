@@ -10,5 +10,9 @@
 	},
 	"logging": {
 		"filename": "CASReader.log"
+	},
+	"gmail": {
+	"user": "USERNAME@gmail.com",
+	"pass": "PASSWORD"
 	}
 }
