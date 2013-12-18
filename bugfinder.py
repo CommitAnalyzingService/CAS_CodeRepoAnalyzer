@@ -8,7 +8,6 @@ description: Identifies buggy commits
 import re
 from commit import *
 from caslogging import logging
-from notifier import *
 
 class BugFinder: 
 	"""

@@ -42,10 +42,13 @@ if len(reposToAnalyze) > 0:
 		repo_id = repo.id
 
 		# Add if applicable subscriber
-		notifier.addSubscribers(['cbr4830@rit.edu'])
+		if repo.email is not None:
+			notifier.addSubscribers([repo.email, 'cbr4830@rit.edu'])
+		else:
+			notifier.addSubscribers(['cbr4830@rit.edu'])
+
 
 		logging.info('Analyzing ' + repo_name)
-
 		repo.analysis_date = str(datetime.now().replace(microsecond=0))
 
 		# all commits in descending order
