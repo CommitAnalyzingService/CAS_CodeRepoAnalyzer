@@ -25,7 +25,7 @@ name
 * Py-PostgreSQL (py-postgresql)
 * rpy2
 * requests
-* dateutil
+* python-dateutil
 
 ###First-Time Database Setup
 Set up the database for the first time by running the scan.py included in the CAS_Reader
