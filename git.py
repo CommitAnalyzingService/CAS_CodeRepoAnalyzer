@@ -181,7 +181,7 @@ class Git():
             la += fileLa 
             ld += fileLd
             nf += 1
-            filesSeen += fileName + ","
+            filesSeen += fileName + ",CAS_DELIMITER,"
 
         # End stats loop
 

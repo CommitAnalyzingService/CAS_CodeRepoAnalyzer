@@ -22,7 +22,7 @@ class Metrics(Base):
     ndnonbuggy = Column(Float, unique=False, default=0)
     nfbuggy = Column(Float, unique=False, default=0)
     nfnonbuggy = Column(Float, unique=False, default=0)
-    entrophy = Column(Float, unique=False, default=0)
+    entrophybuggy = Column(Float, unique=False, default=0)
     entrophynonbuggy = Column(Float, unique=False, default=0)
     labuggy = Column(Float, unique=False, default=0)
     lanonbuggy = Column(Float, unique=False, default=0)
