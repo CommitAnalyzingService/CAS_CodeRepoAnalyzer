@@ -48,11 +48,11 @@ class MetricsGenerator:
 
 
 
-	def __init__(self, repo_name, commits):
+	def __init__(self, repo_id, commits):
 		"""
 		Constructor
 		"""
-		self.repo_name = repo_name
+		self.repo_id = repo_id
 		self.commits = commits
 
 		# R functions to be used
@@ -146,8 +146,8 @@ class MetricsGenerator:
 		the metrics table. Otherwise inserts a -1.
 		"""
 
-		# Metric objects repreents the metrics as a dictionary
-		metricObject = '"repo":"' + self.repo_name + '", '
+		# Metric objects represents the metrics as a dictionary
+		metricObject = '"repo":"' + self.repo_id + '", '
 
 		metricObject += self.getMedian("ns")
 		metricObject += self.getMedian("nd")

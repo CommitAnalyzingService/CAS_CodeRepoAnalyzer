@@ -48,7 +48,7 @@ if len(reposToAnalyze) > 0:
 			notifier.addSubscribers(['cbr4830@rit.edu'])
 
 
-		logging.info('Analyzing ' + repo_name)
+		logging.info('Analyzing repository id ' + repo_id)
 		repo.analysis_date = str(datetime.now().replace(microsecond=0))
 
 		# all commits in descending order
@@ -60,7 +60,6 @@ if len(reposToAnalyze) > 0:
 
 		# corrective commits in ascending order
 		corrective_commits = (session.query(Commit)
-					.filter( Commit.repository_id == repo.id )
 					.filter( Commit.fix == "True") 
 					.filter( Commit.repository_id == repo_id)
 					.order_by( Commit.author_date_unix_timestamp.asc())
@@ -83,8 +82,8 @@ if len(reposToAnalyze) > 0:
 		bug_finder.markBuggyCommits()
 
 		# Generate the metrics
-		logging.info('Generating metrics... ' + repo_name)
-		metrics_generator = MetricsGenerator(repo_name, all_commits)
+		logging.info('Generating metrics for repository id ' + repo_id)
+		metrics_generator = MetricsGenerator(repo_id, all_commits)
 		metrics_generator.generateMetrics()
 
 		# Update database of commits that were buggy & analysis date
