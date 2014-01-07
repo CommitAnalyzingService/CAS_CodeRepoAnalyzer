@@ -21,18 +21,17 @@ appropriate credentials and settings to match the environment.
 ###Installing rpy2
 * Assumes you are working on Ubuntu 12.04
 
-Getting rpy2 to work can be a bit tricky. First, make sure you install R:
-1. Get the repository SSL key and import it to apt by doing 
+Getting rpy2 to work can be a bit tricky. First, make sure R is installed. To do this, first
+get the repository SSL key and import it to apt by doing 
 
   ```
   gpg --keyserver keyserver.ubuntu.com --recv-key E084DAB9 
   gpg -a --export E084DAB9 | sudo apt-key add -
   ```
      
-2. Edit the list of sources `gksudo gedit /etc/apt/sources.list`. 
-   Then, add the following repo at the bottom:`deb http://cran.ma.imperial.ac.uk/bin/linux/ubuntu precise/`
+Then, Edit the list of sources `gksudo gedit /etc/apt/sources.list` and add the following repo at the bottom:`deb http://cran.ma.imperial.ac.uk/bin/linux/ubuntu precise/`
 
-3. Install R 
+Finally, we can install R by running the following commands:
 
   ```
   sudo apt-get update 
