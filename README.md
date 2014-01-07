@@ -30,11 +30,7 @@ Getting rpy2 to work can be a bit tricky. First, make sure you install R:
   ```
      
 2. Edit the list of sources `gksudo gedit /etc/apt/sources.list`. 
-   Then, add the following repo at the bottom:
-
-  `
-  deb http://cran.ma.imperial.ac.uk/bin/linux/ubuntu precise/
-  `
+   Then, add the following repo at the bottom:`deb http://cran.ma.imperial.ac.uk/bin/linux/ubuntu precise/`
 
 3. Install R `sudo apt-get update \n sudo apt-get install r-base`
 
