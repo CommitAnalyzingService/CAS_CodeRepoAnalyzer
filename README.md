@@ -49,12 +49,24 @@ virtualenv --no-site-packages --distribute -p /usr/bin/python3.3 ~/.virtualenvs/
 ```
 
 By default, typically we don't have the python-dev available for python3 on Ubuntu after setting up a new
-virtual environment for it and so have to install it as it's a dependency for rpy2. We do this by simply 
-running `sudo apt-get install python3.3-dev`
+virtual environment for it and so have to install it as it's a dependency for rpy2. Install this with apt-get: 
 
-Now we are finally ready to set up our virtual environment!
-Simply do `virtualenv -p /usr/bin/python3.3 /path/to/new/virtual/environment`
-To activate the virtual env, just enter: `source /path/to/new/virtual/environemnt/bin/activate`
+```
+sudo apt-get install python3.3-dev
+```
+
+Now, we are finally ready to set up our virtual environment:
+
+```
+virtualenv -p /usr/bin/python3.3 /path/to/new/virtual/environment
+```
+
+To activate the virtual env:
+
+```
+source /path/to/new/virtual/environemnt/bin/activate
+```
+
 Type `deactiviate` to exit the virtual env
 
 
