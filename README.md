@@ -23,14 +23,20 @@ appropriate credentials and settings to match the environment.
 
 Getting rpy2 to work can be a bit tricky. First, make sure you install R:
 1. Get the repository SSL key and import it to apt by doing 
-  ```gpg --keyserver keyserver.ubuntu.com --recv-key E084DAB9 
-     gpg -a --export E084DAB9 | sudo apt-key add -```
-2. Edit the list of sources 
-  `gksudo gedit /etc/apt/sources.list`
-   then add the following repo at the bottom:
-  `deb http://cran.ma.imperial.ac.uk/bin/linux/ubuntu precise/`
-3. Install R
-  `sudo apt-get update \n sudo apt-get install r-base`
+
+  ```
+  gpg --keyserver keyserver.ubuntu.com --recv-key E084DAB9 
+  gpg -a --export E084DAB9 | sudo apt-key add -
+  ```
+     
+2. Edit the list of sources `gksudo gedit /etc/apt/sources.list`. 
+   Then, add the following repo at the bottom:
+
+  `
+  deb http://cran.ma.imperial.ac.uk/bin/linux/ubuntu precise/
+  `
+
+3. Install R `sudo apt-get update \n sudo apt-get install r-base`
 
 By default, typically we don't have the python-dev available for python3 on Ubuntu and so have to
 install it as it's a dependency for rpy2. We do this by simply running `sudo apt-get install python3-dev`
