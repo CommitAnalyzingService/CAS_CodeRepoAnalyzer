@@ -32,8 +32,13 @@ sudo apt-get install python3.3
 
 Version 1.7.1.2 of virtual env that comes with Ubuntu 12.04 is not compatibale with python3.3. 
 Therefore, we must installa new version so that we can setup a working virutal environment. First,
-you must uninstall python-virtualenv by doing `sudo apt-get remove python-virtualenv`. 
-Then, install the latest easy_install:
+you must uninstall the current python-virtualenv: 
+
+```
+sudo apt-get remove python-virtualenv
+```
+
+Next, install the latest easy_install:
 
 ```
 wget http://peak.telecommunity.com/dist/ez_setup.py
@@ -90,8 +95,11 @@ Finally, we can install R by running the following commands:
   sudo apt-get install r-base
   ```
   
-Now we are ready to install rpy2. Make sure python version 3 or greater is in use, such as using
-a virtualenv and run `pip install rpy2`
+Now we are ready to install rpy2. Make sure python version 3 or greater is in use (3.2 is not compatibale, however), such as by using a virtualenv and run 
+
+```
+pip install rpy2
+```
 
 ###Additional Pip Packages
 Install the following packages by doing `pip install `  and then the package 
@@ -99,8 +107,8 @@ name. Make sure you are using python3, such as using a virtualenv if using Ubunt
 
 * SQL Alchemy (sqlalchemy)
 * Py-PostgreSQL (py-postgresql)
-* requests
-* python-dateutil
+* requests (requests) 
+* python-dateutil (python-dateutil)
 
 ###First-Time Database Setup
 Set up the database for the first time by running the scan.py included in the CAS_Reader
@@ -108,5 +116,5 @@ repo like normal (see *Usage* below), but with
 `[option]` parameter set to `initDb`
 
 ##Usage
-In a terminal, type `python analyze.py ' to start analyzing
+In a terminal, type `python analyze.py ' to start the analyzer.
 
