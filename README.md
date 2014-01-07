@@ -18,8 +18,48 @@ appropriate credentials and settings to match the environment.
 * requests
 * dateutil 
 
-###Installing rpy2
+###Setting up python3.3 virtual env on Ubuntu
 * Assumes you are working on Ubuntu 12.04
+
+Install python3.3 using the deadsnakes PPA:
+
+```
+sudo apt-get install python-software-properties
+sudo add-apt-repository ppa:fkrull/deadsnakes
+sudo apt-get update
+sudo apt-get install python3.3
+```
+
+Version 1.7.1.2 of virtual env that comes with Ubuntu 12.04 is not compatibale with python3.3. 
+Therefore, we must installa new version so that we can setup a working virutal environment. First,
+you must uninstall python-virtualenv by doing `sudo apt-get remove python-virtualenv`. 
+Then, install the latest easy_install:
+
+```
+wget http://peak.telecommunity.com/dist/ez_setup.py
+sudo python ez_setup.py
+```
+
+Next, install pip and the virtualenv:
+
+```
+sudo easy_install pip
+sudo pip install virtualenv
+virtualenv --no-site-packages --distribute -p /usr/bin/python3.3 ~/.virtualenvs/pywork3
+```
+
+By default, typically we don't have the python-dev available for python3 on Ubuntu after setting up a new
+virtual environment for it and so have to install it as it's a dependency for rpy2. We do this by simply 
+running `sudo apt-get install python3.3-dev`
+
+Now we are finally ready to set up our virtual environment!
+Simply do `virtualenv -p /usr/bin/python3.3 /path/to/new/virtual/environment`
+To activate the virtual env, just enter: `source /path/to/new/virtual/environemnt/bin/activate`
+Type `deactiviate` to exit the virtual env
+
+
+###Installing rpy2
+* Assumes you are working on Ubuntu 12.04 and python 3.3
 
 Getting rpy2 to work can be a bit tricky. First, make sure R is installed. To do this, first
 get the repository SSL key and import it to apt by doing 
@@ -37,9 +77,6 @@ Finally, we can install R by running the following commands:
   sudo apt-get update 
   sudo apt-get install r-base
   ```
-
-By default, typically we don't have the python-dev available for python3 on Ubuntu and so have to
-install it as it's a dependency for rpy2. We do this by simply running `sudo apt-get install python3-dev`
   
 Now we are ready to install rpy2. Make sure python version 3 or greater is in use, such as using
 a virtualenv and run `pip install rpy2`
