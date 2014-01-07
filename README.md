@@ -32,7 +32,12 @@ Getting rpy2 to work can be a bit tricky. First, make sure you install R:
 2. Edit the list of sources `gksudo gedit /etc/apt/sources.list`. 
    Then, add the following repo at the bottom:`deb http://cran.ma.imperial.ac.uk/bin/linux/ubuntu precise/`
 
-3. Install R `sudo apt-get update \n sudo apt-get install r-base`
+3. Install R 
+
+  ```
+  sudo apt-get update 
+  sudo apt-get install r-base
+  ```
 
 By default, typically we don't have the python-dev available for python3 on Ubuntu and so have to
 install it as it's a dependency for rpy2. We do this by simply running `sudo apt-get install python3-dev`
