@@ -22,6 +22,7 @@ class Repository(Base):
     creation_date = Column(String)
     ingestion_date = Column(String)
     analysis_date = Column(String)
+    status = Column(String)
     email = Column(String)
     
     def __init__(self, repoDict):
