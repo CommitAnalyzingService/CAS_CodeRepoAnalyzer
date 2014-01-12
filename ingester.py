@@ -47,10 +47,6 @@ class Ingester(threading.Thread):
     repository_to_ingest.status = "Ingesting"
     self.session.commit()
 
-    # get update frequency from the config file
-    repo_update_freq = int(config['repoUpdates']['freqInDays'])
-    refresh_date = str(datetime.utcnow() - timedelta(days=repo_update_freq))
-
     local_repo = LocalRepository(repository_to_ingest)
     local_repo.sync()
     self.session.merge(repository_to_ingest) 
