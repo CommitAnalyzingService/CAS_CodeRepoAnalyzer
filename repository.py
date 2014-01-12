@@ -18,11 +18,11 @@ class Repository(Base):
     id = Column(String, primary_key=True)
     name = Column(String)
     url = Column(String)
-    
     creation_date = Column(String)
     ingestion_date = Column(String)
     analysis_date = Column(String)
     email = Column(String)
+    status = Column(String)
     
     def __init__(self, repoDict):
         """
