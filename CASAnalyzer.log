@@ -1,0 +1,22 @@
+2014-01-12 18:28:07,497 INFO: Analyzing repository id 2
+2014-01-12 18:28:07,728 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-12 18:28:08,467 INFO: Analyzer has 4999 issue tracker calls left this hour
+2014-01-12 18:28:08,471 INFO: Generating metrics for repository id 2
+2014-01-12 18:28:10,752 INFO: Notification sent successfully
+2014-01-12 18:55:27,175 INFO: Analyzing repository id 2
+2014-01-12 18:55:27,397 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-12 18:55:28,137 INFO: Analyzer has 4998 issue tracker calls left this hour
+2014-01-12 18:55:28,140 INFO: Generating metrics for repository id 2
+2014-01-12 18:55:31,317 INFO: Notification sent successfully
+2014-01-12 19:16:23,764 INFO: A worker is starting scan repository: 2
+2014-01-12 19:16:23,771 INFO: Git fetching repo: <Repository: analyzer - 2>
+2014-01-12 19:16:24,264 INFO: Done fetching.
+2014-01-12 19:16:24,265 INFO: Getting/parsing git commits: <Repository: analyzer - 2>
+2014-01-12 19:16:24,271 INFO: Saving commits to the database...
+2014-01-12 19:16:24,272 INFO: Done saving commits to the database.
+2014-01-12 19:16:24,280 INFO: A worker finished ingesting repo 2
+2014-01-12 19:16:24,292 INFO: Analyzing repository id 2
+2014-01-12 19:16:24,388 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-12 19:16:25,147 INFO: Analyzer has 4997 issue tracker calls left this hour
+2014-01-12 19:16:25,150 INFO: Generating metrics for repository id 2
+2014-01-12 19:16:27,672 INFO: Notification sent successfully

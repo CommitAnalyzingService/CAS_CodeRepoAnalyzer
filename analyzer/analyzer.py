@@ -8,13 +8,13 @@ description: This module contains the Analyzer thread class. Used to create thre
 import sys
 import threading
 from datetime import datetime, timedelta
-from repository import *
-from commit import *
-from bugfinder import *
-from metricsgenerator import *
-from githubissuetracker import *
+from orm.repository import *
+from orm.commit import *
+from analyzer.bugfinder import *
+from analyzer.metricsgenerator import *
+from analyzer.githubissuetracker import *
 from caslogging import logging
-from notifier import *
+from analyzer.notifier import *
 from config import config
 
 class Analyzer(threading.Thread):

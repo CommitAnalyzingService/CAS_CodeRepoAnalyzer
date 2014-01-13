@@ -35,7 +35,7 @@ class GithubIssueTracker:
 		"""
 		authenticate()
 		Authenticates this application to github using
-		the cas-user git user credentials. This is temporary!
+		the cas-user git user credentials. This is hopefully temporary!
 		"""
 
 		s = requests.Session()

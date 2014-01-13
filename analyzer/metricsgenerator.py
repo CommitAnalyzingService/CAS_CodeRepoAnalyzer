@@ -8,7 +8,7 @@ non-buggy and buggy commits and outputs them into the metrics table
 
 import rpy2.robjects as robjects
 from db import *
-from metrics import *
+from orm.metrics import *
 import json
 
 class MetricsGenerator:

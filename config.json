@@ -1,0 +1,18 @@
+{
+	"db": {
+		"type":"postgresql",
+		"adapter":"pypostgresql",
+		"username": "toffer",
+		"password": "",
+		"host": "localhost",
+		"port": "5432",
+		"database": "cas"
+	},
+	"logging": {
+		"filename": "CASAnalyzer.log"
+	},
+	"gmail": {
+		"user": "cas.notifier@gmail.com",
+		"pass": "riskyfruit"
+	}
+}

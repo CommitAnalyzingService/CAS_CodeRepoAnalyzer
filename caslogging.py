@@ -2,7 +2,7 @@
 file: caslogging.py
 author: Ben Grawi <bjg1568@rit.edu>
 date: October 2013
-description: Sets up the logging information
+description: Sets up the logging information for the CAS Reader
 """
 from config import config
 import logging as root_logging

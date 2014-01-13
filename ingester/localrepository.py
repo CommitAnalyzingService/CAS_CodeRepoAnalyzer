@@ -4,11 +4,12 @@ author: Ben Grawi <bjg1568@rit.edu>
 date: October 2013
 description: Holds the repository abstraction class
 """
-from git import *
-from commit import *
+from ingester.git import *
+from orm.commit import *
 from datetime import datetime
 import os
 import logging
+
 class LocalRepository():
     """
     Repository():

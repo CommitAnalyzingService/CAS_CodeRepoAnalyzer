@@ -3,9 +3,8 @@ import subprocess
 import json
 import logging
 import math                              # Required for the math.log function
-from commitFile import *                 # Represents a file
+from ingester.commitFile import *                 # Represents a file
 import time
-
 
 """
 file: repository.py

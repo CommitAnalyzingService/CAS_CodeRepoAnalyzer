@@ -9,10 +9,10 @@ from caslogging import logging
 import sys
 import threading
 from datetime import datetime, timedelta
-from commit import Commit
-from repository import *
-from metrics import *
-from localrepository import *
+from orm.commit import *
+from orm.repository import *
+from orm.metrics import *
+from ingester.localrepository import *
 
 class Ingester(threading.Thread):
   """

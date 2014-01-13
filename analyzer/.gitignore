@@ -38,4 +38,6 @@ nosetests.xml
 # CAS Analyzer
 !.gitkeep
 CASAnalyzer.log
+
 config.json
+.DS_Store
