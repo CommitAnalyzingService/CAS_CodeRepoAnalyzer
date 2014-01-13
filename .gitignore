@@ -36,8 +36,14 @@ nosetests.xml
 .pydevproject
 
 # CAS Analyzer
-!.gitkeep
-CASAnalyzer.log
+analyzer/CASAnalyzer.log
+
+# CAS Reader
+/CASRepos/git/*
+ingester/CASReader.log
 
 config.json
 .DS_Store
+!.gitkeep
+
+
