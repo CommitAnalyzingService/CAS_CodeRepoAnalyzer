@@ -39,7 +39,7 @@ nosetests.xml
 analyzer/CASAnalyzer.log
 
 # CAS Reader
-/CASRepos/git/*
+ingester/CASRepos/git/*
 ingester/CASReader.log
 
 config.json
