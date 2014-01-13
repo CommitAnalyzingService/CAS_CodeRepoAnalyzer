@@ -12,7 +12,13 @@
 		"filename": "CASReader.log"
 	},
 	"gmail": {
-	"user": "USERNAME@gmail.com",
-	"pass": "PASSWORD"
+		"user": "USERNAME@gmail.com",
+		"pass": "PASSWORD"
+	},
+	"repoUpdates": {
+		"freqInDays": "FREQUENCY IN DAYS"
+	},
+	"system": {
+		"workers": "NUMBER OF WORKER THREADS"
 	}
 }

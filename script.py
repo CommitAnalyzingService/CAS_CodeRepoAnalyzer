@@ -1,14 +1,22 @@
-from analyzer.analyzer import *
-from ingester.ingester import *
+"""
+file: script.py
+author: Christoffer Rosen <cbr4830@rit.edu>, Ben Grawi <bjg1568@rit.edu>
+date: Jan. 2014
+description: base script to call. 
+"""
+from cas_manager import *
 
-#import Queue
+if len(sys.argv) > 1:
+	arg = sys.argv[1]
+else:
+	arg = ''
 
-thread2 = Ingester(sys.argv)
-thread2.start()
-thread2.join()
+if arg == "initDb":
+    # Init the database
+    logging.info('Initializing the Database...')
+    Base.metadata.create_all(engine)
+    logging.info('Done')
 
-thread1 = Analyzer(sys.argv)
-thread1.start()
-thread1.join()
-
-print("Fin!")
+else:
+	cas_manager = CAS_Manager()
+	cas_manager.start()

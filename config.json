@@ -14,5 +14,11 @@
 	"gmail": {
 		"user": "cas.notifier@gmail.com",
 		"pass": "riskyfruit"
+	},
+	"repoUpdates": {
+		"freqInDays": 7
+	},
+	"system": {
+		"workers": 3
 	}
 }
