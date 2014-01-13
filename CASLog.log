@@ -1,0 +1,645 @@
+2014-01-13 00:00:41,393 INFO: Adding repo 2 to work queue for ingesting
+2014-01-13 00:00:41,409 INFO: A worker is starting scan repository: 2
+2014-01-13 00:00:41,423 INFO: Git fetching repo: <Repository: analyzer - 2>
+2014-01-13 00:01:26,453 INFO: Adding repo 2 to work queue for ingesting
+2014-01-13 00:01:26,471 INFO: A worker is starting scan repository: 2
+2014-01-13 00:01:26,484 INFO: Git cloning repo: <Repository: analyzer - 2>
+2014-01-13 00:01:27,475 INFO: Done cloning.
+2014-01-13 00:01:27,477 INFO: Getting/parsing git commits: <Repository: analyzer - 2>
+2014-01-13 00:01:27,493 INFO: Done getting/parsing git commits.
+2014-01-13 00:01:27,494 INFO: Saving commits to the database...
+2014-01-13 00:01:27,622 INFO: Done saving commits to the database.
+2014-01-13 00:01:27,628 INFO: A worker finished ingesting repo 2
+2014-01-13 00:01:31,463 INFO: Adding repo 2 to work queue for analyzing.
+2014-01-13 00:01:31,465 INFO: Worker analyzing repository id 2
+2014-01-13 00:01:31,540 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:01:32,174 INFO: Analyzer has 4999 issue tracker calls left this hour
+2014-01-13 00:01:32,177 INFO: Generating metrics for repository id 2
+2014-01-13 00:01:34,526 INFO: Notification sent successfully
+2014-01-13 00:01:34,529 INFO: A worker finished analyzing repo 2
+2014-01-13 00:01:41,472 INFO: Adding repo 3 to work queue for ingesting
+2014-01-13 00:01:41,476 INFO: A worker is starting scan repository: 3
+2014-01-13 00:01:41,488 INFO: Git cloning repo: <Repository: leaflet - 3>
+2014-01-13 00:02:01,548 INFO: Done cloning.
+2014-01-13 00:02:01,548 INFO: Getting/parsing git commits: <Repository: leaflet - 3>
+2014-01-13 00:02:02,800 INFO: Done getting/parsing git commits.
+2014-01-13 00:02:02,802 INFO: Saving commits to the database...
+2014-01-13 00:02:14,377 INFO: Done saving commits to the database.
+2014-01-13 00:02:14,390 INFO: A worker finished ingesting repo 3
+2014-01-13 00:02:16,519 INFO: Adding repo 3 to work queue for analyzing.
+2014-01-13 00:02:16,521 INFO: Worker analyzing repository id 3
+2014-01-13 00:02:17,242 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:17,458 INFO: Analyzer has 4998 issue tracker calls left this hour
+2014-01-13 00:02:17,707 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:17,928 INFO: Searching for issue id: 10
+2014-01-13 00:02:17,930 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:18,248 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:18,527 INFO: Searching for issue id: 30
+2014-01-13 00:02:18,530 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:18,788 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:19,028 INFO: Searching for issue id: 31
+2014-01-13 00:02:19,030 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:19,295 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:19,529 INFO: Searching for issue id: 32
+2014-01-13 00:02:19,532 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:19,796 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:20,046 INFO: Searching for issue id: 24
+2014-01-13 00:02:20,049 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:20,317 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:20,557 INFO: Searching for issue id: 37
+2014-01-13 00:02:20,559 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:20,807 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:21,019 INFO: Searching for issue id: 36
+2014-01-13 00:02:21,021 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:21,322 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:21,556 INFO: Searching for issue id: 43
+2014-01-13 00:02:21,558 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:21,800 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:22,014 INFO: Searching for issue id: 42
+2014-01-13 00:02:22,016 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:22,291 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:22,530 INFO: Searching for issue id: 39
+2014-01-13 00:02:22,531 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:22,758 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:22,994 INFO: Searching for issue id: 40
+2014-01-13 00:02:22,996 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:23,251 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:23,525 INFO: Searching for issue id: 41
+2014-01-13 00:02:23,528 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:23,809 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:24,029 INFO: Searching for issue id: 47
+2014-01-13 00:02:24,031 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:24,335 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:24,583 INFO: Searching for issue id: 61
+2014-01-13 00:02:24,585 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:24,855 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:25,090 INFO: Searching for issue id: 44
+2014-01-13 00:02:25,092 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:25,355 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:25,602 INFO: Searching for issue id: 5
+2014-01-13 00:02:25,604 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:25,941 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:26,219 INFO: Searching for issue id: 22
+2014-01-13 00:02:26,221 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:26,573 INFO: Searching for issue id: 23
+2014-01-13 00:02:26,575 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:27,951 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:28,573 INFO: Searching for issue id: 8
+2014-01-13 00:02:28,575 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:28,821 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:29,039 INFO: Searching for issue id: 48
+2014-01-13 00:02:29,042 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:29,299 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:29,560 INFO: Searching for issue id: 32
+2014-01-13 00:02:29,562 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:29,809 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:30,064 INFO: Searching for issue id: 66
+2014-01-13 00:02:30,066 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:30,349 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:30,582 INFO: Searching for issue id: 71
+2014-01-13 00:02:30,584 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:30,809 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:31,038 INFO: Searching for issue id: 61
+2014-01-13 00:02:31,039 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:31,286 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:31,558 INFO: Searching for issue id: 21
+2014-01-13 00:02:31,560 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:31,826 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:32,106 INFO: Searching for issue id: 74
+2014-01-13 00:02:32,108 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:32,366 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:32,606 INFO: Searching for issue id: 76
+2014-01-13 00:02:32,608 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:32,863 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:33,092 INFO: Searching for issue id: 83
+2014-01-13 00:02:33,094 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:33,424 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:33,652 INFO: Searching for issue id: 86
+2014-01-13 00:02:33,654 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:33,918 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:34,161 INFO: Searching for issue id: 84
+2014-01-13 00:02:34,163 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:34,431 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:34,670 INFO: Searching for issue id: 89
+2014-01-13 00:02:34,672 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:34,916 INFO: Searching for issue id: 84
+2014-01-13 00:02:34,918 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:35,172 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:35,385 INFO: Searching for issue id: 87
+2014-01-13 00:02:35,387 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:35,658 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:35,895 INFO: Searching for issue id: 87
+2014-01-13 00:02:35,898 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:36,133 INFO: Searching for issue id: 91
+2014-01-13 00:02:36,135 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:36,472 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:36,723 INFO: Searching for issue id: 90
+2014-01-13 00:02:36,725 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:36,960 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:37,188 INFO: Searching for issue id: 92
+2014-01-13 00:02:37,190 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:37,482 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:37,726 INFO: Searching for issue id: 97
+2014-01-13 00:02:37,728 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:38,034 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:38,248 INFO: Searching for issue id: 100
+2014-01-13 00:02:38,250 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:38,461 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:38,753 INFO: Searching for issue id: 97
+2014-01-13 00:02:38,755 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:39,025 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:39,251 INFO: Searching for issue id: 94
+2014-01-13 00:02:39,253 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:39,518 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:39,762 INFO: Searching for issue id: 99
+2014-01-13 00:02:39,764 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:40,020 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:40,229 INFO: Searching for issue id: 9
+2014-01-13 00:02:40,231 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:40,458 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:40,702 INFO: Searching for issue id: 102
+2014-01-13 00:02:40,704 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:40,936 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:41,176 INFO: Searching for issue id: 105
+2014-01-13 00:02:41,178 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:41,454 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:41,827 INFO: Searching for issue id: 107
+2014-01-13 00:02:41,830 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:42,250 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:42,617 INFO: Searching for issue id: 114
+2014-01-13 00:02:42,619 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:42,849 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:43,198 INFO: Searching for issue id: 115
+2014-01-13 00:02:43,200 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:43,449 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:43,674 INFO: Searching for issue id: 117
+2014-01-13 00:02:43,676 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:43,924 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:44,179 INFO: Searching for issue id: 113
+2014-01-13 00:02:44,181 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:44,407 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:44,656 INFO: Searching for issue id: 122
+2014-01-13 00:02:44,658 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:44,885 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:45,245 INFO: Searching for issue id: 124
+2014-01-13 00:02:45,247 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:45,492 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:45,695 INFO: Searching for issue id: 84
+2014-01-13 00:02:45,697 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:45,961 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:46,239 INFO: Searching for issue id: 121
+2014-01-13 00:02:46,241 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:46,490 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:46,754 INFO: Searching for issue id: 138
+2014-01-13 00:02:46,756 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:47,069 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:47,284 INFO: Searching for issue id: 156
+2014-01-13 00:02:47,286 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:47,542 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:47,773 INFO: Searching for issue id: 152
+2014-01-13 00:02:47,775 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:48,923 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:49,605 INFO: Searching for issue id: 137
+2014-01-13 00:02:49,607 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:49,933 INFO: Searching for issue id: 160
+2014-01-13 00:02:49,935 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:50,213 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:50,501 INFO: Searching for issue id: 178
+2014-01-13 00:02:50,503 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:50,749 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:50,981 INFO: Searching for issue id: 179
+2014-01-13 00:02:50,983 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:51,293 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:51,571 INFO: Searching for issue id: 180
+2014-01-13 00:02:51,573 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:51,844 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:52,088 INFO: Searching for issue id: 196
+2014-01-13 00:02:52,090 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:52,335 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:52,588 INFO: Searching for issue id: 195
+2014-01-13 00:02:52,590 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:52,879 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:53,178 INFO: Searching for issue id: 200
+2014-01-13 00:02:53,180 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:53,475 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:53,730 INFO: Searching for issue id: 172
+2014-01-13 00:02:53,732 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:54,033 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:54,280 INFO: Searching for issue id: 207
+2014-01-13 00:02:54,282 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:54,505 INFO: Searching for issue id: 172
+2014-01-13 00:02:54,507 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:54,722 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:54,963 INFO: Searching for issue id: 206
+2014-01-13 00:02:54,965 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:55,206 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:55,465 INFO: Searching for issue id: 218
+2014-01-13 00:02:56,299 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:56,538 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:56,766 INFO: Searching for issue id: 214
+2014-01-13 00:02:56,768 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:57,023 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:57,253 INFO: Searching for issue id: 220
+2014-01-13 00:02:57,255 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:57,489 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:57,710 INFO: Searching for issue id: 221
+2014-01-13 00:02:57,712 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:57,976 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:58,236 INFO: Searching for issue id: 234
+2014-01-13 00:02:58,238 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:58,476 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:58,708 INFO: Searching for issue id: 236
+2014-01-13 00:02:58,710 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:58,950 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:59,194 INFO: Searching for issue id: 237
+2014-01-13 00:02:59,196 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:59,461 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:59,663 INFO: Searching for issue id: 235
+2014-01-13 00:02:59,665 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:02:59,928 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:00,133 INFO: Searching for issue id: 233
+2014-01-13 00:03:00,135 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:00,397 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:00,663 INFO: Searching for issue id: 240
+2014-01-13 00:03:00,665 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:00,928 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:01,147 INFO: Searching for issue id: 242
+2014-01-13 00:03:01,149 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:01,372 INFO: Searching for issue id: 241
+2014-01-13 00:03:01,375 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:01,678 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:01,952 INFO: Searching for issue id: 222
+2014-01-13 00:03:01,955 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:02,194 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:02,475 INFO: Searching for issue id: 279
+2014-01-13 00:03:02,477 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:02,853 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:03,115 INFO: Searching for issue id: 278
+2014-01-13 00:03:03,117 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:03,381 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:03,665 INFO: Searching for issue id: 204
+2014-01-13 00:03:03,667 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:03,966 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:04,225 INFO: Searching for issue id: 273
+2014-01-13 00:03:04,227 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:04,487 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:04,745 INFO: Searching for issue id: 292
+2014-01-13 00:03:04,748 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:05,065 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:05,295 INFO: Searching for issue id: 290
+2014-01-13 00:03:05,299 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:05,588 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:05,805 INFO: Searching for issue id: 300
+2014-01-13 00:03:05,807 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:06,091 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:06,430 INFO: Searching for issue id: 302
+2014-01-13 00:03:06,433 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:06,742 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:07,079 INFO: Searching for issue id: 64
+2014-01-13 00:03:07,081 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:07,307 INFO: Searching for issue id: 166
+2014-01-13 00:03:07,309 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:07,536 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:07,744 INFO: Searching for issue id: 273
+2014-01-13 00:03:07,747 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:08,019 INFO: Searching for issue id: 293
+2014-01-13 00:03:08,022 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:08,260 INFO: Searching for issue id: 294
+2014-01-13 00:03:08,262 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:08,504 INFO: Searching for issue id: 288
+2014-01-13 00:03:08,506 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:08,808 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:09,074 INFO: Searching for issue id: 306
+2014-01-13 00:03:09,076 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:09,407 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:09,657 INFO: Searching for issue id: 305
+2014-01-13 00:03:09,659 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:09,888 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:10,145 INFO: Searching for issue id: 231
+2014-01-13 00:03:10,147 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:10,389 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:10,633 INFO: Searching for issue id: 304
+2014-01-13 00:03:10,635 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:10,893 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:11,141 INFO: Searching for issue id: 307
+2014-01-13 00:03:11,143 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:11,426 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:11,710 INFO: Searching for issue id: 308
+2014-01-13 00:03:11,712 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:11,946 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:12,244 INFO: Searching for issue id: 312
+2014-01-13 00:03:12,246 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:12,478 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:12,690 INFO: Searching for issue id: 311
+2014-01-13 00:03:12,692 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:12,960 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:13,249 INFO: Searching for issue id: 339
+2014-01-13 00:03:13,251 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:13,493 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:13,758 INFO: Searching for issue id: 322
+2014-01-13 00:03:13,760 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:14,081 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:14,327 INFO: Searching for issue id: 259
+2014-01-13 00:03:14,329 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:14,713 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:15,036 INFO: Searching for issue id: 381
+2014-01-13 00:03:15,038 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:15,402 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:15,675 INFO: Searching for issue id: 391
+2014-01-13 00:03:15,677 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:16,028 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:16,273 INFO: Searching for issue id: 377
+2014-01-13 00:03:16,275 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:16,586 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:16,802 INFO: Searching for issue id: 354
+2014-01-13 00:03:16,803 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:17,039 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:17,301 INFO: Searching for issue id: 296
+2014-01-13 00:03:17,303 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:17,551 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:17,826 INFO: Searching for issue id: 295
+2014-01-13 00:03:17,828 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:18,076 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:18,378 INFO: Searching for issue id: 403
+2014-01-13 00:03:18,380 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:18,621 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:18,854 INFO: Searching for issue id: 373
+2014-01-13 00:03:18,856 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:19,084 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:19,349 INFO: Searching for issue id: 373
+2014-01-13 00:03:19,351 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:19,594 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:19,806 INFO: Searching for issue id: 452
+2014-01-13 00:03:19,808 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:20,027 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:20,280 INFO: Searching for issue id: 203
+2014-01-13 00:03:20,283 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:20,562 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:20,796 INFO: Searching for issue id: 416
+2014-01-13 00:03:20,798 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:21,052 INFO: Searching for issue id: 407
+2014-01-13 00:03:21,054 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:21,330 INFO: Searching for issue id: 182
+2014-01-13 00:03:21,333 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:21,556 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:21,808 INFO: Searching for issue id: 405
+2014-01-13 00:03:21,810 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:22,032 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:22,276 INFO: Searching for issue id: 69
+2014-01-13 00:03:22,278 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:22,558 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:22,806 INFO: Searching for issue id: 488
+2014-01-13 00:03:22,808 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:23,054 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:23,283 INFO: Searching for issue id: 488
+2014-01-13 00:03:23,285 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:23,526 INFO: Searching for issue id: 488
+2014-01-13 00:03:23,527 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:23,814 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:24,073 INFO: Searching for issue id: 434
+2014-01-13 00:03:24,076 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:24,318 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:24,554 INFO: Searching for issue id: 441
+2014-01-13 00:03:24,557 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:24,815 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:25,121 INFO: Searching for issue id: 494
+2014-01-13 00:03:25,124 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:25,430 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:25,665 INFO: Searching for issue id: 423
+2014-01-13 00:03:25,667 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:25,911 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:26,156 INFO: Searching for issue id: 485
+2014-01-13 00:03:26,159 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:26,436 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:26,681 INFO: Searching for issue id: 508
+2014-01-13 00:03:26,683 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:26,917 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:27,179 INFO: Searching for issue id: 335
+2014-01-13 00:03:27,182 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:27,451 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:27,710 INFO: Searching for issue id: 524
+2014-01-13 00:03:27,712 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:28,007 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:28,270 INFO: Searching for issue id: 525
+2014-01-13 00:03:28,273 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:29,337 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:29,583 INFO: Searching for issue id: 530
+2014-01-13 00:03:29,585 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:29,843 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:30,072 INFO: Searching for issue id: 526
+2014-01-13 00:03:30,075 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:30,398 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:30,664 INFO: Searching for issue id: 538
+2014-01-13 00:03:30,666 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:30,951 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:31,195 INFO: Searching for issue id: 539
+2014-01-13 00:03:31,198 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:31,495 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:31,714 INFO: Searching for issue id: 549
+2014-01-13 00:03:31,716 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:31,977 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:32,205 INFO: Searching for issue id: 552
+2014-01-13 00:03:32,207 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:32,499 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:32,769 INFO: Searching for issue id: 574
+2014-01-13 00:03:32,771 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:33,072 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:33,303 INFO: Searching for issue id: 588
+2014-01-13 00:03:33,305 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:33,592 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:33,851 INFO: Searching for issue id: 589
+2014-01-13 00:03:33,853 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:34,105 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:34,321 INFO: Searching for issue id: 621
+2014-01-13 00:03:34,323 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:34,560 INFO: Searching for issue id: 617
+2014-01-13 00:03:34,563 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:34,817 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:35,040 INFO: Searching for issue id: 653
+2014-01-13 00:03:35,042 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:35,282 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:35,550 INFO: Searching for issue id: 667
+2014-01-13 00:03:35,552 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:35,787 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:36,037 INFO: Searching for issue id: 669
+2014-01-13 00:03:36,039 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:36,276 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:36,515 INFO: Searching for issue id: 671
+2014-01-13 00:03:36,518 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:36,741 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:36,993 INFO: Searching for issue id: 678
+2014-01-13 00:03:36,995 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:37,256 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:37,494 INFO: Searching for issue id: 685
+2014-01-13 00:03:37,496 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:37,749 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:37,968 INFO: Searching for issue id: 652
+2014-01-13 00:03:37,970 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:38,263 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:38,474 INFO: Searching for issue id: 700
+2014-01-13 00:03:38,477 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:38,834 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:39,052 INFO: Searching for issue id: 729
+2014-01-13 00:03:39,054 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:39,285 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:39,523 INFO: Searching for issue id: 701
+2014-01-13 00:03:39,525 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:39,757 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:39,998 INFO: Searching for issue id: 739
+2014-01-13 00:03:40,001 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:40,277 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:40,512 INFO: Searching for issue id: 751
+2014-01-13 00:03:40,515 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:40,800 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:41,063 INFO: Searching for issue id: 750
+2014-01-13 00:03:41,066 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:41,315 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:41,564 INFO: Searching for issue id: 742
+2014-01-13 00:03:41,567 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:41,867 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:42,104 INFO: Searching for issue id: 757
+2014-01-13 00:03:42,107 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:42,365 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:42,596 INFO: Searching for issue id: 641
+2014-01-13 00:03:42,598 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:42,817 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:43,158 INFO: Searching for issue id: 764
+2014-01-13 00:03:43,161 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:44,384 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:44,622 INFO: Searching for issue id: 775
+2014-01-13 00:03:44,624 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:44,914 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:45,163 INFO: Searching for issue id: 777
+2014-01-13 00:03:45,166 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:45,396 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:45,649 INFO: Searching for issue id: 759
+2014-01-13 00:03:45,652 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:45,935 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:46,223 INFO: Searching for issue id: 795
+2014-01-13 00:03:46,225 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:46,466 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:46,746 INFO: Searching for issue id: 796
+2014-01-13 00:03:46,748 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:46,986 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:47,277 INFO: Searching for issue id: 797
+2014-01-13 00:03:47,280 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:47,526 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:47,817 INFO: Searching for issue id: 674
+2014-01-13 00:03:47,820 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:48,073 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:48,303 INFO: Searching for issue id: 801
+2014-01-13 00:03:48,306 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:48,543 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:48,798 INFO: Searching for issue id: 789
+2014-01-13 00:03:48,800 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:49,082 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:49,323 INFO: Searching for issue id: 807
+2014-01-13 00:03:49,326 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:49,597 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:49,851 INFO: Searching for issue id: 18
+2014-01-13 00:03:49,853 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:50,171 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:50,487 INFO: Searching for issue id: 808
+2014-01-13 00:03:50,490 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:50,760 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:50,991 INFO: Searching for issue id: 809
+2014-01-13 00:03:50,993 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:51,250 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:51,500 INFO: Searching for issue id: 137
+2014-01-13 00:03:51,502 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:51,751 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:51,968 INFO: Searching for issue id: 813
+2014-01-13 00:03:51,971 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:52,221 INFO: Searching for issue id: 137
+2014-01-13 00:03:52,223 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:52,459 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:52,728 INFO: Searching for issue id: 827
+2014-01-13 00:03:52,730 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:53,010 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:53,224 INFO: Searching for issue id: 814
+2014-01-13 00:03:53,227 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:53,521 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:53,787 INFO: Searching for issue id: 818
+2014-01-13 00:03:53,789 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:54,067 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:54,312 INFO: Searching for issue id: 830
+2014-01-13 00:03:54,315 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:54,559 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:54,786 INFO: Searching for issue id: 335
+2014-01-13 00:03:54,789 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:55,086 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:55,382 INFO: Searching for issue id: 834
+2014-01-13 00:03:55,384 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:55,630 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:55,903 INFO: Searching for issue id: 832
+2014-01-13 00:03:55,905 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:56,197 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:56,466 INFO: Searching for issue id: 575
+2014-01-13 00:03:56,469 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:56,730 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:56,967 INFO: Searching for issue id: 836
+2014-01-13 00:03:56,969 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:57,284 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:57,517 INFO: Searching for issue id: 835
+2014-01-13 00:03:57,520 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:57,797 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:58,017 INFO: Searching for issue id: 840
+2014-01-13 00:03:58,019 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:58,355 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:58,589 INFO: Searching for issue id: 850
+2014-01-13 00:03:58,592 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:58,838 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:59,127 INFO: Searching for issue id: 852
+2014-01-13 00:03:59,129 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:59,401 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:59,627 INFO: Searching for issue id: 856
+2014-01-13 00:03:59,629 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:03:59,898 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:04:00,134 INFO: Searching for issue id: 861
+2014-01-13 00:04:00,137 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:04:00,387 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:04:00,740 INFO: Searching for issue id: 862
+2014-01-13 00:04:00,743 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:04:01,025 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:04:01,270 INFO: Searching for issue id: 861
+2014-01-13 00:04:01,272 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:04:01,590 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:04:01,876 INFO: Searching for issue id: 861
+2014-01-13 00:04:01,878 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:04:02,128 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:04:02,375 INFO: Searching for issue id: 864
+2014-01-13 00:04:02,378 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:04:02,635 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:04:02,876 INFO: Searching for issue id: 868
+2014-01-13 00:04:02,879 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:04:03,151 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:04:03,420 INFO: Searching for issue id: 869
+2014-01-13 00:04:03,423 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:04:03,751 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:04:04,010 INFO: Searching for issue id: 966
+2014-01-13 00:04:04,012 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:04:04,265 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:04:04,479 INFO: Searching for issue id: 961
+2014-01-13 00:04:04,481 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:04:04,769 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:04:05,013 INFO: Searching for issue id: 968
+2014-01-13 00:04:05,015 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:04:05,260 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:04:05,529 INFO: Searching for issue id: 870
+2014-01-13 00:04:06,328 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:04:07,001 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:04:07,322 INFO: Searching for issue id: 1007
+2014-01-13 00:04:07,324 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:04:07,550 INFO: Searching for issue id: 870
+2014-01-13 00:04:07,553 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:04:07,798 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:04:08,030 INFO: Searching for issue id: 916
+2014-01-13 00:04:08,033 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:04:08,273 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:04:08,485 INFO: Searching for issue id: 1011
+2014-01-13 00:04:08,488 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:04:08,726 INFO: Searching for issue id: 916
+2014-01-13 00:04:08,729 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:04:09,059 INFO: Starting new HTTPS connection (1): api.github.com
+2014-01-13 00:04:09,342 INFO: Searching for issue id: 1022
+2014-01-13 00:04:09,344 INFO: Starting new HTTPS connection (1): api.github.com
