@@ -24,6 +24,7 @@ class Repository(Base):
     analysis_date = Column(String)
     status = Column(String)
     email = Column(String)
+    listed = Column(Boolean)
     
     def __init__(self, repoDict):
         """
