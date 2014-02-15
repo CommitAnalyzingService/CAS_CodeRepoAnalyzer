@@ -230,10 +230,10 @@ class Git():
         description: a very basic abstraction for using git in python.
         """
         os.chdir(os.path.dirname(__file__) + self.REPO_DIRECTORY + repo.id)
-        
         logging.info('Getting/parsing git commits: '+ str(repo) )
+
         # Spawn a git process and convert the output to a string
-        if not firstSync:
+        if not firstSync and repo.ingestion_date is not None:
             cmd = 'git log --after="' + repo.ingestion_date + '" '
         else:
             cmd = 'git log '

@@ -37,6 +37,7 @@ nosetests.xml
 
 # CAS Analyzer
 analyzer/CASAnalyzer.log
+CASAnalyzer.log
 
 # CAS Reader
 ingester/CASRepos/git/*

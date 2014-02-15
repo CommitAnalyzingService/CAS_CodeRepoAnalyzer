@@ -12,12 +12,13 @@ from caslogging import logging
 class Notifier:
 
 
-	def __init__(self, gmail_user, gmail_pwd):
+	def __init__(self, gmail_user, gmail_pwd, repo):
 		"""
 		Constructor
 		"""
 		self.gmail_user = gmail_user
 		self.gmail_pwd = gmail_pwd
+		self.repo = repo
 		self.subscribers = []
 
 	def addSubscribers(self, users):
@@ -38,7 +39,7 @@ class Notifier:
 		FROM = "cas.notifier@gmail.com"
 		TO = self.subscribers
 		SUBJECT = "Your repository has been analyzed"
-		TEXT = "Your analyzed repository is now ready to be viewed at http://kiwi.se.rit.edu/"
+		TEXT = "Your analyzed repository is now ready to be viewed at http://kiwi.se.rit.edu/repo/" + self.repo
 
 		# prepare actual message
 		message = """\From: %s\nTo: %s\nSubject: %s\n\n%s""" % (FROM, ", ".join(TO), SUBJECT, TEXT)

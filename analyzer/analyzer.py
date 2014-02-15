@@ -3,6 +3,7 @@ file: Analyzer.py
 author: Christoffer Rosen <cbr4830@rit.edu>
 date: November 2013
 description: This module contains the functions for analyzing a repo with a given id.
+Currently only supports the GitHub Issue Tracker.
 """
 import sys
 from datetime import datetime, timedelta
@@ -22,11 +23,6 @@ def analyze(repo_id):
 	@param repo_id		The repository id to analyze
 	"""
 
-	# Create the Notifier
-	gmail_user = config['gmail']['user']
-	gmail_pass = config['gmail']['pass']
-	notifier = Notifier(gmail_user, gmail_pass)
-
 	session = Session()
 
 	repo_to_analyze = (session.query(Repository)
@@ -36,11 +32,11 @@ def analyze(repo_id):
 
 	# Verify that repo exists
 	if len(repo_to_analyze) > 0:
-		analyzeRepo(repo_to_analyze[0],notifier,session)
+		analyzeRepo(repo_to_analyze[0],session)
 	else:
 		logging.info('Repo with id ' + repo_id_to_analyze + ' not found!')
 
-def analyzeRepo(repository_to_analyze, notifier, session):
+def analyzeRepo(repository_to_analyze, session):
 	"""
 	Analyzes the given repository
 	@param repository_to_analyze	The repository to analyze. 
@@ -48,14 +44,27 @@ def analyzeRepo(repository_to_analyze, notifier, session):
 	@param session                  SQLAlchemy session
 	@private
 	"""
+	notify = False
+	notifier = None
+
+	# Notify user if repo has never been analyzed previously 
+	if repository_to_analyze.analysis_date is None:
+		notify = True
+
+		# Create the Notifier
+		gmail_user = config['gmail']['user']
+		gmail_pass = config['gmail']['pass']
+		notifier = Notifier(gmail_user, gmail_pass, repository_to_analyze.name)
+
+		# Add subscribers if applicable
+		if repository_to_analyze.email is not None:
+			notifier.addSubscribers([repository_to_analyze.email, 'cbr4830@rit.edu'])
+		else:
+			notifier.addSubscribers(['cbr4830@rit.edu'])
+	# End notifier setup
+
 	repo_name = repository_to_analyze.name
 	repo_id = repository_to_analyze.id
-
-	# Add if applicable subscriber
-	if repository_to_analyze.email is not None:
-		notifier.addSubscribers([repository_to_analyze.email, 'cbr4830@rit.edu'])
-	else:
-		notifier.addSubscribers(['cbr4830@rit.edu'])
 
 	logging.info('Worker analyzing repository id ' + repo_id)
 
@@ -97,15 +106,15 @@ def analyzeRepo(repository_to_analyze, notifier, session):
 	logging.info('Generating metrics for repository id ' + repo_id)
 	metrics_generator = MetricsGenerator(repo_id, all_commits)
 	metrics_generator.generateMetrics()
-
 	repository_to_analyze.status = "Analyzed"
 	repository_to_analyze.analysis_date = str(datetime.now().replace(microsecond=0))
 
 	# Update database of commits that were buggy & analysis date & status
 	session.commit() 
 	
-	# Notify any subscribers of repo that it has been analyzed 
-	notifier.notify()
+	# Notify any subscribers of repo that it has been analyzed IF it has not been analyzed previously
+	if notify is True and notifier is not None:
+		notifier.notify()
 
 	logging.info( 'A worker finished analyzing repo ' + 
                   repository_to_analyze.id )
