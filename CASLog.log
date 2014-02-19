@@ -322,3 +322,23 @@
 2014-02-15 15:01:39,608 INFO: Generating metrics for repository id 3
 2014-02-15 15:01:41,799 INFO: Notification sent successfully
 2014-02-15 15:01:41,802 INFO: A worker finished analyzing repo 3
+2014-02-15 15:03:36,048 INFO: Adding repo 4 to work queue for ingesting
+2014-02-15 15:03:36,052 INFO: Adding repo 4 to work queue for analyzing.
+2014-02-15 15:03:36,064 INFO: A worker is starting scan repository: 4
+2014-02-15 15:03:36,073 INFO: Worker analyzing repository id 4
+2014-02-15 15:03:36,076 INFO: Git fetching repo: <Repository: Leaflet.MousePosition - 4>
+2014-02-15 15:03:36,141 INFO: Starting new HTTPS connection (1): api.github.com
+2014-02-15 15:03:36,277 INFO: Done fetching.
+2014-02-15 15:03:36,277 INFO: Getting/parsing git commits: <Repository: Leaflet.MousePosition - 4>
+2014-02-15 15:03:36,286 INFO: Saving commits to the database...
+2014-02-15 15:03:36,287 INFO: Done saving commits to the database.
+2014-02-15 15:03:36,295 INFO: A worker finished ingesting repo 4
+2014-02-15 15:03:36,616 INFO: Analyzer has 4899 issue tracker calls left this hour
+2014-02-15 15:03:36,623 INFO: Starting new HTTPS connection (1): api.github.com
+2014-02-15 15:03:36,728 INFO: Searching for issue id: 4
+2014-02-15 15:03:36,730 INFO: Starting new HTTPS connection (1): api.github.com
+2014-02-15 15:03:36,837 INFO: Starting new HTTPS connection (1): api.github.com
+2014-02-15 15:03:36,945 INFO: Searching for issue id: 5
+2014-02-15 15:03:36,948 INFO: Starting new HTTPS connection (1): api.github.com
+2014-02-15 15:03:37,060 INFO: Generating metrics for repository id 4
+2014-02-15 15:03:37,118 INFO: A worker finished analyzing repo 4

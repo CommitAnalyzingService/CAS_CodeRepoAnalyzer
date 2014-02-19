@@ -40,7 +40,6 @@ analyzer/CASAnalyzer.log
 CASAnalyzer.log
 
 # CAS Reader
-ingester/CASRepos/git/*
 ingester/CASReader.log
 
 config.json
