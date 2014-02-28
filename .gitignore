@@ -43,8 +43,7 @@ CASAnalyzer.log
 ingester/CASReader.log
 ingester/CASRepos/*
 
+CASLog.log
 config.json
 .DS_Store
 !.gitkeep
-
-

@@ -9,7 +9,7 @@
 		"database": "cas"
 	},
 	"logging": {
-		"filename": "CASReader.log"
+		"filename": "CASLog.log"
 	},
 	"gmail": {
 		"user": "USERNAME@gmail.com",

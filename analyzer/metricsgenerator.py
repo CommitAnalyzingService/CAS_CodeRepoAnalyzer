@@ -76,36 +76,42 @@ class MetricsGenerator:
 		dependingon if it contains a bug or not
 		"""
 		for commit in self.commits:
-			
-			if commit.contains_bug == True:
-				self.ns_buggy.append(commit.ns)
-				self.nd_buggy.append(commit.nd)
-				self.nf_buggy.append(commit.nf)
-				self.entrophy_buggy.append(commit.entrophy)
-				self.la_buggy.append(commit.la)
-				self.ld_buggy.append(commit.ld)
-				self.lt_buggy.append(commit.lt)
-				self.ndev_buggy.append(commit.ndev)
-				self.age_buggy.append(commit.age)
-				self.nuc_buggy.append(commit.nuc)
-				self.exp_buggy.append(commit.exp)
-				self.rexp_buggy.append(commit.rexp)
-				self.sexp_buggy.append(commit.sexp)
 
+			# Exclude merge commits where no lines of code where changed
+			if commit.classification == "Merge" and commit.la == 0 and commit.ld == 0:
+				continue
+			
 			else:
-				self.ns_nonbuggy.append(commit.ns)
-				self.nd_nonbuggy.append(commit.nd)
-				self.nf_nonbuggy.append(commit.nf)
-				self.entrophy_nonbuggy.append(commit.entrophy)
-				self.la_nonbuggy.append(commit.la)
-				self.ld_nonbuggy.append(commit.ld)
-				self.lt_nonbuggy.append(commit.lt)
-				self.ndev_nonbuggy.append(commit.ndev)
-				self.age_nonbuggy.append(commit.age)
-				self.nuc_nonbuggy.append(commit.nuc)
-				self.exp_nonbuggy.append(commit.exp)
-				self.rexp_nonbuggy.append(commit.rexp)
-				self.sexp_nonbuggy.append(commit.sexp)
+
+				if commit.contains_bug == True:
+					self.ns_buggy.append(commit.ns)
+					self.nd_buggy.append(commit.nd)
+					self.nf_buggy.append(commit.nf)
+					self.entrophy_buggy.append(commit.entrophy)
+					self.la_buggy.append(commit.la)
+					self.ld_buggy.append(commit.ld)
+					self.lt_buggy.append(commit.lt)
+					self.ndev_buggy.append(commit.ndev)
+					self.age_buggy.append(commit.age)
+					self.nuc_buggy.append(commit.nuc)
+					self.exp_buggy.append(commit.exp)
+					self.rexp_buggy.append(commit.rexp)
+					self.sexp_buggy.append(commit.sexp)
+
+				else:
+					self.ns_nonbuggy.append(commit.ns)
+					self.nd_nonbuggy.append(commit.nd)
+					self.nf_nonbuggy.append(commit.nf)
+					self.entrophy_nonbuggy.append(commit.entrophy)
+					self.la_nonbuggy.append(commit.la)
+					self.ld_nonbuggy.append(commit.ld)
+					self.lt_nonbuggy.append(commit.lt)
+					self.ndev_nonbuggy.append(commit.ndev)
+					self.age_nonbuggy.append(commit.age)
+					self.nuc_nonbuggy.append(commit.nuc)
+					self.exp_nonbuggy.append(commit.exp)
+					self.rexp_nonbuggy.append(commit.rexp)
+					self.sexp_nonbuggy.append(commit.sexp)
 
 	def getMedian(self,metric):
 		"""

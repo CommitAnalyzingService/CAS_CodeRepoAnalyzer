@@ -2,8 +2,9 @@ import os
 import subprocess
 import json
 import logging
-import math                              # Required for the math.log function
-from ingester.commitFile import *                 # Represents a file
+import math   # Required for the math.log function
+from ingester.commitFile import *  # Represents a file
+from classifier.classifier import * # Used for classifying each commit
 import time
 
 """
@@ -40,8 +41,6 @@ class Git():
     CLONE_CMD = 'git clone -q --mirror {!s} {!s}'     # git clone command w/o downloading src code
     FETCH_CMD = 'git fetch -q origin master:master'         # git fetch command 
     REPO_DIRECTORY = "/CASRepos/git/"            # directory in which to store repositories
-
-    correctiveWords = ['fix','bug']   #TODO: we should read this from a flat file to allow easy modification
     
     def getCommitStatsProperties( stats, commitFiles, devExperience, author, unixTimeStamp ):
         """ 
@@ -248,20 +247,19 @@ class Git():
         if len(log) == 0:
             return []
 
-        # keep track of ALL file changes
-        commitFiles = {} 
-
-        # Keep track of ALL developer experience
-        devExperience = {}
+        commitFiles = {}            # keep track of ALL file changes
+        devExperience = {}          # Keep track of ALL developer experience
+        classifier = Classifier()   # classifier for classifying commits (i.e., corrective, feature addition, etc)
 
         commitList = log.split("CAS_READER_STARTPRETTY") 
+
         for commit in commitList:
             author = ""                                 # author of commit
             unixTimeStamp = 0                           # timestamp of commit
             fix = False                                 # whether or not the change is a defect fix
+            classification = None                       # classification of the commit (i.e., corrective, feature addition, etc)
 
             commit = commit.replace('\\x', '\\u00')   # Remove invalid json escape characters
-
             splitCommitStat = commit.split("CAS_READER_STOPPRETTY")  # split the commit info and its stats
 
             # The first split will contain an empty list
@@ -289,12 +287,14 @@ class Git():
                 if(values[0] == '"author_date_unix_timestamp"'):
                     unixTimeStamp = values[1].replace('"','')
 
-                # Check if it is a 'fix' commit
+                # Classify the commit
                 if(values[0] == '"commit_message"'):
-                    for word in self.correctiveWords: 
-                        if word.lower() in values[1].lower():
-                            fix = True
-                            break
+                    classification = classifier.categorize(values[1].lower())
+
+                    # If it is a corrective commit, we induce it fixes a bug somewhere in the system
+                    if classification == "Corrective":
+                        fix = True
+
 
                 commitObject += "," + propStr[0:-1]
                 # End property loop
@@ -303,6 +303,9 @@ class Git():
             # Get the stat properties
             stats = statCommit.split("\\n")
             commitObject += self.getCommitStatsProperties(stats, commitFiles, devExperience, author, unixTimeStamp)
+
+            # Update the classification of the commit
+            commitObject += ',"classification":"' + str( classification ) + '\"'
 
              # Update whether commit was a fix or not
             commitObject += ',"fix":"' + str( fix ) + '\"'

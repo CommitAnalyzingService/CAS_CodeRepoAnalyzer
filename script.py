@@ -18,5 +18,6 @@ if arg == "initDb":
     logging.info('Done')
 
 else:
+	logging.info("Starting CAS Manager")
 	cas_manager = CAS_Manager()
 	cas_manager.start()
