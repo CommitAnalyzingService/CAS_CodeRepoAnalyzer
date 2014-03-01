@@ -39,7 +39,7 @@ def analyze(repo_id):
 def analyzeRepo(repository_to_analyze, session):
 	"""
 	Analyzes the given repository
-	@param repository_to_analyze	The repository to analyze. 
+	@param repository_to_analyze	The repository to analyze.
 	@param notifier                 gmail notifier object
 	@param session                  SQLAlchemy session
 	@private
@@ -47,7 +47,7 @@ def analyzeRepo(repository_to_analyze, session):
 	notify = False
 	notifier = None
 
-	# Notify user if repo has never been analyzed previously 
+	# Notify user if repo has never been analyzed previously
 	if repository_to_analyze.analysis_date is None:
 		notify = True
 
@@ -81,7 +81,7 @@ def analyzeRepo(repository_to_analyze, session):
 
 	# corrective commits in ascending order
 	corrective_commits = (session.query(Commit)
-				.filter( Commit.fix == "True") 
+				.filter( Commit.fix == "True")
 				.filter( Commit.repository_id == repo_id)
 				.order_by( Commit.author_date_unix_timestamp.asc())
 				.all()
@@ -105,18 +105,16 @@ def analyzeRepo(repository_to_analyze, session):
 	# Generate the metrics
 	logging.info('Generating metrics for repository id ' + repo_id)
 	metrics_generator = MetricsGenerator(repo_id, all_commits)
-	metrics_generator.generateMetrics()
+	metrics_generator.buildAllModels()
 	repository_to_analyze.status = "Analyzed"
 	repository_to_analyze.analysis_date = str(datetime.now().replace(microsecond=0))
 
 	# Update database of commits that were buggy & analysis date & status
-	session.commit() 
-	
+	session.commit()
+
 	# Notify any subscribers of repo that it has been analyzed IF it has not been analyzed previously
 	if notify is True and notifier is not None:
 		notifier.notify()
 
-	logging.info( 'A worker finished analyzing repo ' + 
+	logging.info( 'A worker finished analyzing repo ' +
                   repository_to_analyze.id )
-
-
