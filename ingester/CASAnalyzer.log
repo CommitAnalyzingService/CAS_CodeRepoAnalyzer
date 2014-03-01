@@ -1,8 +1,0 @@
-2014-01-12 17:24:47,733 INFO: A worker is starting scan repository: 2
-2014-01-12 17:24:47,738 INFO: Git cloning repo: <Repository: analyzer - 2>
-2014-01-12 17:24:48,567 INFO: Done cloning.
-2014-01-12 17:24:48,567 INFO: Getting/parsing git commits: <Repository: analyzer - 2>
-2014-01-12 17:24:48,584 INFO: Done getting/parsing git commits.
-2014-01-12 17:24:48,584 INFO: Saving commits to the database...
-2014-01-12 17:24:48,723 INFO: Done saving commits to the database.
-2014-01-12 17:24:48,728 INFO: A worker finished ingesting repo 2
