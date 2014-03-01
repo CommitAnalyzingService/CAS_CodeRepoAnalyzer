@@ -2250,3 +2250,160 @@ Not Found
 2014-02-28 17:50:41,882 INFO: Starting new HTTPS connection (1): api.github.com
 2014-02-28 17:50:41,992 INFO: Generating metrics for repository id 1
 2014-02-28 17:50:42,068 INFO: A worker finished analyzing repo 1
+2014-02-28 18:01:44,118 INFO: Starting CAS Manager
+2014-02-28 18:02:29,208 INFO: Adding repo 2 to work queue for ingesting
+2014-02-28 18:02:29,225 INFO: A worker is starting scan repository: 2
+2014-02-28 18:02:29,238 INFO: Git cloning repo: <Repository: cas web - 2>
+2014-02-28 18:02:29,863 INFO: Done cloning.
+2014-02-28 18:02:29,864 INFO: Getting/parsing git commits: <Repository: cas web - 2>
+2014-02-28 18:02:29,936 INFO: Done getting/parsing git commits.
+2014-02-28 18:02:29,937 INFO: Saving commits to the database...
+2014-02-28 18:02:30,220 INFO: Done saving commits to the database.
+2014-02-28 18:02:30,228 INFO: A worker finished ingesting repo 2
+2014-02-28 18:02:34,217 INFO: Adding repo 2 to work queue for analyzing.
+2014-02-28 18:02:34,220 INFO: Worker analyzing repository id 2
+2014-02-28 18:02:34,288 INFO: Starting new HTTPS connection (1): api.github.com
+2014-02-28 18:02:34,762 INFO: Analyzer has 4994 issue tracker calls left this hour
+2014-02-28 18:02:34,772 INFO: Starting new HTTPS connection (1): api.github.com
+2014-02-28 18:02:34,884 INFO: Searching for issue id: 5
+2014-02-28 18:02:34,886 INFO: Starting new HTTPS connection (1): api.github.com
+2014-02-28 18:02:34,998 INFO: Starting new HTTPS connection (1): api.github.com
+2014-02-28 18:02:35,105 INFO: Searching for issue id: 7
+2014-02-28 18:02:35,108 INFO: Starting new HTTPS connection (1): api.github.com
+2014-02-28 18:02:35,220 INFO: Generating metrics for repository id 2
+2014-02-28 18:02:37,276 INFO: Notification sent successfully
+2014-02-28 18:02:37,280 INFO: A worker finished analyzing repo 2
+2014-02-28 18:08:15,090 INFO: Starting CAS Manager
+2014-02-28 18:33:21,420 INFO: Starting CAS Manager
+2014-02-28 18:34:01,505 INFO: Adding repo 3 to work queue for ingesting
+2014-02-28 18:34:01,522 INFO: A worker is starting scan repository: 3
+2014-02-28 18:34:01,535 INFO: Git cloning repo: <Repository: test2 - 3>
+2014-02-28 18:34:01,866 INFO: Done cloning.
+2014-02-28 18:34:01,868 INFO: Getting/parsing git commits: <Repository: test2 - 3>
+2014-02-28 18:34:01,882 INFO: Done getting/parsing git commits.
+2014-02-28 18:34:01,883 INFO: Saving commits to the database...
+2014-02-28 18:34:01,953 INFO: Done saving commits to the database.
+2014-02-28 18:34:01,961 INFO: A worker finished ingesting repo 3
+2014-02-28 18:34:06,515 INFO: Adding repo 3 to work queue for analyzing.
+2014-02-28 18:34:06,518 INFO: Worker analyzing repository id 3
+2014-02-28 18:34:07,577 INFO: Starting new HTTPS connection (1): api.github.com
+2014-02-28 18:34:08,054 INFO: Analyzer has 4989 issue tracker calls left this hour
+2014-02-28 18:34:08,062 INFO: Starting new HTTPS connection (1): api.github.com
+2014-02-28 18:34:08,171 INFO: Searching for issue id: 1
+2014-02-28 18:34:08,173 INFO: Starting new HTTPS connection (1): api.github.com
+2014-02-28 18:34:08,285 INFO: Starting new HTTPS connection (1): api.github.com
+2014-02-28 18:34:08,395 INFO: Searching for issue id: 2
+2014-02-28 18:34:08,398 INFO: Starting new HTTPS connection (1): api.github.com
+2014-02-28 18:34:08,504 INFO: Generating metrics for repository id 3
+2014-02-28 18:34:10,633 INFO: Notification sent successfully
+2014-02-28 18:34:10,637 INFO: A worker finished analyzing repo 3
+2014-02-28 18:38:13,543 INFO: Starting CAS Manager
+2014-02-28 18:38:38,611 INFO: Adding repo 4 to work queue for ingesting
+2014-02-28 18:38:38,628 INFO: A worker is starting scan repository: 4
+2014-02-28 18:38:38,640 INFO: Git cloning repo: <Repository: test3 - 4>
+2014-02-28 18:38:38,984 INFO: Done cloning.
+2014-02-28 18:38:38,985 INFO: Getting/parsing git commits: <Repository: test3 - 4>
+2014-02-28 18:39:08,738 INFO: Starting CAS Manager
+2014-02-28 18:39:08,778 INFO: Adding repo 4 to work queue for ingesting
+2014-02-28 18:39:08,795 INFO: A worker is starting scan repository: 4
+2014-02-28 18:39:08,801 INFO: Git fetching repo: <Repository: test3 - 4>
+2014-02-28 18:39:09,326 INFO: Done fetching.
+2014-02-28 18:39:09,327 INFO: Getting/parsing git commits: <Repository: test3 - 4>
+2014-02-28 18:39:09,340 INFO: Done getting/parsing git commits.
+2014-02-28 18:39:09,341 INFO: Saving commits to the database...
+2014-02-28 18:39:09,407 INFO: Done saving commits to the database.
+2014-02-28 18:39:09,761 INFO: A worker finished ingesting repo 4
+2014-02-28 18:39:13,788 INFO: Adding repo 4 to work queue for analyzing.
+2014-02-28 18:39:13,791 INFO: Worker analyzing repository id 4
+2014-02-28 18:39:13,854 INFO: Starting new HTTPS connection (1): api.github.com
+2014-02-28 18:39:14,342 INFO: Analyzer has 4984 issue tracker calls left this hour
+2014-02-28 18:39:14,350 INFO: Starting new HTTPS connection (1): api.github.com
+2014-02-28 18:39:14,464 INFO: Searching for issue id: 1
+2014-02-28 18:39:14,467 INFO: Starting new HTTPS connection (1): api.github.com
+2014-02-28 18:39:14,585 INFO: Starting new HTTPS connection (1): api.github.com
+2014-02-28 18:39:14,701 INFO: Searching for issue id: 2
+2014-02-28 18:39:14,703 INFO: Starting new HTTPS connection (1): api.github.com
+2014-02-28 18:39:14,821 INFO: Generating metrics for repository id 4
+2014-02-28 18:39:16,334 INFO: Notification sent successfully
+2014-02-28 18:39:16,338 INFO: A worker finished analyzing repo 4
+2014-02-28 18:47:15,460 INFO: Starting CAS Manager
+2014-02-28 18:47:35,522 INFO: Adding repo 5 to work queue for ingesting
+2014-02-28 18:47:35,539 INFO: A worker is starting scan repository: 5
+2014-02-28 18:47:35,552 INFO: Git cloning repo: <Repository: test4 - 5>
+2014-02-28 18:47:35,919 INFO: Done cloning.
+2014-02-28 18:47:35,920 INFO: Getting/parsing git commits: <Repository: test4 - 5>
+2014-02-28 18:47:49,536 INFO: Starting CAS Manager
+2014-02-28 18:47:59,587 INFO: Adding repo 5 to work queue for ingesting
+2014-02-28 18:47:59,604 INFO: A worker is starting scan repository: 5
+2014-02-28 18:47:59,616 INFO: Git fetching repo: <Repository: test4 - 5>
+2014-02-28 18:47:59,794 INFO: Done fetching.
+2014-02-28 18:47:59,796 INFO: Getting/parsing git commits: <Repository: test4 - 5>
+2014-02-28 18:48:28,618 INFO: Starting CAS Manager
+2014-02-28 18:48:38,673 INFO: Adding repo 5 to work queue for ingesting
+2014-02-28 18:48:38,689 INFO: A worker is starting scan repository: 5
+2014-02-28 18:48:38,702 INFO: Git fetching repo: <Repository: test4 - 5>
+2014-02-28 18:48:39,240 INFO: Done fetching.
+2014-02-28 18:48:39,241 INFO: Getting/parsing git commits: <Repository: test4 - 5>
+2014-02-28 18:48:39,254 INFO: Done getting/parsing git commits.
+2014-02-28 18:48:39,255 INFO: Saving commits to the database...
+2014-02-28 18:48:39,322 INFO: Done saving commits to the database.
+2014-02-28 18:48:39,330 INFO: A worker finished ingesting repo 5
+2014-02-28 18:48:43,683 INFO: Adding repo 5 to work queue for analyzing.
+2014-02-28 18:48:43,686 INFO: Worker analyzing repository id 5
+2014-02-28 18:48:43,738 INFO: Starting new HTTPS connection (1): api.github.com
+2014-02-28 18:48:44,208 INFO: Analyzer has 4979 issue tracker calls left this hour
+2014-02-28 18:48:44,217 INFO: Starting new HTTPS connection (1): api.github.com
+2014-02-28 18:48:44,325 INFO: Searching for issue id: 1
+2014-02-28 18:48:44,328 INFO: Starting new HTTPS connection (1): api.github.com
+2014-02-28 18:48:44,438 INFO: Starting new HTTPS connection (1): api.github.com
+2014-02-28 18:48:44,546 INFO: Searching for issue id: 2
+2014-02-28 18:48:44,549 INFO: Starting new HTTPS connection (1): api.github.com
+2014-02-28 18:48:44,653 INFO: Generating metrics for repository id 5
+2014-02-28 18:48:46,280 INFO: Notification sent successfully
+2014-02-28 18:48:46,284 INFO: A worker finished analyzing repo 5
+2014-02-28 18:52:37,515 INFO: Starting CAS Manager
+2014-02-28 18:53:12,596 INFO: Adding repo 6 to work queue for ingesting
+2014-02-28 18:53:12,612 INFO: A worker is starting scan repository: 6
+2014-02-28 18:53:12,625 INFO: Git cloning repo: <Repository: test5 - 6>
+2014-02-28 18:53:12,952 INFO: Done cloning.
+2014-02-28 18:53:12,953 INFO: Getting/parsing git commits: <Repository: test5 - 6>
+2014-02-28 18:53:12,968 INFO: Done getting/parsing git commits.
+2014-02-28 18:53:12,968 INFO: Saving commits to the database...
+2014-02-28 18:53:13,038 INFO: Done saving commits to the database.
+2014-02-28 18:53:13,046 INFO: A worker finished ingesting repo 6
+2014-02-28 18:53:17,605 INFO: Adding repo 6 to work queue for analyzing.
+2014-02-28 18:53:17,608 INFO: Worker analyzing repository id 6
+2014-02-28 18:53:17,669 INFO: Starting new HTTPS connection (1): api.github.com
+2014-02-28 18:53:18,137 INFO: Analyzer has 4999 issue tracker calls left this hour
+2014-02-28 18:53:18,144 INFO: Starting new HTTPS connection (1): api.github.com
+2014-02-28 18:53:18,254 INFO: Searching for issue id: 1
+2014-02-28 18:53:18,257 INFO: Starting new HTTPS connection (1): api.github.com
+2014-02-28 18:53:18,374 INFO: Starting new HTTPS connection (1): api.github.com
+2014-02-28 18:53:18,482 INFO: Searching for issue id: 2
+2014-02-28 18:53:18,485 INFO: Starting new HTTPS connection (1): api.github.com
+2014-02-28 18:53:18,594 INFO: Generating metrics for repository id 6
+2014-02-28 18:53:21,088 INFO: Notification sent successfully
+2014-02-28 18:53:21,091 INFO: A worker finished analyzing repo 6
+2014-02-28 19:10:11,872 INFO: Starting CAS Manager
+2014-02-28 19:10:31,937 INFO: Adding repo 7 to work queue for ingesting
+2014-02-28 19:10:31,954 INFO: A worker is starting scan repository: 7
+2014-02-28 19:10:31,967 INFO: Git cloning repo: <Repository: test6 - 7>
+2014-02-28 19:10:32,312 INFO: Done cloning.
+2014-02-28 19:10:32,313 INFO: Getting/parsing git commits: <Repository: test6 - 7>
+2014-02-28 19:10:32,328 INFO: Done getting/parsing git commits.
+2014-02-28 19:10:32,329 INFO: Saving commits to the database...
+2014-02-28 19:10:32,398 INFO: Done saving commits to the database.
+2014-02-28 19:10:32,406 INFO: A worker finished ingesting repo 7
+2014-02-28 19:10:36,948 INFO: Adding repo 7 to work queue for analyzing.
+2014-02-28 19:10:36,950 INFO: Worker analyzing repository id 7
+2014-02-28 19:10:37,002 INFO: Starting new HTTPS connection (1): api.github.com
+2014-02-28 19:10:37,478 INFO: Analyzer has 4994 issue tracker calls left this hour
+2014-02-28 19:10:37,487 INFO: Starting new HTTPS connection (1): api.github.com
+2014-02-28 19:10:37,597 INFO: Searching for issue id: 1
+2014-02-28 19:10:37,600 INFO: Starting new HTTPS connection (1): api.github.com
+2014-02-28 19:10:37,712 INFO: Starting new HTTPS connection (1): api.github.com
+2014-02-28 19:10:37,819 INFO: Searching for issue id: 2
+2014-02-28 19:10:37,821 INFO: Starting new HTTPS connection (1): api.github.com
+2014-02-28 19:10:37,931 INFO: Generating metrics for repository id 7
+2014-02-28 19:10:39,930 INFO: Notification sent successfully
+2014-02-28 19:10:39,933 INFO: A worker finished analyzing repo 7

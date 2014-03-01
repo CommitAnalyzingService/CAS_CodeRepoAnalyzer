@@ -2,9 +2,9 @@ import os
 import subprocess
 import json
 import logging
-import math   # Required for the math.log function
-from ingester.commitFile import *  # Represents a file
-from classifier.classifier import * # Used for classifying each commit
+import math                               # Required for the math.log function
+from ingester.commitFile import *         # Represents a file
+from classifier.classifier import *       # Used for classifying each commit
 import time
 
 """
@@ -37,20 +37,20 @@ class Git():
     \\"author_date_unix_timestamp\\"CAS_READER_PROP_DELIMITER: \\"%at\\",CAS_READER_PROP_DELIMITER2\
     \\"commit_message\\"CAS_READER_PROP_DELIMITER: \\"%s%b\\"\
     CAS_READER_STOPPRETTY \" --numstat --reverse '
-    
+
     CLONE_CMD = 'git clone -q --mirror {!s} {!s}'     # git clone command w/o downloading src code
-    FETCH_CMD = 'git fetch -q origin master:master'         # git fetch command 
+    FETCH_CMD = 'git fetch -q origin master:master'         # git fetch command
     REPO_DIRECTORY = "/CASRepos/git/"            # directory in which to store repositories
-    
+
     def getCommitStatsProperties( stats, commitFiles, devExperience, author, unixTimeStamp ):
-        """ 
+        """
         getCommitStatsProperties
         Helper method for log. Caclulates statistics for each change/commit and
         returns them as a comma seperated string. Log will add these to the commit object
         properties
 
         @param stats            These are the stats given by --numstat as an array
-        @param commitFiles      These are all tracked commit files 
+        @param commitFiles      These are all tracked commit files
         @param devExperience    These are all tracked developer experiences
         @param author           The author of the commit
         @param unixTimeStamp    Time of the commit
@@ -61,11 +61,11 @@ class Git():
         # Data structures to keep track of info needed for stats
         subsystemsSeen = []                         # List of system names seen
         directoriesSeen = []                        # List of directory names seen
-        locModifiedPerFile = []                     # List of modified loc in each file seen 
+        locModifiedPerFile = []                     # List of modified loc in each file seen
         authors = []                                # List of all unique authors seen for each file
         fileAges = []                               # List of the ages for each file in a commit
 
-        # Stats variables 
+        # Stats variables
         la = 0                                      # lines added
         ld = 0                                      # lines deleted
         nf = 0                                      # Number of modified files
@@ -75,11 +75,11 @@ class Git():
         lt = 0                                      # lines of code in each file (sum) before the commit
         ndev = 0                                    # the number of developers that modifed the files in a commit
         age = 0                                     # the average time interval between the last and current change
-        nuc = 0                                     # the number of unique changes to the modified files
         exp = 0                                     # number of changes made by author previously
         rexp = 0                                    # experience weighted by age of files ( 1 / (n + 1))
         sexp = 0                                    # changes made previous by author in same subsystem
         totalLOCModified = 0                        # Total modified LOC across all files
+        nuc = 0                                     # number of unique changes to the files
         filesSeen = ""                              # files seen in change/commit
 
         for stat in stats:
@@ -95,7 +95,7 @@ class Git():
 
             # catch the git "-" line changes
             try:
-                fileLa = int(fileStat[0])                
+                fileLa = int(fileStat[0])
                 fileLd = int(fileStat[1])
             except:
                 fileLa = 0
@@ -106,31 +106,35 @@ class Git():
 
             totalModified = fileLa + fileLd
 
+            # have we seen this file already?
             if(fileName in commitFiles):
                 prevFileChanged = commitFiles[fileName]
                 prevLOC = getattr(prevFileChanged, 'loc')
                 prevAuthors = getattr(prevFileChanged, 'authors')
                 prevChanged = getattr(prevFileChanged, 'lastchanged')
+                file_nuc = getattr(prevFileChanged, 'nuc')
+                nuc += file_nuc
                 lt += prevLOC
 
                 for prevAuthor in prevAuthors:
                     if prevAuthor not in authors:
                         authors.append(prevAuthor)
 
-                if prevChanged not in fileAges:
-                    nuc += 1
-
                 # Convert age to days instead of seconds
-                age += ( (int(unixTimeStamp) - int(prevChanged)) / 86400 )    
+                age += ( (int(unixTimeStamp) - int(prevChanged)) / 86400 )
                 fileAges.append(prevChanged)
 
                 # Update the file info
-                setattr(prevFileChanged, 'loc', prevLOC + fileLa - fileLd) 
+
+                file_nuc += 1 # file was modified in this commit
+                setattr(prevFileChanged, 'loc', prevLOC + fileLa - fileLd)
                 setattr(prevFileChanged, 'authors', authors)
                 setattr(prevFileChanged, 'lastchanged', unixTimeStamp)
+                setattr(prevFileChanged, 'nuc', file_nuc)
 
-            else: 
+            else:
 
+                # new file we haven't seen b4, add it to file commit files dict
                 if(author not in authors):
                     authors.append(author)
 
@@ -140,7 +144,9 @@ class Git():
                 fileObject = CommitFile(fileName, fileLa - fileLd, authors, unixTimeStamp)
                 commitFiles[fileName] = fileObject
 
-            locModifiedPerFile.append(totalModified) # Required for entrphy
+            # end of stats loop
+
+            locModifiedPerFile.append(totalModified) # Required for entrophy
             totalLOCModified += totalModified
             fileDirs = fileName.split("/")
 
@@ -171,12 +177,12 @@ class Git():
 
             else:
                 devExperience[author] = {subsystem: 1}
-        
+
             if( directory not in directoriesSeen ):
                 directoriesSeen.append( directory )
 
             # Update file-level metrics
-            la += fileLa 
+            la += fileLa
             ld += fileLd
             nf += 1
             filesSeen += fileName + ",CAS_DELIMITER,"
@@ -222,7 +228,7 @@ class Git():
 
     def log(self, repo, firstSync):
         """
-        log(): Repository, Boolean -> Dictionary                                                                                                                                              
+        log(): Repository, Boolean -> Dictionary
         arguments: repo Repository: the repository to clone
                    firstSync Boolean: whether to sync all commits or after the
             ingestion date
@@ -236,13 +242,13 @@ class Git():
             cmd = 'git log --after="' + repo.ingestion_date + '" '
         else:
             cmd = 'git log '
-        
+
         log = str( subprocess.check_output(cmd + self.LOG_FORMAT, shell=True ) )
         log = log[2:-1]   # Remove head/end clutter
-        
+
         # List of json objects
         json_list = []
-        
+
         # Make sure there are commits to parse
         if len(log) == 0:
             return []
@@ -251,7 +257,7 @@ class Git():
         devExperience = {}          # Keep track of ALL developer experience
         classifier = Classifier()   # classifier for classifying commits (i.e., corrective, feature addition, etc)
 
-        commitList = log.split("CAS_READER_STARTPRETTY") 
+        commitList = log.split("CAS_READER_STARTPRETTY")
 
         for commit in commitList:
             author = ""                                 # author of commit
@@ -311,7 +317,7 @@ class Git():
             commitObject += ',"fix":"' + str( fix ) + '\"'
 
             # Remove first comma and extra space
-            commitObject = commitObject[1:].replace('    ','')                      
+            commitObject = commitObject[1:].replace('    ','')
 
             # Add commit object to json_list
             json_list.append(json.loads('{' + commitObject + '}'))
@@ -331,14 +337,14 @@ class Git():
         # Go to the repo directory
         os.chdir(os.path.dirname(__file__) + self.REPO_DIRECTORY)
         # Run the clone command and return the results
-        
+
         logging.info('Git cloning repo: '+ str(repo) )
-        cloneResult = str(subprocess.check_output( 
+        cloneResult = str(subprocess.check_output(
                   self.CLONE_CMD.format(repo.url, './' + repo.id),
                   shell=True ) )
         logging.info('Done cloning.')
         #logging.debug("Git clone result:\n" + cloneResult)
-        
+
         # Reset path for next repo
 
         # TODO: only return true on success, else return false
@@ -356,7 +362,7 @@ class Git():
         os.chdir(os.path.dirname(__file__) + self.REPO_DIRECTORY + repo.id)
         # Run the pull command and return the results
         logging.info('Git fetching repo: '+ str(repo) )
-        fetchResult = str(subprocess.check_output( 
+        fetchResult = str(subprocess.check_output(
                   self.FETCH_CMD,
                   shell=True ) )
         logging.info('Done fetching.')
