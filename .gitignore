@@ -43,6 +43,8 @@ CASAnalyzer.log
 ingester/CASReader.log
 ingester/CASRepos/*
 
+analyzer/datasets/*
+
 CASLog.log
 config.json
 .DS_Store

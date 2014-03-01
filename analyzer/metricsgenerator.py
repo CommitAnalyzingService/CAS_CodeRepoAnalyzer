@@ -8,6 +8,7 @@ non-buggy and buggy commits and outputs them into the metrics table
 
 from analyzer.repositorymetrics import * # metrics abstraction; holds all metric values for commits
 from analyzer.medianmodel import * # builds the median model
+from analyzer.linear_reg_model import *
 import json
 
 class MetricsGenerator:
@@ -34,7 +35,10 @@ class MetricsGenerator:
 		self.fetchAllMetrics() # first get all metrics
 
 		median_model = MedianModel(self.metrics, self.repo_id)
-		median_model.buildModel();
+		linear_reg_model = LinearRegressionModel(self.metrics, self.repo_id)
+
+		median_model.buildModel()
+		linear_reg_model.buildModel()
 
 	def fetchAllMetrics(self):
 		"""
@@ -65,6 +69,7 @@ class MetricsGenerator:
 					self.metrics.exp_buggy.append(commit.exp)
 					self.metrics.rexp_buggy.append(commit.rexp)
 					self.metrics.sexp_buggy.append(commit.sexp)
+					self.metrics.num_buggy += 1
 
 				else:
 					self.metrics.ns_nonbuggy.append(commit.ns)
@@ -80,3 +85,4 @@ class MetricsGenerator:
 					self.metrics.exp_nonbuggy.append(commit.exp)
 					self.metrics.rexp_nonbuggy.append(commit.rexp)
 					self.metrics.sexp_nonbuggy.append(commit.sexp)
+					self.metrics.num_nonbuggy += 1

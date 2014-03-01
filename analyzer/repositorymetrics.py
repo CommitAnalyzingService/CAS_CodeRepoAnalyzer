@@ -32,3 +32,5 @@ class RepositoryMetrics:
     self.rexp_buggy = []
     self.sexp_buggy = []
     self.sexp_nonbuggy = []
+    self.num_buggy = 0
+    self.num_nonbuggy = 0
