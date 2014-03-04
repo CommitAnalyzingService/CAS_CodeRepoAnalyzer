@@ -1,5 +1,5 @@
 """
-file: metricsgenerator.py 
+file: metricsgenerator.py
 author: Christoffer Rosen <cbr4830@rit.edu>
 date: Novemember, 2013
 description: Generats the metrics (medians) for each metric for the
@@ -60,7 +60,7 @@ class MetricsGenerator:
 		self.wilcoxFn = robjects.r['wilcox.test']
 
 		# A p-value
-		self.psig = 0.0
+		self.psig = 0
 
 	def generateMetrics(self):
 		"""
@@ -72,7 +72,7 @@ class MetricsGenerator:
 	def buildMetricsLists(self):
 		"""
 		buildMetricsLists()
-		Iterate through each commit storing each individual's metrics into appropriate list 
+		Iterate through each commit storing each individual's metrics into appropriate list
 		dependingon if it contains a bug or not
 		"""
 		for commit in self.commits:
@@ -80,7 +80,7 @@ class MetricsGenerator:
 			# Exclude merge commits where no lines of code where changed
 			if commit.classification == "Merge" and commit.la == 0 and commit.ld == 0:
 				continue
-			
+
 			else:
 
 				if commit.contains_bug == True:
@@ -130,6 +130,7 @@ class MetricsGenerator:
 
 			# First check p-values, if signficant then calculate median
 			pvalue = self.wilcoxFn(robjects.FloatVector(metric_buggy), robjects.FloatVector(metric_nonbuggy))[2][0]
+
 			if pvalue >= self.psig:
 				buggy_median = self.medianFn(robjects.FloatVector(metric_buggy))
 				nonbuggy_median = self.medianFn(robjects.FloatVector(metric_nonbuggy))
@@ -140,7 +141,7 @@ class MetricsGenerator:
 				median_props += '"' + metric + 'nonbuggy":"-1", '
 
 		except:
-			print("Skipping metric: " + metric + 
+			print("Skipping metric: " + metric +
 				". Please make sure you have run the latest CAS_Reader")
 
 		return median_props
@@ -148,7 +149,7 @@ class MetricsGenerator:
 	def calculateMedians(self):
 		"""
 		Using R through the rpy2 module, generate the medians of each metrics
-		lists. If it passes the wilcox test (statistically sig), put it into 
+		lists. If it passes the wilcox test (statistically sig), put it into
 		the metrics table. Otherwise inserts a -1.
 		"""
 
@@ -178,15 +179,6 @@ class MetricsGenerator:
 
 		# Copy state of metrics object to db
 		metricsSession.merge(metrics)
-		
+
 		# Write the metrics changes to the database
 		metricsSession.commit()
-
-		
-
-
-
-
-
-
-

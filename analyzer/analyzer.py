@@ -39,7 +39,7 @@ def analyze(repo_id):
 def analyzeRepo(repository_to_analyze, session):
 	"""
 	Analyzes the given repository
-	@param repository_to_analyze	The repository to analyze. 
+	@param repository_to_analyze	The repository to analyze.
 	@param notifier                 gmail notifier object
 	@param session                  SQLAlchemy session
 	@private
@@ -47,7 +47,7 @@ def analyzeRepo(repository_to_analyze, session):
 	notify = False
 	notifier = None
 
-	# Notify user if repo has never been analyzed previously 
+	# Notify user if repo has never been analyzed previously
 	if repository_to_analyze.analysis_date is None:
 		notify = True
 
@@ -81,7 +81,7 @@ def analyzeRepo(repository_to_analyze, session):
 
 	# corrective commits in ascending order
 	corrective_commits = (session.query(Commit)
-				.filter( Commit.fix == "True") 
+				.filter( Commit.fix == "True")
 				.filter( Commit.repository_id == repo_id)
 				.order_by( Commit.author_date_unix_timestamp.asc())
 				.all()
@@ -89,34 +89,62 @@ def analyzeRepo(repository_to_analyze, session):
 
 	#### Issue Tracker ####
 
+	issue_tracker = None
+
+
 	# If using github, assume use of github issue tracker
-	if("github" in repository_to_analyze.url):
-		github_info = repository_to_analyze.url.split("https://github.com/")[1].split("/")
-		owner = github_info[0]
-		repo = github_info[1][0:-4] # Remove the .git
-		issue_tracker = GithubIssueTracker(owner,repo)
-	else:
-		issue_tracker = None
+	if "//github" in repository_to_analyze.url:
+		try:
+
+			github_info = None
+
+			if "https" in repository_to_analyze.url:
+				github_info = repository_to_analyze.url.split("https://github.com/")[1].split("/")
+			elif "http" in repository_to_analyze.url:
+				github_info = repository_to_analyze.url.split("http://github.com/")[1].split("/")
+
+			if github_info != None:
+				owner = github_info[0]
+
+				if ".git" in repository_to_analyze.url:
+					repo = github_info[1][0:-4] # Remove the .git
+				else:
+					repo = github_info[1]
+
+				issue_tracker = GithubIssueTracker(owner,repo)
+
+		except:
+			logging.error("Error creating github issue tracker - continuing");
+
 
 	# Find and mark the buggy commits
 	bug_finder = BugFinder(all_commits, corrective_commits, issue_tracker)
-	bug_finder.markBuggyCommits()
+
+	try:
+		bug_finder.markBuggyCommits()
+	except:
+		logging.error("unable to automatically find buggy commits for repository " +
+									repository_to_analyze.id)
 
 	# Generate the metrics
 	logging.info('Generating metrics for repository id ' + repo_id)
-	metrics_generator = MetricsGenerator(repo_id, all_commits)
-	metrics_generator.generateMetrics()
-	repository_to_analyze.status = "Analyzed"
+
+	try:
+		metrics_generator = MetricsGenerator(repo_id, all_commits)
+		metrics_generator.generateMetrics()
+		repository_to_analyze.status = "Analyzed"
+	except:
+		logging.error("Unable to generate metrics for repository id " + repo_id)
+		repository_to_analyze.status = "Error"
+
 	repository_to_analyze.analysis_date = str(datetime.now().replace(microsecond=0))
 
 	# Update database of commits that were buggy & analysis date & status
-	session.commit() 
-	
+	session.commit()
+
 	# Notify any subscribers of repo that it has been analyzed IF it has not been analyzed previously
 	if notify is True and notifier is not None:
 		notifier.notify()
 
-	logging.info( 'A worker finished analyzing repo ' + 
+	logging.info( 'A worker finished analyzing repo ' +
                   repository_to_analyze.id )
-
-
