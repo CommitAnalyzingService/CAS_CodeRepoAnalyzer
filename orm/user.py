@@ -6,16 +6,16 @@ import uuid
 from db import *
 from datetime import datetime
 
-class Feedback(Base):
+class User(Base):
     """
-    Commit():
+    User():
     description: The SQLAlchemy ORM for the user table
     """
-    __tablename__ = 'user'
+    __tablename__ = 'users'
 
     id = Column(String, primary_key=True)
     email = Column(String)
-    password = Column(Integer)
+    password = Column(String)
 
     def __init__(self, userDict):
         """
