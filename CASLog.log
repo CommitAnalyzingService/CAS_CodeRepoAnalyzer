@@ -4427,3 +4427,7 @@ Not Found
 2014-03-03 21:01:15,565 INFO: Generating metrics for repository id 15
 2014-03-03 21:01:17,358 INFO: Notification sent successfully
 2014-03-03 21:01:17,361 INFO: A worker finished analyzing repo 15
+2014-03-03 21:46:20,453 INFO: Initializing the Database...
+2014-03-03 21:46:20,538 INFO: Done
+2014-03-03 21:48:27,452 INFO: Initializing the Database...
+2014-03-03 21:48:27,533 INFO: Done
