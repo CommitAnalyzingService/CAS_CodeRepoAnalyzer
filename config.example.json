@@ -20,5 +20,9 @@
 	},
 	"system": {
 		"workers": "NUMBER OF WORKER THREADS"
+	},
+	"github": {
+		"user": "example_user",
+		"pass": "PASSWORD"
 	}
 }

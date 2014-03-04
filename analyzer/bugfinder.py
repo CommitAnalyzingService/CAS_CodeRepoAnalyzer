@@ -1,5 +1,5 @@
 """
-file: bugfinder.py 
+file: bugfinder.py
 author: Christoffer Rosen <cbr4830@rit.edu>
 date: November 2013
 description: Identifies buggy commits
@@ -9,7 +9,7 @@ import re
 from orm.commit import *
 from caslogging import logging
 
-class BugFinder: 
+class BugFinder:
 	"""
 	BugFinder():
 	description: Finds commits that are buggy
@@ -57,15 +57,15 @@ class BugFinder:
 
 	def searchForBuggyCommit(self, correctiveCommit):
 		"""
-		Finds the buggy commit based on the bug fixing commit 
-		Helper method for markBuggyCommits. If commti links to an 
-		issue tracker, we check files changed prior to this date. 
+		Finds the buggy commit based on the bug fixing commit
+		Helper method for markBuggyCommits. If commti links to an
+		issue tracker, we check files changed prior to this date.
 		Otherwise, me only check date prior to the fix.
 
 		@param correctiveCommits: the bug fixing commit
 		"""
 		bug_introduced_prior = correctiveCommit.author_date_unix_timestamp
-		issue_opened = self.findIssueOpened(correctiveCommit) 
+		issue_opened = self.findIssueOpened(correctiveCommit)
 
 		if issue_opened is not None:
 			bug_introduced_prior = issue_opened
@@ -78,6 +78,7 @@ class BugFinder:
 				commitFiles = commit.fileschanged.split(",CAS_DELIMITER,")
 
 				for commitFile in commitFiles:
+
 					# This introudced the bug!
 					if commitFile in correctiveFiles:
 						return commit
@@ -95,8 +96,6 @@ class BugFinder:
 			buggyCommit = self.searchForBuggyCommit(correctiveCommit)
 			if buggyCommit is not -1:
 				buggyCommit.contains_bug = True
-			#else: 
-				#print("Cound not find the bug inducing commit for: " + 
+			#else:
+				#print("Cound not find the bug inducing commit for: " +
 					#	correctiveCommit.commit_message)
-		
-			

@@ -72,9 +72,13 @@ def analyzeRepo(repository_to_analyze, session):
 	repository_to_analyze.status = "Analyzing"
 	session.commit()
 
+	# use data only up to 3 months prior as we won't have data until then.
+	three_months = str(datetime.utcnow() - timedelta(days=30))
+
 	# all commits in descending order
 	all_commits = (session.query(Commit)
 				.filter( Commit.repository_id == repo_id)
+				.filter( Commit.author_date_unix_timestamp < three_months)
 				.order_by( Commit.author_date_unix_timestamp.desc())
 				.all()
 				)
@@ -83,6 +87,7 @@ def analyzeRepo(repository_to_analyze, session):
 	corrective_commits = (session.query(Commit)
 				.filter( Commit.fix == "True")
 				.filter( Commit.repository_id == repo_id)
+				.filter( Commit.author_date_unix_timestamp < three_months)
 				.order_by( Commit.author_date_unix_timestamp.asc())
 				.all()
 				)

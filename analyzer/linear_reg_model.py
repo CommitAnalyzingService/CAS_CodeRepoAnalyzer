@@ -2,6 +2,9 @@ import csv
 import os
 
 class LinearRegressionModel:
+  """
+  builds the linear regression model
+  """
 
   def __init__(self,metrics,repo_id):
     self.metrics = metrics
@@ -11,6 +14,11 @@ class LinearRegressionModel:
     self.buildDataSet()
 
   def buildDataSet(self):
+    """
+    builds the data set to be used for getting the linear regression model.
+    saves datasets in the datasets folder as csv files to easily be imported
+    or used by R.
+    """
 
     # to write dataset file in this directory (git ignored!)
     current_dir = os.path.dirname(__file__)
@@ -19,7 +27,7 @@ class LinearRegressionModel:
     num_buggy = getattr(self.metrics, "num_buggy")
     num_nonbuggy = getattr(self.metrics, "num_nonbuggy")
 
-    with open(dir_of_datasets + self.repo_id, "w") as file:
+    with open(dir_of_datasets + self.repo_id + ".csv", "w") as file:
       csv_writer = csv.writer(file, dialect="excel")
 
       # write the columns
@@ -59,3 +67,5 @@ class LinearRegressionModel:
         rexp = self.metrics.rexp_nonbuggy[nonbuggy_index]
         sexp = self.metrics.sexp_nonbuggy[nonbuggy_index]
         csv_writer.writerow([ns,nd,nf,entrophy,la,ld,lt,ndev,age,nuc,exp,rexp,sexp,False])
+      # end non buggy data
+    # end file
