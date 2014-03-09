@@ -9,6 +9,7 @@ non-buggy and buggy commits and outputs them into the metrics table
 from analyzer.repositorymetrics import * # metrics abstraction; holds all metric values for commits
 from analyzer.medianmodel import * # builds the median model
 from analyzer.linear_reg_model import *
+from orm.commit import *
 import json
 
 class MetricsGenerator:
@@ -39,6 +40,27 @@ class MetricsGenerator:
 
 		median_model.buildModel()
 		linear_reg_model.buildModel()
+		self.dumpData()
+
+	def dumpData(self):
+
+		# to write dataset file in this directory (git ignored!)
+		current_dir = os.path.dirname(__file__)
+		dir_of_datasets = current_dir + "/datasets/monthly/"
+
+		with open(dir_of_datasets + self.repo_id + ".csv", "w") as file:
+			csv_writer = csv.writer(file, dialect="excel")
+			columns = Commit.__table__.columns.keys()
+
+			# write the columns
+			csv_writer.writerow(columns)
+
+			# dump all commit data
+			for commit in self.commits:
+				commit_data = []
+				for col in columns:
+					commit_data.append(getattr(commit,col))
+				csv_writer.writerow(commit_data)
 
 	def fetchAllMetrics(self):
 		"""
