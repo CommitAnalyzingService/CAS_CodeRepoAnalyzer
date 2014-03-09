@@ -40,10 +40,12 @@ class MetricsGenerator:
 
 		median_model.buildModel()
 		linear_reg_model.buildModel()
-		self.dumpData()
 
 	def dumpData(self):
-
+		"""
+		dumps all commit data into the monthly dataset folder.
+		dataset names after repository id
+		"""
 		# to write dataset file in this directory (git ignored!)
 		current_dir = os.path.dirname(__file__)
 		dir_of_datasets = current_dir + "/datasets/monthly/"

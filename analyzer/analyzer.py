@@ -111,6 +111,14 @@ def analyzeRepo(repository_to_analyze, session):
 	logging.info('Generating metrics for repository id ' + repo_id)
 	metrics_generator = MetricsGenerator(repo_id, all_commits)
 	metrics_generator.buildAllModels()
+
+	# dump monthly data - hardcoded 30 days
+	dump_refresh_date = str(datetime.utcnow() - timedelta(days=30))
+
+	if repository_to_analyze.last_data_dump == None or repository_to_analyze.last_data_dump < dump_refresh_date:
+		metrics_generator.dumpData()
+		repository_to_analyze.last_data_dump = str(datetime.now().replace(microsecond=0))
+
 	repository_to_analyze.status = "Analyzed"
 	repository_to_analyze.analysis_date = str(datetime.now().replace(microsecond=0))
 
