@@ -58,9 +58,9 @@ def analyzeRepo(repository_to_analyze, session):
 
 		# Add subscribers if applicable
 		if repository_to_analyze.email is not None:
-			notifier.addSubscribers([repository_to_analyze.email, 'cbr4830@rit.edu'])
+			notifier.addSubscribers([repository_to_analyze.email, gmail_user])
 		else:
-			notifier.addSubscribers(['cbr4830@rit.edu'])
+			notifier.addSubscribers([gmail_user])
 	# End notifier setup
 
 	repo_name = repository_to_analyze.name
