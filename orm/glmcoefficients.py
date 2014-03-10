@@ -12,6 +12,7 @@ class GlmCoefficients(Base):
 
     repo = Column(String, primary_key=True)
 
+    intercept = Column(Float, unique=False, default=0)
     ns = Column(Float, unique=False, default=0)
     nd = Column(Float, unique=False, default=0)
     nf = Column(Float, unique=False, default=0)

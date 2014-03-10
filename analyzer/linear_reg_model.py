@@ -6,7 +6,9 @@ from db import *	# postgresql db information
 
 class LinearRegressionModel:
   """
-  builds the generalized linear regression model (GLM)
+  builds the generalized linear regression model (GLM).
+  all coefficients stored in the database under the glm_coefficients table
+  probability: intercept + sum([metric_coefficient] * metric)
   """
 
   def __init__(self,metrics,repo_id):
@@ -100,11 +102,11 @@ class LinearRegressionModel:
     @private
     """
     # Coefficient object represents the coefficients as a dictionary
-    coefObject = '"repo":"' + str(self.repo_id) + '","ns":"' + str(coef[1]) + '","nd":"' \
-      + str(coef[2]) + '","nf":"' + str(coef[3]) + '","entrophy":"' + str(coef[4]) + '","la":"' + str(coef[5]) \
-      + '","ld":"' + str(coef[6]) + '","lt":"' + str(coef[7]) + '","ndev":"' + str(coef[8]) + '","age":"' \
-      + str(coef[9]) + '","nuc":"' + str(coef[10]) + '","exp":"' + str(coef[11]) + '","rexp":"' + str(coef[12]) \
-      + '","sexp":"' + str(coef[13]) + '"'
+    coefObject = '"repo":"' + str(self.repo_id) + '","intercept":"' + str(coef[0]) + '","ns":"' + str(coef[1]) \
+      + '","nd":"' + str(coef[2]) + '","nf":"' + str(coef[3]) + '","entrophy":"' + str(coef[4]) + '","la":"' \
+      + str(coef[5]) + '","ld":"' + str(coef[6]) + '","lt":"' + str(coef[7]) + '","ndev":"' + str(coef[8]) \
+      + '","age":"' + str(coef[9]) + '","nuc":"' + str(coef[10]) + '","exp":"' + str(coef[11]) + '","rexp":"' \
+      + str(coef[12]) + '","sexp":"' + str(coef[13]) + '"'
 
     # Insert into the coefficient table
     coefSession = Session()
