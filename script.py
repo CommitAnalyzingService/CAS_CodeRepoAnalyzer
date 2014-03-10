@@ -6,8 +6,9 @@ description: base script to call.
 """
 from cas_manager import *
 from analyzer.analyzer import *
-from orm.feedback import *
-from orm.user import *
+from orm.feedback import * # so that we create the table - used by web
+from orm.user import * # so that we create the table - used by web
+from orm.glmcoefficients import * # so that we create the table - used by web
 
 if len(sys.argv) > 1:
 	arg = sys.argv[1]
