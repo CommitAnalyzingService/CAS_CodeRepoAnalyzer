@@ -1,10 +1,12 @@
 import csv
 import os
 import rpy2.robjects as robjects # R integration
+from orm.glmcoefficients import * # to store the glm coefficients
+from db import *	# postgresql db information
 
 class LinearRegressionModel:
   """
-  builds the linear regression model
+  builds the generalized linear regression model (GLM)
   """
 
   def __init__(self,metrics,repo_id):
@@ -80,7 +82,7 @@ class LinearRegressionModel:
 
   def _getCoefficients(self):
     """
-    builds the linear regression model
+    builds the linear regression model & stores them
     @private
     """
     current_dir = os.path.dirname(__file__)
@@ -90,4 +92,26 @@ class LinearRegressionModel:
     formula = "is_buggy~ns+nd+nf+entrophy+la+ld+lt+ndev+age+nuc+exp+rexp+sexp"
     glm_model = self.glm(formula, data=data, family="binomial")
     coef = self.coef(glm_model)
- 
+    self._storeCoefficients(coef)
+
+  def _storeCoefficients(self, coef):
+    """
+    stores the glm coefficients in the database
+    @private
+    """
+    # Coefficient object represents the coefficients as a dictionary
+    coefObject = '"repo":"' + str(self.repo_id) + '","ns":"' + str(coef[1]) + '","nd":"' \
+      + str(coef[2]) + '","nf":"' + str(coef[3]) + '","entrophy":"' + str(coef[4]) + '","la":"' + str(coef[5]) \
+      + '","ld":"' + str(coef[6]) + '","lt":"' + str(coef[7]) + '","ndev":"' + str(coef[8]) + '","age":"' \
+      + str(coef[9]) + '","nuc":"' + str(coef[10]) + '","exp":"' + str(coef[11]) + '","rexp":"' + str(coef[12]) \
+      + '","sexp":"' + str(coef[13]) + '"'
+
+    # Insert into the coefficient table
+    coefSession = Session()
+    allCoef = GlmCoefficients(json.loads('{' + coefObject + '}'))
+
+    # Copy to db
+    coefSession.merge(allCoef)
+
+    # Write
+    coefSession.commit()
