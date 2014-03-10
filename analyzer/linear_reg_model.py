@@ -1,5 +1,6 @@
 import csv
 import os
+import rpy2.robjects as robjects # R integration
 
 class LinearRegressionModel:
   """
@@ -10,20 +11,27 @@ class LinearRegressionModel:
     self.metrics = metrics
     self.repo_id = repo_id
 
-  def buildModel(self):
-    self.buildDataSet()
+    # R functions to be used
+    self.glm = robjects.r['glm']
+    self.readcsv = robjects.r['read.csv']
+    self.coef = robjects.r['coef'] # get coefficients
 
-  def buildDataSet(self):
+  def buildModel(self):
+    self._buildDataSet()
+    self._getCoefficients()
+
+  def _buildDataSet(self):
     """
     builds the data set to be used for getting the linear regression model.
     saves datasets in the datasets folder as csv files to easily be imported
     or used by R.
+
+    @private
     """
 
     # to write dataset file in this directory (git ignored!)
     current_dir = os.path.dirname(__file__)
     dir_of_datasets = current_dir + "/datasets/"
-
     num_buggy = getattr(self.metrics, "num_buggy")
     num_nonbuggy = getattr(self.metrics, "num_nonbuggy")
 
@@ -69,3 +77,17 @@ class LinearRegressionModel:
         csv_writer.writerow([ns,nd,nf,entrophy,la,ld,lt,ndev,age,nuc,exp,rexp,sexp,False])
       # end non buggy data
     # end file
+
+  def _getCoefficients(self):
+    """
+    builds the linear regression model
+    @private
+    """
+    current_dir = os.path.dirname(__file__)
+    dir_of_datasets = current_dir + "/datasets/"
+
+    data = self.readcsv(dir_of_datasets + self.repo_id + ".csv", header=True, sep = ",")
+    formula = "is_buggy~ns+nd+nf+entrophy+la+ld+lt+ndev+age+nuc+exp+rexp+sexp"
+    glm_model = self.glm(formula, data=data, family="binomial")
+    coef = self.coef(glm_model)
+ 
