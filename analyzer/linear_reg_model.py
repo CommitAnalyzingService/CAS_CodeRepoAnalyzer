@@ -138,7 +138,7 @@ class LinearRegressionModel:
     # Is this a real coefficient or a p-value/sig coefficient?
     if "sig" in coef_name:
 
-      if coef_value < self.sig_threshold:
+      if coef_value <= self.sig_threshold:
         coef_object += '"' + str(coef_name) + '":"1'
       else:
         coef_object += '"' + str(coef_name) + '":"0'
