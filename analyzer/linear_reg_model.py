@@ -1,6 +1,7 @@
 import csv
 import os
 import rpy2.robjects as robjects # R integration
+from rpy2.robjects.packages import importr # import the importr package from R
 from orm.glmcoefficients import * # to store the glm coefficients
 from db import *	# postgresql db information
 
@@ -14,11 +15,10 @@ class LinearRegressionModel:
   def __init__(self,metrics,repo_id):
     self.metrics = metrics
     self.repo_id = repo_id
-
-    # R functions to be used
-    self.glm = robjects.r['glm']
+    self.stats = importr('stats')
+    self.base = importr('base')
     self.readcsv = robjects.r['read.csv']
-    self.coef = robjects.r['coef'] # get coefficients
+    self.sig_threshold = 0.05
 
   def buildModel(self):
     self._buildDataSet()
@@ -92,25 +92,80 @@ class LinearRegressionModel:
 
     data = self.readcsv(dir_of_datasets + self.repo_id + ".csv", header=True, sep = ",")
     formula = "is_buggy~ns+nd+nf+entrophy+la+ld+lt+ndev+age+nuc+exp+rexp+sexp"
-    glm_model = self.glm(formula, data=data, family="binomial")
-    coef = self.coef(glm_model)
+    fit = self.stats.glm(formula, data=data, family="binomial")
+    summary = self.base.summary(fit)
+
+    coef = {} # a dict containing all coefficients
+    coef['intercept'] = summary.rx2('coefficients').rx(1)[0]
+    coef['intercept_sig'] = summary.rx2('coefficients').rx(1,4)[0]
+    coef['ns'] = summary.rx2('coefficients').rx(2)[0]
+    coef['ns_sig'] = summary.rx2('coefficients').rx(2,4)[0]
+    coef['nd'] = summary.rx2('coefficients').rx(3)[0]
+    coef['nd_sig'] = summary.rx2('coefficients').rx(3,4)[0]
+    coef['nf'] = summary.rx2('coefficients').rx(4)[0]
+    coef['nf_sig'] = summary.rx2('coefficients').rx(4,4)[0]
+    coef['entrophy'] = summary.rx2('coefficients').rx(5)[0]
+    coef['entrophy_sig'] = summary.rx2('coefficients').rx(5,4)[0]
+    coef['la'] = summary.rx2('coefficients').rx(6)[0]
+    coef['la_sig'] = summary.rx2('coefficients').rx(6,4)[0]
+    coef['ld'] = summary.rx2('coefficients').rx(7)[0]
+    coef['ld_sig'] = summary.rx2('coefficients').rx(7,4)[0]
+    coef['lt'] = summary.rx2('coefficients').rx(8)[0]
+    coef['lt_sig'] = summary.rx2('coefficients').rx(8,4)[0]
+    coef['ndev'] = summary.rx2('coefficients').rx(9)[0]
+    coef['ndev_sig'] = summary.rx2('coefficients').rx(9,4)[0]
+    coef['age'] = summary.rx2('coefficients').rx(10)[0]
+    coef['age_sig'] = summary.rx2('coefficients').rx(10,4)[0]
+    coef['nuc'] = summary.rx2('coefficients').rx(11)[0]
+    coef['nuc_sig'] = summary.rx2('coefficients').rx(11,4)[0]
+    coef['exp'] = summary.rx2('coefficients').rx(12)[0]
+    coef['exp_sig'] = summary.rx2('coefficients').rx(12,4)[0]
+    coef['rexp'] = summary.rx2('coefficients').rx(13)[0]
+    coef['rexp_sig'] = summary.rx2('coefficients').rx(13,4)[0]
+    coef['sexp'] = summary.rx2('coefficients').rx(14)[0]
+    coef['sexp_sig'] = summary.rx2('coefficients').rx(14,4)[0]
+
     self._storeCoefficients(coef)
 
-  def _storeCoefficients(self, coef):
+  def _getCoefficientObject(self, coef_name, coef_value):
+    """
+    returns a JSON object representation of coefficient given
+    the name and value. if coefficient significance, true or false
+    is given depending on if it meets the significance threshold
+    """
+    coef_object = ""
+
+    # Is this a real coefficient or a p-value/sig coefficient?
+    if "sig" in coef_name:
+
+      if coef_value < self.sig_threshold:
+        coef_object += '"' + str(coef_name) + '":"1'
+      else:
+        coef_object += '"' + str(coef_name) + '":"0'
+
+    else:
+      coef_object += '"' + str(coef_name) + '":"' + str(coef_value)
+
+    return coef_object + '",'
+
+  def _storeCoefficients(self, coef_dict):
     """
     stores the glm coefficients in the database
     @private
     """
-    # Coefficient object represents the coefficients as a dictionary
-    coefObject = '"repo":"' + str(self.repo_id) + '","intercept":"' + str(coef[0]) + '","ns":"' + str(coef[1]) \
-      + '","nd":"' + str(coef[2]) + '","nf":"' + str(coef[3]) + '","entrophy":"' + str(coef[4]) + '","la":"' \
-      + str(coef[5]) + '","ld":"' + str(coef[6]) + '","lt":"' + str(coef[7]) + '","ndev":"' + str(coef[8]) \
-      + '","age":"' + str(coef[9]) + '","nuc":"' + str(coef[10]) + '","exp":"' + str(coef[11]) + '","rexp":"' \
-      + str(coef[12]) + '","sexp":"' + str(coef[13]) + '"'
+    coefs = ""
+    coefs += '"repo":"' + str(self.repo_id) + '",'
+
+    # iterate through all the values in the dict containing coeficients
+    for coef_name, coef_value in coef_dict.items():
+      coefs += self._getCoefficientObject(coef_name, coef_value)
+
+    # remove the trailing comma
+    coefs = coefs[:-1]
 
     # Insert into the coefficient table
     coefSession = Session()
-    allCoef = GlmCoefficients(json.loads('{' + coefObject + '}'))
+    allCoef = GlmCoefficients(json.loads('{' + coefs + '}'))
 
     # Copy to db
     coefSession.merge(allCoef)
