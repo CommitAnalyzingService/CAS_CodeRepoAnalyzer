@@ -12,13 +12,15 @@ class LinearRegressionModel:
   probability: intercept + sum([metric_coefficient] * metric)
   """
 
-  def __init__(self,metrics,repo_id):
+  def __init__(self, metrics, repo_id):
     self.metrics = metrics
     self.repo_id = repo_id
     self.stats = importr('stats')
     self.base = importr('base')
     self.readcsv = robjects.r['read.csv']
     self.sig_threshold = 0.05
+    self.coef = {} # a dict containing glm coefficients
+    self.ready = False
 
   def buildModel(self):
     self._buildDataSet()
@@ -95,37 +97,36 @@ class LinearRegressionModel:
     fit = self.stats.glm(formula, data=data, family="binomial")
     summary = self.base.summary(fit)
 
-    coef = {} # a dict containing all coefficients
-    coef['intercept'] = summary.rx2('coefficients').rx(1)[0]
-    coef['intercept_sig'] = summary.rx2('coefficients').rx(1,4)[0]
-    coef['ns'] = summary.rx2('coefficients').rx(2)[0]
-    coef['ns_sig'] = summary.rx2('coefficients').rx(2,4)[0]
-    coef['nd'] = summary.rx2('coefficients').rx(3)[0]
-    coef['nd_sig'] = summary.rx2('coefficients').rx(3,4)[0]
-    coef['nf'] = summary.rx2('coefficients').rx(4)[0]
-    coef['nf_sig'] = summary.rx2('coefficients').rx(4,4)[0]
-    coef['entrophy'] = summary.rx2('coefficients').rx(5)[0]
-    coef['entrophy_sig'] = summary.rx2('coefficients').rx(5,4)[0]
-    coef['la'] = summary.rx2('coefficients').rx(6)[0]
-    coef['la_sig'] = summary.rx2('coefficients').rx(6,4)[0]
-    coef['ld'] = summary.rx2('coefficients').rx(7)[0]
-    coef['ld_sig'] = summary.rx2('coefficients').rx(7,4)[0]
-    coef['lt'] = summary.rx2('coefficients').rx(8)[0]
-    coef['lt_sig'] = summary.rx2('coefficients').rx(8,4)[0]
-    coef['ndev'] = summary.rx2('coefficients').rx(9)[0]
-    coef['ndev_sig'] = summary.rx2('coefficients').rx(9,4)[0]
-    coef['age'] = summary.rx2('coefficients').rx(10)[0]
-    coef['age_sig'] = summary.rx2('coefficients').rx(10,4)[0]
-    coef['nuc'] = summary.rx2('coefficients').rx(11)[0]
-    coef['nuc_sig'] = summary.rx2('coefficients').rx(11,4)[0]
-    coef['exp'] = summary.rx2('coefficients').rx(12)[0]
-    coef['exp_sig'] = summary.rx2('coefficients').rx(12,4)[0]
-    coef['rexp'] = summary.rx2('coefficients').rx(13)[0]
-    coef['rexp_sig'] = summary.rx2('coefficients').rx(13,4)[0]
-    coef['sexp'] = summary.rx2('coefficients').rx(14)[0]
-    coef['sexp_sig'] = summary.rx2('coefficients').rx(14,4)[0]
+    self.coef['intercept'] = summary.rx2('coefficients').rx(1)[0]
+    self.coef['intercept_sig'] = summary.rx2('coefficients').rx(1,4)[0]
+    self.coef['ns'] = summary.rx2('coefficients').rx(2)[0]
+    self.coef['ns_sig'] = summary.rx2('coefficients').rx(2,4)[0]
+    self.coef['nd'] = summary.rx2('coefficients').rx(3)[0]
+    self.coef['nd_sig'] = summary.rx2('coefficients').rx(3,4)[0]
+    self.coef['nf'] = summary.rx2('coefficients').rx(4)[0]
+    self.coef['nf_sig'] = summary.rx2('coefficients').rx(4,4)[0]
+    self.coef['entrophy'] = summary.rx2('coefficients').rx(5)[0]
+    self.coef['entrophy_sig'] = summary.rx2('coefficients').rx(5,4)[0]
+    self.coef['la'] = summary.rx2('coefficients').rx(6)[0]
+    self.coef['la_sig'] = summary.rx2('coefficients').rx(6,4)[0]
+    self.coef['ld'] = summary.rx2('coefficients').rx(7)[0]
+    self.coef['ld_sig'] = summary.rx2('coefficients').rx(7,4)[0]
+    self.coef['lt'] = summary.rx2('coefficients').rx(8)[0]
+    self.coef['lt_sig'] = summary.rx2('coefficients').rx(8,4)[0]
+    self.coef['ndev'] = summary.rx2('coefficients').rx(9)[0]
+    self.coef['ndev_sig'] = summary.rx2('coefficients').rx(9,4)[0]
+    self.coef['age'] = summary.rx2('coefficients').rx(10)[0]
+    self.coef['age_sig'] = summary.rx2('coefficients').rx(10,4)[0]
+    self.coef['nuc'] = summary.rx2('coefficients').rx(11)[0]
+    self.coef['nuc_sig'] = summary.rx2('coefficients').rx(11,4)[0]
+    self.coef['exp'] = summary.rx2('coefficients').rx(12)[0]
+    self.coef['exp_sig'] = summary.rx2('coefficients').rx(12,4)[0]
+    self.coef['rexp'] = summary.rx2('coefficients').rx(13)[0]
+    self.coef['rexp_sig'] = summary.rx2('coefficients').rx(13,4)[0]
+    self.coef['sexp'] = summary.rx2('coefficients').rx(14)[0]
+    self.coef['sexp_sig'] = summary.rx2('coefficients').rx(14,4)[0]
 
-    self._storeCoefficients(coef)
+    self._storeCoefficients()
 
   def _getCoefficientObject(self, coef_name, coef_value):
     """
@@ -138,7 +139,7 @@ class LinearRegressionModel:
     # Is this a real coefficient or a p-value/sig coefficient?
     if "sig" in coef_name:
 
-      if coef_value < self.sig_threshold:
+      if coef_value <= self.sig_threshold:
         coef_object += '"' + str(coef_name) + '":"1'
       else:
         coef_object += '"' + str(coef_name) + '":"0'
@@ -148,7 +149,7 @@ class LinearRegressionModel:
 
     return coef_object + '",'
 
-  def _storeCoefficients(self, coef_dict):
+  def _storeCoefficients(self):
     """
     stores the glm coefficients in the database
     @private
@@ -157,7 +158,7 @@ class LinearRegressionModel:
     coefs += '"repo":"' + str(self.repo_id) + '",'
 
     # iterate through all the values in the dict containing coeficients
-    for coef_name, coef_value in coef_dict.items():
+    for coef_name, coef_value in self.coef.items():
       coefs += self._getCoefficientObject(coef_name, coef_value)
 
     # remove the trailing comma
@@ -172,3 +173,29 @@ class LinearRegressionModel:
 
     # Write
     coefSession.commit()
+    self.ready = True
+
+  def calculateProbCommits(self, commits):
+    """
+    calcualte the probability of commits to be buggy or not
+    using the linear regression model
+    """
+    assert(self.ready == True)
+
+    for commit in commits:
+      prob = (self.coef["intercept"] * self.coef["intercept"]) \
+              + (self.coef["ns"] * self.coef["ns_sig"]) \
+              + (self.coef["nd"] * self.coef["nd_sig"]) \
+              + (self.coef["nf"] * self.coef["nf_sig"]) \
+              + (self.coef["entrophy"] * self.coef["entrophy_sig"]) \
+              + (self.coef["la"] * self.coef["la_sig"]) \
+              + (self.coef["ld"] * self.coef["ld_sig"]) \
+              + (self.coef["lt"] * self.coef["lt_sig"]) \
+              + (self.coef["ndev"] * self.coef["ndev_sig"]) \
+              + (self.coef["age"] * self.coef["age_sig"]) \
+              + (self.coef["nuc"] * self.coef["nuc_sig"]) \
+              + (self.coef["exp"] * self.coef["exp_sig"]) \
+              + (self.coef["rexp"] * self.coef["rexp_sig"]) \
+              + (self.coef["sexp"] * self.coef["sexp_sig"])
+
+      commit.glm_probability = prob

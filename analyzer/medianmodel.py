@@ -20,7 +20,7 @@ class MedianModel:
     self.repo_id = repo_id
 
     # A p-value for wilcox test
-    self.psig = 0.0
+    self.psig = 0.05
 
     # R functions to be used
     self.medianFn = robjects.r['median']
@@ -50,14 +50,15 @@ class MedianModel:
 
       # First check p-values, if signficant then calculate median
       pvalue = self.wilcoxFn(robjects.FloatVector(metric_buggy), robjects.FloatVector(metric_nonbuggy))[2][0]
-      if pvalue >= self.psig:
-        buggy_median = self.medianFn(robjects.FloatVector(metric_buggy))
-        nonbuggy_median = self.medianFn(robjects.FloatVector(metric_nonbuggy))
-        median_props += '"' + metric + 'buggy":"' + str(buggy_median[0]) + '", '
-        median_props += '"' + metric + 'nonbuggy":"' + str(nonbuggy_median[0]) + '", '
+      buggy_median = self.medianFn(robjects.FloatVector(metric_buggy))
+      nonbuggy_median = self.medianFn(robjects.FloatVector(metric_nonbuggy))
+      median_props += '"' + metric + 'buggy":"' + str(buggy_median[0]) + '", '
+      median_props += '"' + metric + 'nonbuggy":"' + str(nonbuggy_median[0]) + '", '
+
+      if pvalue <= self.psig:
+        median_props += '"' + metric + '_sig":"1", '
       else:
-        median_props += '"' + metric + 'buggy":"-1", '
-        median_props += '"' + metric + 'nonbuggy":"-1", '
+        median_props += '"' + metric + '_sig":"0", '
 
     except:
       print("Skipping metric: " + metric +

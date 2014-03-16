@@ -13,7 +13,7 @@ class Commit(Base):
     description: The SQLAlchemy ORM for the commits table
     """
     __tablename__ = 'commits'
-    
+
     commit_hash = Column(String, primary_key=True)
     author_name  = Column(String)
     author_date_unix_timestamp  = Column(String)
@@ -39,19 +39,22 @@ class Commit(Base):
     exp = Column(Float, unique=False, default=0)
     rexp = Column(Float, unique=False, default=0)
     sexp = Column(Float, unique=False, default=0)
-    
+
+    # The linear regression probability of commit containing bug
+    glm_probability = Column(Float, unique=False, default=0)
+
     # Many-to-One Relation to repositories table
     repository_id = Column(String)
-    
+
     def __init__(self, commitDict):
         """
         __init__(): Dictonary -> NoneType
         """
         self.__dict__.update(commitDict)
-            
+
     def __repr__(self):
         return "<Commit('%s','%s', '%s', '%s')>" % \
             (self.commit_hash,
-            self.author_name, 
-            self.author_date, 
+            self.author_name,
+            self.author_date,
             self.commit_message)
