@@ -38,8 +38,14 @@ class MetricsGenerator:
 		median_model = MedianModel(self.metrics, self.repo_id)
 		linear_reg_model = LinearRegressionModel(self.metrics, self.repo_id)
 
+		# build the median model
 		median_model.buildModel()
+
+		# build the linear regression model
 		linear_reg_model.buildModel()
+
+		# calculate the probabilities of each commit based on linear regression
+		linear_reg_model.calculateProbCommits(self.commits)
 
 	def dumpData(self):
 		"""

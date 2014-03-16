@@ -102,7 +102,7 @@ def analyzeRepo(repository_to_analyze, session):
 		issue_tracker = GithubIssueTracker(owner,repo)
 	else:
 		issue_tracker = None
-s
+
 	# Find and mark the buggy commits
 	bug_finder = BugFinder(all_commits, corrective_commits, issue_tracker)
 	bug_finder.markBuggyCommits()
