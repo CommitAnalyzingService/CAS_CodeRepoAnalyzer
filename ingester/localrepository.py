@@ -24,50 +24,50 @@ class LocalRepository():
         description: Abstracts the actions done on a repository
         """
         self.repo = repo
-        
+
         # Temporary until other Repo types are added
-        self.adapter = Git      
-        
+        self.adapter = Git
+
         self.commits = {}
-    
+
     def sync(self):
         """
         sync():
         description: Simply wraps the syncing functions together
         """
-        
+
         # TODO: Error checking.
         firstSync = self.syncRepoFiles()
         self.syncCommits(firstSync)
-        
+
         # Set the date AFTER it has been ingested and synced.
         self.repo.ingestion_date = self.start_date
-    
+
     def syncRepoFiles(self):
         """
         syncRepoFiles() -> Boolean
-        description: Downloads the current repo locally, and sets the path and 
+        description: Downloads the current repo locally, and sets the path and
             injestion date accordingly
         returns: Boolean - if this is the first sync
         """
         # Cache the start date to set later
         self.start_date = str(datetime.now().replace(microsecond=0))
-        
+
         path = os.path.dirname(__file__) + self.adapter.REPO_DIRECTORY + self.repo.id
-        # See if repo has already been downloaded, if it is fetch, if not clone
+        # See if repo has already been downloaded, if it is pull, if not clone
         if os.path.isdir(path):
-            self.adapter.fetch(self.adapter, self.repo)
+            self.adapter.pull(self.adapter, self.repo)
             firstSync = False
         else:
             self.adapter.clone(self.adapter, self.repo)
             firstSync = True
-        
+
         return firstSync
 
     def syncCommits(self, firstSync):
         """
         syncCommits():
-        description: Makes each commit dictonary into an object and then 
+        description: Makes each commit dictonary into an object and then
             inserts them into the database
         arguments: firstSync Boolean: whether to sync all commits or after the
             ingestion date

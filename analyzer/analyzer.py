@@ -102,6 +102,7 @@ def analyzeRepo(repository_to_analyze, session):
 		issue_tracker = GithubIssueTracker(owner,repo)
 	else:
 		issue_tracker = None
+	issue_tracker = None
 
 	# Find and mark the buggy commits
 	bug_finder = BugFinder(all_commits, corrective_commits, issue_tracker)
@@ -122,7 +123,7 @@ def analyzeRepo(repository_to_analyze, session):
 	repository_to_analyze.status = "Analyzed"
 	repository_to_analyze.analysis_date = str(datetime.now().replace(microsecond=0))
 
-	# Update database of commits that were buggy & analysis date & status
+	# Update database of commits that were buggy & analysis date & status & glm probabilities
 	session.commit()
 
 	# Notify any subscribers of repo that it has been analyzed IF it has not been analyzed previously

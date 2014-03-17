@@ -2,7 +2,8 @@
 file: bugfinder.py
 author: Christoffer Rosen <cbr4830@rit.edu>
 date: November 2013
-description: Identifies buggy commits
+description: Links changes that introduces bugs by identifying changes
+that fix problems.
 """
 
 import re
@@ -12,7 +13,7 @@ from caslogging import logging
 class BugFinder:
 	"""
 	BugFinder():
-	description: Finds commits that are buggy
+	description: Links changes that introduces bugs.
 	"""
 
 	def __init__(self, allCommits, correctiveCommits, issueTracker):
@@ -20,7 +21,9 @@ class BugFinder:
 		Constructor
 
 		@param commits: All commits in ascending order by date
-		@param correctiveCommits: All commits which all bug fixing
+		@param correctiveCommits: All commits/changes which are identified
+		as fixing problems.
+		@param issueTracker: Issue tracker (e.g., GitHub Issues)
 		"""
 		self.allCommits = allCommits
 		self.correctiveCommits = correctiveCommits
@@ -29,7 +32,7 @@ class BugFinder:
 	def findIssueOpened(self, correctiveCommit):
 		"""
 		findIssueIds()
-		If the commit links to a issue in the issue tracker, returns
+		If the corrective change/commit links to a issue in the issue tracker, returns
 		the date of oldest open issue found otherwise returns none
 		"""
 		issue_opened = None
@@ -58,7 +61,7 @@ class BugFinder:
 	def searchForBuggyCommit(self, correctiveCommit):
 		"""
 		Finds the buggy commit based on the bug fixing commit
-		Helper method for markBuggyCommits. If commti links to an
+		Helper method for markBuggyCommits. If commir links to an
 		issue tracker, we check files changed prior to this date.
 		Otherwise, me only check date prior to the fix.
 

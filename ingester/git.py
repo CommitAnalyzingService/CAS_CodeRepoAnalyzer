@@ -38,9 +38,9 @@ class Git():
     \\"commit_message\\"CAS_READER_PROP_DELIMITER: \\"%s%b\\"\
     CAS_READER_STOPPRETTY \" --numstat --reverse '
 
-    CLONE_CMD = 'git clone -q --mirror {!s} {!s}'     # git clone command w/o downloading src code
-    FETCH_CMD = 'git fetch -q origin master:master'         # git fetch command
-    REPO_DIRECTORY = "/CASRepos/git/"            # directory in which to store repositories
+    CLONE_CMD = 'git clone {!s} {!s}'     # git clone command w/o downloading src code
+    PULL_CMD = 'git pull origin master'      # git pull command
+    REPO_DIRECTORY = "/CASRepos/git/"        # directory in which to store repositories
 
     def getCommitStatsProperties( stats, commitFiles, devExperience, author, unixTimeStamp ):
         """
@@ -350,20 +350,19 @@ class Git():
         # TODO: only return true on success, else return false
         return True
 
-    def fetch(self, repo):
+    def pull(self, repo):
         """
         fetch(repo): Repository -> String
-        description:Takes the current repo and pulls it into the
-            `clone_directory/the_repo_id`
+        description:Takes the current repo and pulls the latest changes.
         arguments: repo Repository: the repository to pull
         pre-conditions: The repo has already been created
         """
         # Go to the repo directory
         os.chdir(os.path.dirname(__file__) + self.REPO_DIRECTORY + repo.id)
         # Run the pull command and return the results
-        logging.info('Git fetching repo: '+ str(repo) )
+        logging.info('Pulling latest changes from repo: '+ str(repo) )
         fetchResult = str(subprocess.check_output(
-                  self.FETCH_CMD,
+                  self.PULL_CMD,
                   shell=True ) )
         logging.info('Done fetching.')
         #logging.debug("Git pull result:\n" + cloneResult)
