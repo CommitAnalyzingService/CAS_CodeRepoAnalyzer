@@ -4,6 +4,7 @@ import rpy2.robjects as robjects # R integration
 from rpy2.robjects.packages import importr # import the importr package from R
 from orm.glmcoefficients import * # to store the glm coefficients
 from db import *	# postgresql db information
+import math
 
 class LinearRegressionModel:
   """
@@ -141,8 +142,17 @@ class LinearRegressionModel:
 
       if coef_value <= self.sig_threshold:
         coef_object += '"' + str(coef_name) + '":"1'
+
+        # update the coeficient dict, as this is used when
+        # calcuating estimated probabilities
+        self.coef[coef_name] = 1
+
       else:
         coef_object += '"' + str(coef_name) + '":"0'
+
+        # update the coeficient dict, as this is used when
+        # calcuating estimated probabilities
+        self.coef[coef_name] = 0
 
     else:
       coef_object += '"' + str(coef_name) + '":"' + str(coef_value)
@@ -179,23 +189,28 @@ class LinearRegressionModel:
     """
     calcualte the probability of commits to be buggy or not
     using the linear regression model
+
+    estimated probability = 1/[1 + exp(-a - BX)]
     """
     assert(self.ready == True)
 
     for commit in commits:
-      prob = (self.coef["intercept"] * self.coef["intercept"]) \
-              + (self.coef["ns"] * self.coef["ns_sig"]) \
-              + (self.coef["nd"] * self.coef["nd_sig"]) \
-              + (self.coef["nf"] * self.coef["nf_sig"]) \
-              + (self.coef["entrophy"] * self.coef["entrophy_sig"]) \
-              + (self.coef["la"] * self.coef["la_sig"]) \
-              + (self.coef["ld"] * self.coef["ld_sig"]) \
-              + (self.coef["lt"] * self.coef["lt_sig"]) \
-              + (self.coef["ndev"] * self.coef["ndev_sig"]) \
-              + (self.coef["age"] * self.coef["age_sig"]) \
-              + (self.coef["nuc"] * self.coef["nuc_sig"]) \
-              + (self.coef["exp"] * self.coef["exp_sig"]) \
-              + (self.coef["rexp"] * self.coef["rexp_sig"]) \
-              + (self.coef["sexp"] * self.coef["sexp_sig"])
 
-      commit.glm_probability = prob
+
+        coefs =   (commit.ns * self.coef["ns"] * self.coef["ns_sig"]) \
+                + (commit.nd * self.coef["nd"] * self.coef["nd_sig"]) \
+                + (commit.nf * self.coef["nf"] * self.coef["nf_sig"]) \
+                + (commit.entrophy * self.coef["entrophy"] * self.coef["entrophy_sig"]) \
+                + (commit.la * self.coef["la"] * self.coef["la_sig"]) \
+                + (commit.ld * self.coef["ld"] * self.coef["ld_sig"]) \
+                + (commit.lt * self.coef["lt"] * self.coef["lt_sig"]) \
+                + (commit.ndev * self.coef["ndev"] * self.coef["ndev_sig"]) \
+                + (commit.age * self.coef["age"] * self.coef["age_sig"]) \
+                + (commit.nuc * self.coef["nuc"] * self.coef["nuc_sig"]) \
+                + (commit.exp * self.coef["exp"] * self.coef["exp_sig"]) \
+                + (commit.rexp * self.coef["rexp"] * self.coef["rexp_sig"]) \
+                + (commit.sexp * self.coef["sexp"] * self.coef["sexp_sig"])
+
+        constant = (self.coef["intercept"] * self.coef["intercept_sig"])
+        est_probability = 1/(1 + math.exp(-constant-coefs))
+        commit.glm_probability = est_probability
