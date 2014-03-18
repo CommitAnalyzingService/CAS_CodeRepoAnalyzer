@@ -5,6 +5,7 @@ from rpy2.robjects.packages import importr # import the importr package from R
 from orm.glmcoefficients import * # to store the glm coefficients
 from db import *	# postgresql db information
 import math
+from caslogging import logging
 
 class LinearRegressionModel:
   """
@@ -98,36 +99,39 @@ class LinearRegressionModel:
     fit = self.stats.glm(formula, data=data, family="binomial")
     summary = self.base.summary(fit)
 
-    self.coef['intercept'] = summary.rx2('coefficients').rx(1)[0]
-    self.coef['intercept_sig'] = summary.rx2('coefficients').rx(1,4)[0]
-    self.coef['ns'] = summary.rx2('coefficients').rx(2)[0]
-    self.coef['ns_sig'] = summary.rx2('coefficients').rx(2,4)[0]
-    self.coef['nd'] = summary.rx2('coefficients').rx(3)[0]
-    self.coef['nd_sig'] = summary.rx2('coefficients').rx(3,4)[0]
-    self.coef['nf'] = summary.rx2('coefficients').rx(4)[0]
-    self.coef['nf_sig'] = summary.rx2('coefficients').rx(4,4)[0]
-    self.coef['entrophy'] = summary.rx2('coefficients').rx(5)[0]
-    self.coef['entrophy_sig'] = summary.rx2('coefficients').rx(5,4)[0]
-    self.coef['la'] = summary.rx2('coefficients').rx(6)[0]
-    self.coef['la_sig'] = summary.rx2('coefficients').rx(6,4)[0]
-    self.coef['ld'] = summary.rx2('coefficients').rx(7)[0]
-    self.coef['ld_sig'] = summary.rx2('coefficients').rx(7,4)[0]
-    self.coef['lt'] = summary.rx2('coefficients').rx(8)[0]
-    self.coef['lt_sig'] = summary.rx2('coefficients').rx(8,4)[0]
-    self.coef['ndev'] = summary.rx2('coefficients').rx(9)[0]
-    self.coef['ndev_sig'] = summary.rx2('coefficients').rx(9,4)[0]
-    self.coef['age'] = summary.rx2('coefficients').rx(10)[0]
-    self.coef['age_sig'] = summary.rx2('coefficients').rx(10,4)[0]
-    self.coef['nuc'] = summary.rx2('coefficients').rx(11)[0]
-    self.coef['nuc_sig'] = summary.rx2('coefficients').rx(11,4)[0]
-    self.coef['exp'] = summary.rx2('coefficients').rx(12)[0]
-    self.coef['exp_sig'] = summary.rx2('coefficients').rx(12,4)[0]
-    self.coef['rexp'] = summary.rx2('coefficients').rx(13)[0]
-    self.coef['rexp_sig'] = summary.rx2('coefficients').rx(13,4)[0]
-    self.coef['sexp'] = summary.rx2('coefficients').rx(14)[0]
-    self.coef['sexp_sig'] = summary.rx2('coefficients').rx(14,4)[0]
+    try:
+      self.coef['intercept'] = summary.rx2('coefficients').rx(1)[0]
+      self.coef['intercept_sig'] = summary.rx2('coefficients').rx(1,4)[0]
+      self.coef['ns'] = summary.rx2('coefficients').rx(2)[0]
+      self.coef['ns_sig'] = summary.rx2('coefficients').rx(2,4)[0]
+      self.coef['nd'] = summary.rx2('coefficients').rx(3)[0]
+      self.coef['nd_sig'] = summary.rx2('coefficients').rx(3,4)[0]
+      self.coef['nf'] = summary.rx2('coefficients').rx(4)[0]
+      self.coef['nf_sig'] = summary.rx2('coefficients').rx(4,4)[0]
+      self.coef['entrophy'] = summary.rx2('coefficients').rx(5)[0]
+      self.coef['entrophy_sig'] = summary.rx2('coefficients').rx(5,4)[0]
+      self.coef['la'] = summary.rx2('coefficients').rx(6)[0]
+      self.coef['la_sig'] = summary.rx2('coefficients').rx(6,4)[0]
+      self.coef['ld'] = summary.rx2('coefficients').rx(7)[0]
+      self.coef['ld_sig'] = summary.rx2('coefficients').rx(7,4)[0]
+      self.coef['lt'] = summary.rx2('coefficients').rx(8)[0]
+      self.coef['lt_sig'] = summary.rx2('coefficients').rx(8,4)[0]
+      self.coef['ndev'] = summary.rx2('coefficients').rx(9)[0]
+      self.coef['ndev_sig'] = summary.rx2('coefficients').rx(9,4)[0]
+      self.coef['age'] = summary.rx2('coefficients').rx(10)[0]
+      self.coef['age_sig'] = summary.rx2('coefficients').rx(10,4)[0]
+      self.coef['nuc'] = summary.rx2('coefficients').rx(11)[0]
+      self.coef['nuc_sig'] = summary.rx2('coefficients').rx(11,4)[0]
+      self.coef['exp'] = summary.rx2('coefficients').rx(12)[0]
+      self.coef['exp_sig'] = summary.rx2('coefficients').rx(12,4)[0]
+      self.coef['rexp'] = summary.rx2('coefficients').rx(13)[0]
+      self.coef['rexp_sig'] = summary.rx2('coefficients').rx(13,4)[0]
+      self.coef['sexp'] = summary.rx2('coefficients').rx(14)[0]
+      self.coef['sexp_sig'] = summary.rx2('coefficients').rx(14,4)[0]
+      self._storeCoefficients()
 
-    self._storeCoefficients()
+    except:
+      logging.error("singularity found, skipping coefficients...")
 
   def _getCoefficientObject(self, coef_name, coef_value):
     """
@@ -192,7 +196,8 @@ class LinearRegressionModel:
 
     estimated probability = 1/[1 + exp(-a - BX)]
     """
-    assert(self.ready == True)
+    if (self.ready != True):
+      return
 
     for commit in commits:
 
@@ -211,6 +216,10 @@ class LinearRegressionModel:
                 + (commit.rexp * self.coef["rexp"] * self.coef["rexp_sig"]) \
                 + (commit.sexp * self.coef["sexp"] * self.coef["sexp_sig"])
 
-        constant = (self.coef["intercept"] * self.coef["intercept_sig"])
-        est_probability = 1/(1 + math.exp(-constant-coefs))
-        commit.glm_probability = est_probability
+        try:
+          constant = (self.coef["intercept"] * self.coef["intercept_sig"])
+          est_probability = 1/(1 + math.exp(-constant-coefs))
+          commit.glm_probability = est_probability
+
+        except:
+          commit.glm_probability = 0.5
