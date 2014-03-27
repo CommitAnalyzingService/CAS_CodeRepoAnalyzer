@@ -134,14 +134,9 @@ def analyzeRepo(repository_to_analyze, session):
 	# Generate the metrics
 	logging.info('Generating metrics for repository id ' + repo_id)
 
-	try:
-		metrics_generator = MetricsGenerator(repo_id, all_commits)
-		metrics_generator.generateMetrics()
-		repository_to_analyze.status = "Analyzed"
-
-	except:
-		logging.error("Unable to generate metrics for repository id " + repo_id)
-		repository_to_analyze.status = "Error"
+	metrics_generator = MetricsGenerator(repo_id, all_commits)
+	metrics_generator.buildAllModels()
+	repository_to_analyze.status = "Analyzed"
 
 	repository_to_analyze.analysis_date = str(datetime.now().replace(microsecond=0))
 
@@ -153,4 +148,4 @@ def analyzeRepo(repository_to_analyze, session):
 		notifier.notify()
 
 	logging.info( 'A worker finished analyzing repo ' +
-                  repository_to_analyze.id )
+									repository_to_analyze.id )
