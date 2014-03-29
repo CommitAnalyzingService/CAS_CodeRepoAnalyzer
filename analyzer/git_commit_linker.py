@@ -16,7 +16,11 @@ class GitCommitLinker:
   heavily commented as git diff tool doesn't provide a clean way of seeing
   the specific line of code modified. therefore, we are manually forced to
   grep for this information and therefore this may be hard to understand/follow
-  without many comments.
+  without many comments. we are also using the git scm tool to annotate/blame to
+  track down the bug-introducing chages; therefore, it's not just python code being
+  executed.
+
+  this class assumes that GNU grep is installed on the machine running this code.
   """
 
   REPO_DIR = "ingester/CASRepos/git/" # locations where repo directories are stored
@@ -123,7 +127,12 @@ class GitCommitLinker:
         # logging.info(str(lines_modified_info.split(" ")))
 
         # get the starting line of code that was modified
-        line_introduction = lines_modified_info.split(" ")[1]
+        line_introduction = lines_modified_info.split(" ")[1][1:] # also remove the '-' in front of line #
+
+        # also remove the comma; we only use the start of the modification/deletion.
+        if (line_introduction.find(",") != -1):
+          line_introduction = line_introduction[0:line_introduction.find(",")]
+          
         region_diff[last_modified_file].append(line_introduction)
 
     return region_diff
@@ -152,13 +161,17 @@ class GitCommitLinker:
     return self._getModifiedRegions(diff_cmd, files_modified)
 
 
-  def getBlame(self, listOfRegions, commit):
+  def gitAnnotateLinker(self, regions, commit):
     """
-    returns the commit ids that most recently modified the regions in the
-    list of regions for the passed in commit.
+    tracks down the origin of the deleted/modified loc in the regions dict using
+    the git annotate (now called git blame) feature of git and a list of commit
+    hashes of the most recent revision in which the line identified by the regions
+    was modified. these discovered commits are identified as bug-introducing changes.
 
-    @listOfRegions - a list containing the starting line numbers of each hunk of source code
-    that differed in a diff between commit and its ancester
-    @commit - the corrective commit
+    @regions - a dict of {file} -> {list of line numbers that were modified}
+    @commit - commit that belongs to the passed in chucks/regions.
     """
-    pass
+    bug_introducing_changes = []
+    annotate_cmd = "git blame"
+
+  #  for file, chunks in regions.items():
