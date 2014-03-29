@@ -56,11 +56,15 @@ class GitCommitLinker:
       logging.info("-- file: " + k)
       logging.info("---- regions: " + str(v))
 
+    bug_introducing_changes = self.gitAnnotate(region_chunks, commit)
+
   def _getModifiedRegions(self, diff_cmd, files_modified):
     """
     returns a dict of file -> list of line numbers modified. helper function for getModifiedRegions
     heavily commented as it may seem a bit janky. git diff doesn't provide a clean way of simply
-    getting the specific lines that were modified, so we are doing so here manually using grep.
+    getting the specific lines that were modified, so we are doing so here manually using grep. A possible
+    refactor in the future may be to use an external diff tool, so that this implementation wouldn't be scm
+    specific.
 
     if a file was merely deleted, then there was no chunk or region changed but we do capture the file.
     however, we do not assume this is a location of a bug.
@@ -100,7 +104,6 @@ class GitCommitLinker:
       possible_file_info = region_info[0]
       lines_modified_info = region_info[1]
 
-      # logging.info("possible file info: " + possible_file_info)
       # logging.info("lines modified info: " + lines_modified_info)
 
       # check to see if this is a file name -> if so, replace the last_modified_file
@@ -132,7 +135,7 @@ class GitCommitLinker:
         # also remove the comma; we only use the start of the modification/deletion.
         if (line_introduction.find(",") != -1):
           line_introduction = line_introduction[0:line_introduction.find(",")]
-          
+
         region_diff[last_modified_file].append(line_introduction)
 
     return region_diff
@@ -147,11 +150,11 @@ class GitCommitLinker:
     # change directory to repo directory
     os.chdir(self.repo_path)
 
-    # diff cmd w/ no lines of context
-    diff_cmd = "git diff " + commit.commit_hash + " "+ commit.commit_hash + "^ --unified=0"
+    # diff cmd w/ no lines of context between current vs parent
+    diff_cmd = "git diff " + commit.commit_hash + "^ "+ commit.commit_hash + " --unified=0"
 
     # files changed, this is used by the getLineNumbersChanged function
-    diff_cmd_lines_changed = "git diff " + commit.commit_hash + " "+ commit.commit_hash + "^ --name-only"
+    diff_cmd_lines_changed = "git diff " + commit.commit_hash + "^ "+ commit.commit_hash + " --name-only"
 
     # get the files modified -> use this to validate if we have arrived at a new file
     # when grepping for the specific lines changed.
@@ -161,7 +164,7 @@ class GitCommitLinker:
     return self._getModifiedRegions(diff_cmd, files_modified)
 
 
-  def gitAnnotateLinker(self, regions, commit):
+  def gitAnnotate(self, regions, commit):
     """
     tracks down the origin of the deleted/modified loc in the regions dict using
     the git annotate (now called git blame) feature of git and a list of commit
@@ -172,6 +175,20 @@ class GitCommitLinker:
     @commit - commit that belongs to the passed in chucks/regions.
     """
     bug_introducing_changes = []
-    annotate_cmd = "git blame"
 
-  #  for file, chunks in regions.items():
+    for file, lines in regions.items():
+      for line in lines:
+
+        # assume if region starts at beginning its a deletion or rename and ignore
+        if line != 0 and line != "0" :
+
+          # we need to git blame with the --follow option so that it follows renames in the file, and the '-l'
+          # option gives us the complete commit hash.
+          buggy_change = str( subprocess.check_output( "git blame -L" + line + ",+1 " + commit.commit_hash + " -l -- " \
+                            + file, shell=True )).split(" ")[0][2:]
+
+          if buggy_change not in bug_introducing_changes:
+            logging.info("blamming " + buggy_change + " for line "+ str(line) + " in file " + file + " in commit " + commit.commit_hash)
+            bug_introducing_changes.append(buggy_change)
+
+    return bug_introducing_changes
