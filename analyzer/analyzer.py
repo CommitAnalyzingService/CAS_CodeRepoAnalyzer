@@ -15,6 +15,7 @@ from analyzer.githubissuetracker import *
 from caslogging import logging
 from analyzer.notifier import *
 from config import config
+from analyzer.git_commit_linker import *
 
 def analyze(repo_id):
 	"""
@@ -124,18 +125,23 @@ def analyzeRepo(repository_to_analyze, session):
 
 	# Find and mark the buggy commits
 	bug_finder = BugFinder(all_commits, corrective_commits, issue_tracker)
+	git_commit_linker = GitCommitLinker(repo_id)
+	git_commit_linker.linkCorrectiveCommits(corrective_commits)
 
-	try:
-		bug_finder.markBuggyCommits()
-	except:
-		logging.error("unable to automatically find buggy commits for repository " +
-									repository_to_analyze.id)
 
-	# Generate the metrics
-	logging.info('Generating metrics for repository id ' + repo_id)
-
-	metrics_generator = MetricsGenerator(repo_id, all_commits)
-	metrics_generator.buildAllModels()
+	# try:
+	# 	bug_finder.markBuggyCommits()
+	# except:
+	# 	logging.error("unable to automatically find buggy commits for repository " +
+	# 								repository_to_analyze.id)
+	#
+	#
+	# # Generate the metrics
+	# logging.info('Generating metrics for repository id ' + repo_id)
+	#
+	# metrics_generator = MetricsGenerator(repo_id, all_commits)
+	# metrics_generator.buildAllModels()
+	
 	repository_to_analyze.status = "Analyzed"
 
 	repository_to_analyze.analysis_date = str(datetime.now().replace(microsecond=0))

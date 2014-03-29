@@ -12,45 +12,145 @@ class GitCommitLinker:
 
   assumes that regions where modified or deleted source code
   in a corrective fix is the location of a bug.
+
+  heavily commented as git diff tool doesn't provide a clean way of seeing
+  the specific line of code modified. therefore, we are manually forced to
+  grep for this information and therefore this may be hard to understand/follow
+  without many comments.
   """
 
-  REPO_DIR = "/CASRepos/git/" # locations where repo directories are stored
-
-  os.chdir(os.path.dirname(__file__) + self.REPO_DIRECTORY + repo.id)
+  REPO_DIR = "ingester/CASRepos/git/" # locations where repo directories are stored
 
   def __init__(self, repoId):
     """
     constructor
+    sets the repository path.
     """
-    self.repo_path = os.path.dirname(__file__) + "/CASReos/git/" + repo.id
+    self.repo_path = os.path.join(os.path.dirname(__file__), '..', self.REPO_DIR + repoId)
 
-  def linkCorrectiveCommit(self, commit):
+  def linkCorrectiveCommits(self, commits):
+    """
+    links all corrective changes/commits to the change that introduced the problem
+    """
+    for commit in commits:
+      self._linkCorrectiveCommit(commit)
+
+  def _linkCorrectiveCommit(self, commit):
     """
     links the corrective change/commit to the change/commit which was the
-    cause
+    cause. this is the purpose of this object
 
     @commit - the corrective change to link w/ the changes that introduces the
     problems/issues it fixes.
     """
+    logging.info(" #### Linking commit " + commit.commit_hash + " ####")
 
-    # change directory to repo directory
-    os.chdir(self.repo_path)
+    region_chunks = self.getModifiedRegions(commit)
 
-    # diff cmd
-    diff_cmd = "git diff " + commit.commit_hash + " ^" + commit.commit_hash
+    logging.info("Linkage: ")
+    for k,v in region_chunks.items():
+      logging.info("-- file: " + k)
+      logging.info("---- regions: " + str(v))
 
-    # get the diff
-    diff_output = str( subprocess.check_output(diff_cmd, shell=True ) )
+  def _getModifiedRegions(self, diff_cmd, files_modified):
+    """
+    returns a dict of file -> list of line numbers modified. helper function for getModifiedRegions
+    heavily commented as it may seem a bit janky. git diff doesn't provide a clean way of simply
+    getting the specific lines that were modified, so we are doing so here manually using grep.
 
+    if a file was merely deleted, then there was no chunk or region changed but we do capture the file.
+    however, we do not assume this is a location of a bug.
+    """
+    logging.info("Getting modified regions..")
+    region_diff = {}
 
-  def getListOfRegions(self, commit):
+    # initialize the dictionary with the files -> lists
+    for file in files_modified:
+
+      if file != "'" and file != "":
+        region_diff[file] = []
+
+    # grep for the file and line number changed by looking for the '@@' and also
+    # grepping the line above it, which if this is a new file will show us this.
+    # we see that its so by checking if it matches one of the files modified, which is passed
+    # in to the function.
+    grep_cmd = "grep '@@' -B 1"
+
+    # this is just dividing each region up in a very unfiltered manner
+    # example on how a region may look: "b'+++ b/{filename}\\n@@ {lines_modified_info} @@ {class}"
+    modified_regions = str( subprocess.check_output( diff_cmd + " | " + grep_cmd, shell=True ) ).split("--")
+
+    # keep track of the last modified file, as if there are multiple regions modified within a file
+    # it will not list the same file again in the line before the modified liens of code.
+    last_modified_file = None
+
+    for region in modified_regions:
+
+      # splits the information into three chuncks: line before the grep that may contain
+      # the file information, the place containing the lines of code modified, and the third
+      # chunck we don't care for.
+      region_info = region.split("@@")
+
+      # if we arrived at a new file, we will see it here; otherwise, it will just contain
+      # un-interesting information grepped before the lines modified information.
+      possible_file_info = region_info[0]
+      lines_modified_info = region_info[1]
+
+      # logging.info("possible file info: " + possible_file_info)
+      # logging.info("lines modified info: " + lines_modified_info)
+
+      # check to see if this is a file name -> if so, replace the last_modified_file
+      start_index = possible_file_info.find("b/")
+
+      if start_index != -1:
+        possible_file_info = possible_file_info[start_index+2:] # move passed b/
+
+        # remove newline at end if existent
+        end_index = possible_file_info.find("\\n")
+        if end_index != -1:
+          possible_file_info = possible_file_info[:end_index]
+
+        #logging.info("verifying that possible file: " + possible_file_info + " is acceptable.")
+
+        # verify that this is indeed a valid file and not just something random grepped.
+        if possible_file_info in region_diff:
+        #  logging.info("verified")
+          last_modified_file = possible_file_info # set it as the last modified file.
+
+      # it is possible there is a binary file being tracked.
+      if last_modified_file != None:
+        # logging.info("last modified file: " + last_modified_file)
+        # logging.info(str(lines_modified_info.split(" ")))
+
+        # get the starting line of code that was modified
+        line_introduction = lines_modified_info.split(" ")[1]
+        region_diff[last_modified_file].append(line_introduction)
+
+    return region_diff
+
+  def getModifiedRegions(self, commit):
     """
     returns the list of regions that were modified/deleted between this commit and its ancester.
     ex: [10,25]; this shows that regions starting at lines 10 and 25 were modified/deleted.
 
     @commit - change to get the list of regions
     """
-    pass
+    # change directory to repo directory
+    os.chdir(self.repo_path)
+
+    # diff cmd w/ no lines of context
+    diff_cmd = "git diff " + commit.commit_hash + " "+ commit.commit_hash + "^ --unified=0"
+
+    # files changed, this is used by the getLineNumbersChanged function
+    diff_cmd_lines_changed = "git diff " + commit.commit_hash + " "+ commit.commit_hash + "^ --name-only"
+
+    # get the files modified -> use this to validate if we have arrived at a new file
+    # when grepping for the specific lines changed.
+    files_modified = str( subprocess.check_output( diff_cmd_lines_changed, shell=True )).replace("b'", "").split("\\n")
+
+    # now, let's get the file and the line number changed in the commit
+    return self._getModifiedRegions(diff_cmd, files_modified)
+
 
   def getBlame(self, listOfRegions, commit):
     """
