@@ -25,6 +25,7 @@ class Commit(Base):
     classification = Column(String, unique=False)
 
     contains_bug = Column(Boolean, unique=False, default=False)
+    fixes = Column(String, unique=False)
     ns = Column(Float, unique=False, default=0)
     nd = Column(Float, unique=False, default=0)
     nf = Column(Float, unique=False, default=0)

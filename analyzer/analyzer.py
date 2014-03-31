@@ -124,9 +124,9 @@ def analyzeRepo(repository_to_analyze, session):
 
 
 	# Find and mark the buggy commits
-	bug_finder = BugFinder(all_commits, corrective_commits, issue_tracker)
+	#bug_finder = BugFinder(all_commits, corrective_commits, issue_tracker)
 	git_commit_linker = GitCommitLinker(repo_id)
-	git_commit_linker.linkCorrectiveCommits(corrective_commits)
+	git_commit_linker.linkCorrectiveCommits(corrective_commits, all_commits)
 
 
 	# try:
@@ -141,7 +141,7 @@ def analyzeRepo(repository_to_analyze, session):
 	#
 	# metrics_generator = MetricsGenerator(repo_id, all_commits)
 	# metrics_generator.buildAllModels()
-	
+
 	repository_to_analyze.status = "Analyzed"
 
 	repository_to_analyze.analysis_date = str(datetime.now().replace(microsecond=0))

@@ -32,12 +32,35 @@ class GitCommitLinker:
     """
     self.repo_path = os.path.join(os.path.dirname(__file__), '..', self.REPO_DIR + repoId)
 
-  def linkCorrectiveCommits(self, commits):
+  def linkCorrectiveCommits(self, corrective_commits, all_commits):
     """
     links all corrective changes/commits to the change that introduced the problem
+    note: a bug introducing change may have introduced more than one bug.
     """
-    for commit in commits:
-      self._linkCorrectiveCommit(commit)
+
+    linked_commits = {} # dict of buggy commit hash -> [corrective commits]
+
+    # find all bug introducing commits
+    for corrective_commit in corrective_commits:
+      buggy_commits = self._linkCorrectiveCommit(corrective_commit)
+
+      for buggy_commit in buggy_commits:
+
+        if buggy_commit in linked_commits:
+          linked_commits[buggy_commit].append(corrective_commit.commit_hash)
+        else:
+          linked_commits[buggy_commit] = [corrective_commit.commit_hash
+
+    # mark & link the buggy commits
+    logging.info("#### marking and linking the buggy commits ####")
+    for commit in all_commits:
+      logging.info(commit.commit_hash)
+      if commit.commit_hash in linked_commits:
+        logging.info("marking..")
+        commit.contains_bug = True
+        logging.info("fixes = " + str(linked_commits[commit.commit_hash]))
+        commit.fixes = str(linked_commits[commit.commit_hash])
+
 
   def _linkCorrectiveCommit(self, commit):
     """
@@ -57,6 +80,7 @@ class GitCommitLinker:
       logging.info("---- regions: " + str(v))
 
     bug_introducing_changes = self.gitAnnotate(region_chunks, commit)
+    return bug_introducing_changes
 
   def _getModifiedRegions(self, diff_cmd, files_modified):
     """
