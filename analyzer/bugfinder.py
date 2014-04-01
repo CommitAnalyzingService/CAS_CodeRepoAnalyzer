@@ -9,6 +9,7 @@ that fix problems.
 import re
 from orm.commit import *
 from caslogging import logging
+from analyzer.git_commit_linker import *
 
 class BugFinder:
 	"""
@@ -95,6 +96,7 @@ class BugFinder:
 		it to be bug inducing if it changes the same file in a bug fixing
 		commit
 		"""
+
 		for correctiveCommit in self.correctiveCommits:
 			buggyCommit = self.searchForBuggyCommit(correctiveCommit)
 			if buggyCommit is not -1:

@@ -45,16 +45,18 @@ class GitCommitLinker:
       buggy_commits = self._linkCorrectiveCommit(corrective_commit)
 
       for buggy_commit in buggy_commits:
-
+        
         if buggy_commit in linked_commits:
           linked_commits[buggy_commit].append(corrective_commit.commit_hash)
         else:
-          linked_commits[buggy_commit] = [corrective_commit.commit_hash
+          linked_commits[buggy_commit] = [corrective_commit.commit_hash]
 
     # mark & link the buggy commits
     logging.info("#### marking and linking the buggy commits ####")
+
     for commit in all_commits:
       logging.info(commit.commit_hash)
+
       if commit.commit_hash in linked_commits:
         logging.info("marking..")
         commit.contains_bug = True
@@ -195,6 +197,9 @@ class GitCommitLinker:
     hashes of the most recent revision in which the line identified by the regions
     was modified. these discovered commits are identified as bug-introducing changes.
 
+    git blame command is set up to start looking back starting from the commit BEFORE the 
+    commit that was passed in. this is because a bug MUST have occured prior to this commit.
+
     @regions - a dict of {file} -> {list of line numbers that were modified}
     @commit - commit that belongs to the passed in chucks/regions.
     """
@@ -207,8 +212,8 @@ class GitCommitLinker:
         if line != 0 and line != "0" :
 
           # we need to git blame with the --follow option so that it follows renames in the file, and the '-l'
-          # option gives us the complete commit hash.
-          buggy_change = str( subprocess.check_output( "git blame -L" + line + ",+1 " + commit.commit_hash + " -l -- " \
+          # option gives us the complete commit hash. additionally, start looking at the commit's direct ancestor.
+          buggy_change = str( subprocess.check_output( "git blame -L" + line + ",+1 " + commit.commit_hash + "^ -l -- " \
                             + file, shell=True )).split(" ")[0][2:]
 
           if buggy_change not in bug_introducing_changes:
