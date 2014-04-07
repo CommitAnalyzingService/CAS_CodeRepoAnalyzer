@@ -90,11 +90,21 @@ class GitCommitLinker:
     modified means modified or deleted -- not added! We assume are lines of code modified is the location of a bug.
     """
     region_diff = {}
+    file_exts_to_ignore = ["txt", "pdf", "png", "jpg", "md", "html"] # not source code files and these can substentially slow algo
 
     for file in files_modified:
 
+      # weed out bad files/binary files/etc
       if file != "'" and file != "":
-        region_diff[file] = []
+        file_info = file.split(".")
+
+        # get extentions
+        if len(file_info) > 1:
+          file_ext = (file_info[1]).lower()
+
+          # ensure these are not a readme/txt type file
+          if file_ext not in file_exts_to_ignore:
+            region_diff[file] = []
 
     # split all the different regions 
     regions = diff.split("diff --git")[1:] # remove the clutter
@@ -207,8 +217,8 @@ class GitCommitLinker:
 
           # we need to git blame with the --follow option so that it follows renames in the file, and the '-l'
           # option gives us the complete commit hash. additionally, start looking at the commit's ancestor 
-          buggy_change = str( subprocess.check_output( "git blame -L" + line + ",+1 " + commit.commit_hash + "^ -l -- " \
-                            + file, shell=True )).split(" ")[0][2:]
+          buggy_change = str( subprocess.check_output( "git blame -L" + line + ",+1 " + commit.commit_hash + "^ -l -- '" \
+                            + file + "'", shell=True )).split(" ")[0][2:]
 
           if buggy_change not in bug_introducing_changes:
             bug_introducing_changes.append(buggy_change)
