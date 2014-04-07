@@ -8,8 +8,11 @@
 		"port": "5432",
 		"database": "cas"
 	},
-	"logging": {
+	"logging_system": {
 		"filename": "CASLog.log"
+	},
+	"logging_analyzer": {
+		"filename": "Analyzer.log"
 	},
 	"gmail": {
 		"user": "USERNAME@gmail.com",
