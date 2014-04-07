@@ -110,10 +110,7 @@ class GitCommitLinker:
     regions = diff.split("diff --git")[1:] # remove the clutter
 
     for region in regions:
-     # logging.info("\n\n region: " + str(region))
       chunks = re.split(r'@@ |@@\\n', region)
-     # chunks = region.split("@@ ") # see git diff documentation 
-     # logging.info(chunks)
 
       # if a binary file it doesn't display the lines modified (a.k.a the '@@' part)
       if len(chunks) == 1:
@@ -134,19 +131,13 @@ class GitCommitLinker:
       # iterate through the following chunks to extract the section of code modified. 
       for chunk in range(1, len(chunks), 2):
 
-      #  logging.info(" chunk: " + str(chunks[chunk]) )
-       # logging.info(" mod code: " + str(chunks[chunk+1].split("\\n") ))
-       # logging.info(" mod code w/o clutter " + str(chunks[chunk+1].split("\\n")[1:-1]))
         mod_line_info = chunks[chunk].split(" ")[0] # remove clutter
         mod_code_info = chunks[chunk+1].split("\\n")[1:-1] # remove clutter
-      #  logging.info("Before: " + str(mod_line_info))
 
         # remove comma from mod_line_info as we only care about the start of the modification
         if mod_line_info.find(",") != -1:
           mod_line_info = mod_line_info[0:mod_line_info.find(",")]
 
-      #  logging.info("\n ### Finding modified lines of code in file " + file_name + " ###")
-       # logging.info(mod_line_info)
         current_line = abs(int(mod_line_info)) # remove the '-' in front of the line number by abs
 
         # now only use the code line changes that MODIFIES (not adds) in the diff
