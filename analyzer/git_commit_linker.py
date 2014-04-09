@@ -111,8 +111,6 @@ class GitCommitLinker:
 
     for region in regions:
       chunks = re.split(r'@@ |@@\\n', region)
-      logging.info("chunks: " + str(chunks))
-      logging.info("region: " + str(region))
 
       # if a binary file it doesn't display the lines modified (a.k.a the '@@' part)
       if len(chunks) == 1:
@@ -136,11 +134,16 @@ class GitCommitLinker:
         mod_line_info = chunks[chunk].split(" ")[0] # remove clutter
         mod_code_info = chunks[chunk+1].split("\\n")[1:-1] # remove clutter
 
+        # make sure this is legitimate. expect modified line info to start with '-'
+        # as one of my previous comments actually had an example using the exact delimiters
+        # this became necessary :-).
+        if mod_line_info[0] != '-':
+          continue
+
         # remove comma from mod_line_info as we only care about the start of the modification
         if mod_line_info.find(",") != -1:
           mod_line_info = mod_line_info[0:mod_line_info.find(",")]
 
-        logging.info("mod_line_info: " + mod_line_info)
         current_line = abs(int(mod_line_info)) # remove the '-' in front of the line number by abs
 
         # now only use the code line changes that MODIFIES (not adds) in the diff
