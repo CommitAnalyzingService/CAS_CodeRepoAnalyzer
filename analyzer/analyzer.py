@@ -15,6 +15,7 @@ from analyzer.githubissuetracker import *
 from caslogging import logging
 from analyzer.notifier import *
 from config import config
+from analyzer.git_commit_linker import *
 
 def analyze(repo_id):
 	"""
@@ -92,52 +93,30 @@ def analyzeRepo(repository_to_analyze, session):
 				.all()
 				)
 
-#### Issue Tracker ####
-
-	issue_tracker = None
-
-
-	# If using github, assume use of github issue tracker
-	if "//github" in repository_to_analyze.url:
-		try:
-
-			github_info = None
-
-			if "https" in repository_to_analyze.url:
-				github_info = repository_to_analyze.url.split("https://github.com/")[1].split("/")
-			elif "http" in repository_to_analyze.url:
-				github_info = repository_to_analyze.url.split("http://github.com/")[1].split("/")
-
-			if github_info != None:
-				owner = github_info[0]
-
-				if ".git" in repository_to_analyze.url:
-					repo = github_info[1][0:-4] # Remove the .git
-				else:
-					repo = github_info[1]
-
-				issue_tracker = GithubIssueTracker(owner,repo)
-
-		except:
-			logging.error("Error creating github issue tracker - continuing");
-
-
-	# Find and mark the buggy commits
-	bug_finder = BugFinder(all_commits, corrective_commits, issue_tracker)
 
 	try:
-		bug_finder.markBuggyCommits()
-	except:
-		logging.error("unable to automatically find buggy commits for repository " +
-									repository_to_analyze.id)
+		git_commit_linker = GitCommitLinker(repo_id)
+		git_commit_linker.linkCorrectiveCommits(corrective_commits, all_commits)
+	except Exception as e:
+		logging.error("Error linking bug fixing changes to bug inducing changes for repo " + repo_id)
+		logging.error(e)
+		repository_to_analyze.status = "Error"
+		sys.exit(0)
 
-	# Generate the metrics
+
+	#  Generate the metrics
 	logging.info('Generating metrics for repository id ' + repo_id)
+	
+	try: 
+		metrics_generator = MetricsGenerator(repo_id, all_commits)
+		metrics_generator.buildAllModels()
+	except Exception as e:
+		logging.error("Error generating metrics & building models for repository " + repo_id)
+		logging.error(e)
+		repository_to_analyze.status = "Error"
+		sys.exit(0)
 
-	metrics_generator = MetricsGenerator(repo_id, all_commits)
-	metrics_generator.buildAllModels()
 	repository_to_analyze.status = "Analyzed"
-
 	repository_to_analyze.analysis_date = str(datetime.now().replace(microsecond=0))
 
 	# Update database of commits that were buggy & analysis date & status & glm probabilities
