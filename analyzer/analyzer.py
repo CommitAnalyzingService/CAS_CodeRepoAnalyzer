@@ -101,6 +101,7 @@ def analyzeRepo(repository_to_analyze, session):
 		logging.error("Error linking bug fixing changes to bug inducing changes for repo " + repo_id)
 		logging.error(e)
 		repository_to_analyze.status = "Error"
+		session.commit() # update repo status
 		sys.exit(0)
 
 
@@ -114,10 +115,19 @@ def analyzeRepo(repository_to_analyze, session):
 		logging.error("Error generating metrics & building models for repository " + repo_id)
 		logging.error(e)
 		repository_to_analyze.status = "Error"
+		session.commit() # update repo status
 		sys.exit(0)
 
 	repository_to_analyze.status = "Analyzed"
 	repository_to_analyze.analysis_date = str(datetime.now().replace(microsecond=0))
+
+
+	# dump monthly data - hardcoded 30 days
+	dump_refresh_date = str(datetime.utcnow() - timedelta(days=30))
+
+	if repository_to_analyze.last_data_dump == None or repository_to_analyze.last_data_dump < dump_refresh_date:
+		metrics_generator.dumpData()
+		repository_to_analyze.last_data_dump = str(datetime.now().replace(microsecond=0))
 
 	# Update database of commits that were buggy & analysis date & status & glm probabilities
 	session.commit()
