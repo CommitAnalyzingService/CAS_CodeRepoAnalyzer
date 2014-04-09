@@ -50,9 +50,7 @@ class CAS_Manager(threading.Thread):
 		refresh_date = str(datetime.utcnow() - timedelta(days=repo_update_freq))
 
 		repos_to_get = (self.session.query(Repository)
-						  .filter( (Repository.status == "Waiting to be Analyzed") |
-							(Repository.ingestion_date < refresh_date)
-							)
+						  .filter( (Repository.status == "Waiting to be Analyzed") )
 						  .all()
 						)
 		
@@ -77,7 +75,9 @@ class Worker(threading.Thread):
 		self.start()
 	
 	def run(self):
+
 		while True:
+
 			func, args, kargs = self.tasks.get()
 			try:
 				func(*args, **kargs)

@@ -48,7 +48,7 @@ class GitCommitLinker:
           linked_commits[buggy_commit] = [corrective_commit.commit_hash]
 
     # mark & link the buggy commits
-    logging.info("#### marking and linking the buggy commits ####")
+  #  logging.info("#### marking and linking the buggy commits ####")
 
     for commit in all_commits:
 
@@ -65,14 +65,14 @@ class GitCommitLinker:
     @commit - the corrective change to link w/ the changes that introduces the
     problems/issues it fixes.
     """
-    logging.info(" #### Linking commit " + commit.commit_hash + " ####")
+   # logging.info(" #### Linking commit " + commit.commit_hash + " ####")
 
     region_chunks = self.getModifiedRegions(commit)
 
-    logging.info("Linkage for commit " + commit.commit_hash)
-    for k,v in region_chunks.items():
-      logging.info("-- file: " + k)
-      logging.info("---- loc modified: " + str(v))
+    # logging.info("Linkage for commit " + commit.commit_hash)
+    # for k,v in region_chunks.items():
+    #   logging.info("-- file: " + k)
+    #   logging.info("---- loc modified: " + str(v))
 
     bug_introducing_changes = self.gitAnnotate(region_chunks, commit)
     return bug_introducing_changes
@@ -145,7 +145,6 @@ class GitCommitLinker:
 
           # this lines modifies or deletes a line of code
           if section[0] == "-":
-            #logging.info("modifying section found : " + str(section))
 
             # weed out false positives by ignoring new line/ deletion of lines modifications
             if len(section) > 2:
@@ -154,8 +153,6 @@ class GitCommitLinker:
             # we only increment modified lines of code because we those lines did NOT exist
             # in the previous commit!
             current_line += 1 
-
-          #logging.info("current line: " + str(current_line))
 
     return region_diff
 
