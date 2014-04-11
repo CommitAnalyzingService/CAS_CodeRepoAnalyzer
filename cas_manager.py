@@ -41,7 +41,10 @@ class CAS_Manager(threading.Thread):
 
 		for repo in repos_to_get:
 			logging.info("Adding repo " + repo.id + " to work queue for ingesting")
+			repo.status = "In Queue to be Ingested"
 			self.workQueue.add_task(ingest,repo.id)
+
+		self.session.commit() # update the status of repos that are now in queue
 
 	def checkAnalyzation(self):
 		"""Checks if any repo needs to be analyzed"""
@@ -56,7 +59,10 @@ class CAS_Manager(threading.Thread):
 		
 		for repo in repos_to_get:
 			logging.info("Adding repo " + repo.id + " to work queue for analyzing.")
+			repo.status = "In Queue to be Analyzed"
 			self.workQueue.add_task(analyze, repo.id)
+
+		self.session.commit() # update the status of repos that are now in queue
 
 	def run(self):
 
