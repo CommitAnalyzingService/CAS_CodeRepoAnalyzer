@@ -234,7 +234,7 @@ class Git():
             ingestion date
         description: a very basic abstraction for using git in python.
         """
-        os.chdir(os.path.dirname(__file__) + self.REPO_DIRECTORY + repo.id)
+        repo_dir = os.chdir(os.path.dirname(__file__) + self.REPO_DIRECTORY + repo.id)
         logging.info('Getting/parsing git commits: '+ str(repo) )
 
         # Spawn a git process and convert the output to a string
@@ -243,7 +243,7 @@ class Git():
         else:
             cmd = 'git log '
 
-        log = str( subprocess.check_output(cmd + self.LOG_FORMAT, shell=True ) )
+        log = str( subprocess.check_output(cmd + self.LOG_FORMAT, shell=True, cwd = repo_dir ) )
         log = log[2:-1]   # Remove head/end clutter
 
         # List of json objects
@@ -334,14 +334,15 @@ class Git():
         arguments: repo Repository: the repository to clone
         pre-conditions: The repo has not been already created
         """
-        # Go to the repo directory
-        os.chdir(os.path.dirname(__file__) + self.REPO_DIRECTORY)
+        repo_dir = os.chdir(os.path.dirname(__file__) + self.REPO_DIRECTORY)
+
         # Run the clone command and return the results
 
         logging.info('Git cloning repo: '+ str(repo) )
         cloneResult = str(subprocess.check_output(
                   self.CLONE_CMD.format(repo.url, './' + repo.id),
-                  shell=True ) )
+                  shell= True,
+                  cwd = repo_dir ) )
         logging.info('Done cloning.')
         #logging.debug("Git clone result:\n" + cloneResult)
 
@@ -357,13 +358,15 @@ class Git():
         arguments: repo Repository: the repository to pull
         pre-conditions: The repo has already been created
         """
-        # Go to the repo directory
-        os.chdir(os.path.dirname(__file__) + self.REPO_DIRECTORY + repo.id)
+
+        repo_dir = os.path.dirname(__file__) + self.REPO_DIRECTORY + repo.id
+
         # Run the pull command and return the results
         logging.info('Pulling latest changes from repo: '+ str(repo) )
         fetchResult = str(subprocess.check_output(
                   self.PULL_CMD,
-                  shell=True ) )
+                  shell=True,
+                  cwd=  repo_dir  ) )
         logging.info('Done fetching.')
         #logging.debug("Git pull result:\n" + cloneResult)
 

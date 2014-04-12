@@ -27,6 +27,7 @@ class GitCommitLinker:
     sets the repository path.
     """
     self.repo_path = os.path.join(os.path.dirname(__file__), '..', self.REPO_DIR + repoId)
+    self.repo_id = repoId
 
   def linkCorrectiveCommits(self, corrective_commits, all_commits):
     """
@@ -170,19 +171,17 @@ class GitCommitLinker:
 
     @commit - change to get the list of regions
     """
-    # change directory to repo directory
-    os.chdir(self.repo_path)
 
     # diff cmd w/ no lines of context between current vs parent
     diff_cmd = "git diff " + commit.commit_hash + "^ "+ commit.commit_hash + " --unified=0"
-    diff = str(subprocess.check_output(diff_cmd, shell=True))
+    diff = str(subprocess.check_output(diff_cmd, shell=True, cwd= self.repo_path ))
 
     # files changed, this is used by the getLineNumbersChanged function
     diff_cmd_lines_changed = "git diff " + commit.commit_hash + "^ "+ commit.commit_hash + " --name-only"
 
     # get the files modified -> use this to validate if we have arrived at a new file
     # when grepping for the specific lines changed.
-    files_modified = str( subprocess.check_output( diff_cmd_lines_changed, shell=True )).replace("b'", "").split("\\n")
+    files_modified = str( subprocess.check_output( diff_cmd_lines_changed, shell=True, cwd= self.repo_path )).replace("b'", "").split("\\n")
 
     # now, let's get the file and the line number changed in the commit
     return self._getModifiedRegionsOnly(diff, files_modified)
@@ -206,13 +205,15 @@ class GitCommitLinker:
     for file, lines in regions.items():
       for line in lines:
 
+   #     logging.info("I am " + self.repo_id + " and my cwd is: " + self.repo_path ) 
+
         # assume if region starts at beginning its a deletion or rename and ignore
         if line != 0 and line != "0" :
 
           # we need to git blame with the --follow option so that it follows renames in the file, and the '-l'
           # option gives us the complete commit hash. additionally, start looking at the commit's ancestor 
           buggy_change = str( subprocess.check_output( "git blame -L" + line + ",+1 " + commit.commit_hash + "^ -l -- '" \
-                            + file + "'", shell=True )).split(" ")[0][2:]
+                            + file + "'", shell=True, cwd= self.repo_path )).split(" ")[0][2:]
 
           if buggy_change not in bug_introducing_changes:
             bug_introducing_changes.append(buggy_change)
