@@ -138,3 +138,5 @@ def analyzeRepo(repository_to_analyze, session):
 
 	logging.info( 'A worker finished analyzing repo ' +
 									repository_to_analyze.id )
+
+	session.close()

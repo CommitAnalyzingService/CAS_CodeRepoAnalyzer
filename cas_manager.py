@@ -36,13 +36,14 @@ class CAS_Manager(threading.Thread):
 		repos_to_get = (self.session.query(Repository) 
 							.filter( 
 								(Repository.status == "Waiting to be Ingested") | 
-								(Repository.ingestion_date < refresh_date))
+								(Repository.ingestion_date < refresh_date) &
+								(Repository.status != "Analyzing"))
 							.all())
 
 		for repo in repos_to_get:
 			logging.info("Adding repo " + repo.id + " to work queue for ingesting")
 			repo.status = "In Queue to be Ingested"
-			self.session.commit() # update the status of repos that are now in queue
+			self.session.commit() # update the status of repo
 			self.workQueue.add_task(ingest,repo.id)
 
 	def checkAnalyzation(self):
@@ -59,7 +60,7 @@ class CAS_Manager(threading.Thread):
 		for repo in repos_to_get:
 			logging.info("Adding repo " + repo.id + " to work queue for analyzing.")
 			repo.status = "In Queue to be Analyzed"
-			self.session.commit() # update the status of repos that are now in queue
+			self.session.commit() # update the status of repo
 			self.workQueue.add_task(analyze, repo.id)
 
 	def run(self):
@@ -68,7 +69,7 @@ class CAS_Manager(threading.Thread):
 			### --- Check repository table if there is any work to be done ---  ###
 			self.checkIngestion()
 			self.checkAnalyzation()
-			time.sleep(5)
+			time.sleep(60)
 
 class Worker(threading.Thread):
 	"""Thread executing tasks from a given tasks queue"""

@@ -36,6 +36,8 @@ def ingestRepo(repository_to_ingest, session):
   logging.info( 'A worker finished ingesting repo ' + 
                   repository_to_ingest.id )
 
+  session.close()
+
 def ingest(repo_id):
   """
   Ingest a repository with the given id. Gets the repository information
