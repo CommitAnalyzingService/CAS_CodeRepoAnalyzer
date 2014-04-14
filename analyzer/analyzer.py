@@ -17,6 +17,7 @@ from analyzer.notifier import *
 from config import config
 from analyzer.git_commit_linker import *
 from sqlalchemy import Date, cast
+import calendar # to convert datetime to unix time
 
 def analyze(repo_id):
 	"""
@@ -67,7 +68,7 @@ def analyzeRepo(repository_to_analyze, session):
 
 	repo_name = repository_to_analyze.name
 	repo_id = repository_to_analyze.id
-	last_analysis_date = datetime.strptime(repository_to_analyze.analysis_date, '%Y-%m-%d %H:%M:%S').date()
+	last_analysis_date = repository_to_analyze.analysis_date
 
 	logging.info('Worker analyzing repository id ' + repo_id)
 
@@ -88,9 +89,11 @@ def analyzeRepo(repository_to_analyze, session):
 	# No need to re-link corrective commits that have already been linked with the bug-inducing commit.
 
 	corrective_commits = (session.query(Commit)
-				.filter( Commit.fix == "True")
-				.filter( Commit.repository_id == repo_id)
-				.filter( Commit.linked == False )
+				.filter( 
+					( Commit.fix == "True" ) &
+					( Commit.repository_id == repo_id ) &
+					( Commit.linked == False )
+				)
 				.order_by( Commit.author_date_unix_timestamp.asc() )
 				.all()
 				)
@@ -100,15 +103,19 @@ def analyzeRepo(repository_to_analyze, session):
 	# use data only up to 3 months prior we won't have sufficent data to build models
 	# as there may be bugs introduced in those months that haven't been fixed, skewing
 	# our model.
-	three_months = str(datetime.utcnow() - timedelta(days=30))
+	three_months_datetime = datetime.utcnow() - timedelta(days=30)
+	three_months_unixtime = calendar.timegm(three_months_datetime.utctimetuple())
+
 	all_commits_modeling = (session.query(Commit)
-				.filter( Commit.repository_id == repo_id)
-				.filter( Commit.author_date_unix_timestamp < three_months)
-				.order_by( Commit.author_date_unix_timestamp.desc())
+				.filter( 
+					( Commit.repository_id == repo_id ) &
+					( Commit.author_date_unix_timestamp < str(three_months_unixtime))
+				)
+				.order_by( Commit.author_date_unix_timestamp.desc() )
 				.all()
 				)
 
-	logging.info("Modeling on " + str(len(all_commits_modeling)) + " commits")
+	logging.info("Modeling on " + str(len(all_commits_modeling)) + " commits for repo " + repo_id)
 
 	try:
 		git_commit_linker = GitCommitLinker(repo_id)
