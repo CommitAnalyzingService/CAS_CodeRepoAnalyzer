@@ -69,7 +69,7 @@ class CAS_Manager(threading.Thread):
 			### --- Check repository table if there is any work to be done ---  ###
 			self.checkIngestion()
 			self.checkAnalyzation()
-			time.sleep(60)
+			time.sleep(10)
 
 class Worker(threading.Thread):
 	"""Thread executing tasks from a given tasks queue"""

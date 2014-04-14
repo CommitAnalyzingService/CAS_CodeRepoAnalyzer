@@ -48,6 +48,8 @@ class GitCommitLinker:
         else:
           linked_commits[buggy_commit] = [corrective_commit.commit_hash]
 
+      corrective_commit.linked = True # mark that we have linked this corrective commit.
+
     # mark & link the buggy commits
   #  logging.info("#### marking and linking the buggy commits ####")
 

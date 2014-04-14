@@ -23,6 +23,7 @@ class Commit(Base):
 
     fix = Column(String, unique=False)
     classification = Column(String, unique=False)
+    linked = Column(Boolean, default = False)
 
     contains_bug = Column(Boolean, unique=False, default=False)
     fixes = Column(String, unique=False)
