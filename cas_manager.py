@@ -9,6 +9,7 @@ description: This module contains the CAS_manager class, which is a thread that 
 from analyzer.analyzer import *
 from ingester.ingester import *
 from orm.repository import *
+import calendar # to convert datetime to unix time
 from caslogging import logging
 from queue import *
 import threading
@@ -26,6 +27,7 @@ class CAS_Manager(threading.Thread):
 		self.session = Session()
 		numOfWorkers = int(config['system']['workers'])
 		self.workQueue = ThreadPool(numOfWorkers)
+		self.modelQueue = Queue()
 
 	def checkIngestion(self):
 		"""Check if any repo needs to be ingested"""
@@ -63,12 +65,87 @@ class CAS_Manager(threading.Thread):
 			self.session.commit() # update the status of repo
 			self.workQueue.add_task(analyze, repo.id)
 
+	def checkModel(self):
+		"""Check if any repo needs metrics to be generated"""
+
+		repos_to_get = (self.session.query(Repository) 
+							.filter( 
+								(Repository.status == "In Queue to Build Model") )
+							.all())
+
+		for repo in repos_to_get:
+			logging.info("Adding repo " + repo.id + " to model queue to finish analyzing")
+			repo.status = "Building Model"
+			self.session.commit() # update status of repo
+			self.modelQueue.put(repo)
+
+	def checkBuildModel(self):
+		""" Checks if any repo is awaiting to build model. 
+			We are using a queue because we can't concurrently access R """
+
+		if self.modelQueue.empty() != True:
+			repo = self.modelQueue.get()
+			repo_id = repo.id 
+
+			# use data only up to 3 months prior we won't have sufficent data to build models
+			# as there may be bugs introduced in those months that haven't been fixed, skewing
+			# our model.
+			three_months_datetime = datetime.utcnow() - timedelta(days=30)
+			three_months_unixtime = calendar.timegm(three_months_datetime.utctimetuple())
+
+			all_commits_modeling = (self.session.query(Commit)
+						.filter( 
+							( Commit.repository_id == repo_id ) &
+							( Commit.author_date_unix_timestamp < str(three_months_unixtime))
+						)
+						.order_by( Commit.author_date_unix_timestamp.desc() )
+						.all())
+		
+			try: 
+				metrics_generator = MetricsGenerator(repo_id, all_commits_modeling)
+				metrics_generator.buildAllModels()
+			except Exception as e:
+				logging.exception("Got an exception building model for repository " + repo_id)
+				repository_to_analyze.status = "Error"
+				session.commit() # update repo status
+				raise
+
+			logging.info("Repo " + repo_id + " finished analyzing.")
+			repo.status = "Analyzed"
+			self.session.commit() # update status of repo
+			self.notify(repo)
+		# End of if statement
+
+	def notify(self, repo):
+		""" Send e-mail notifications if applicable to a repo 
+			used by checkBuildModel """
+		notify = False
+		notifier = None
+
+		# Notify user if repo has never been analyzed previously
+		if repo.analysis_date is None:
+
+			# Create the Notifier
+			gmail_user = config['gmail']['user']
+			gmail_pass = config['gmail']['pass']
+			notifier = Notifier(gmail_user, gmail_pass, repo.name)
+
+			# Add subscribers if applicable
+			if repo.email is not None:
+				notifier.addSubscribers([repo.email, gmail_user])
+			else:
+				notifier.addSubscribers([gmail_user])
+
+			notifier.notify()
+
 	def run(self):
 
 		while(True):
 			### --- Check repository table if there is any work to be done ---  ###
 			self.checkIngestion()
 			self.checkAnalyzation()
+			self.checkModel()
+			self.checkBuildModel()
 			time.sleep(10)
 
 class Worker(threading.Thread):
