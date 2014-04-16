@@ -121,43 +121,42 @@ def analyzeRepo(repository_to_analyze, session):
 		git_commit_linker = GitCommitLinker(repo_id)
 		git_commit_linker.linkCorrectiveCommits(corrective_commits, all_commits)
 	except Exception as e:
-		logging.error("Error linking bug fixing changes to bug inducing changes for repo " + repo_id)
-		logging.error(e)
+		logging.exception("Got an exception linking bug fixing changes to bug inducing changes for repo " + repo_id)
 		repository_to_analyze.status = "Error"
 		session.commit() # update repo status
-		sys.exit(0)
-
+		raise
 
 	#  Generate the metrics
-	logging.info('Generating metrics for repository id ' + repo_id)
-	
-	try: 
-		metrics_generator = MetricsGenerator(repo_id, all_commits_modeling)
-		metrics_generator.buildAllModels()
-	except Exception as e:
-		logging.error("Error generating metrics & building models for repository " + repo_id)
-		logging.error(e)
-		repository_to_analyze.status = "Error"
-		session.commit() # update repo status
-		sys.exit(0)
+	if repository_to_analyze.status != "Error":
+		logging.info('Generating metrics for repository id ' + repo_id)
+		
+		try: 
+			metrics_generator = MetricsGenerator(repo_id, all_commits_modeling)
+			metrics_generator.buildAllModels()
+		except Exception as e:
+			logging.exception("Got an exceotion generating metrics for repository " + repo_id)
+			repository_to_analyze.status = "Error"
+			session.commit() # update repo status
+			raise
 
-	repository_to_analyze.status = "Analyzed"
-	repository_to_analyze.analysis_date = str(datetime.now().replace(microsecond=0))
+	if repository_to_analyze.status != "Error":
+ 
+		repository_to_analyze.status = "Analyzed" # repo successfully has been analyzed
+		repository_to_analyze.analysis_date = str(datetime.now().replace(microsecond=0))
 
+		# dump monthly data - hardcoded 30 days
+		dump_refresh_date = str(datetime.utcnow() - timedelta(days=30))
 
-	# dump monthly data - hardcoded 30 days
-	dump_refresh_date = str(datetime.utcnow() - timedelta(days=30))
+		if repository_to_analyze.last_data_dump == None or repository_to_analyze.last_data_dump < dump_refresh_date:
+			metrics_generator.dumpData() 
+			repository_to_analyze.last_data_dump = str(datetime.now().replace(microsecond=0))
 
-	if repository_to_analyze.last_data_dump == None or repository_to_analyze.last_data_dump < dump_refresh_date:
-		metrics_generator.dumpData()
-		repository_to_analyze.last_data_dump = str(datetime.now().replace(microsecond=0))
+		# Update database of commits that were buggy & analysis date & status & glm probabilities
+		session.commit()
 
-	# Update database of commits that were buggy & analysis date & status & glm probabilities
-	session.commit()
-
-	# Notify any subscribers of repo that it has been analyzed IF it has not been analyzed previously
-	if notify is True and notifier is not None and repository_to_analyze.status is not "Error":
-		notifier.notify()
+		# Notify any subscribers of repo that it has been analyzed IF it has not been analyzed previously
+		if notify is True and notifier is not None and repository_to_analyze.status is not "Error":
+			notifier.notify()
 
 	logging.info( 'A worker finished analyzing repo ' +
 									repository_to_analyze.id )
