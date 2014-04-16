@@ -84,7 +84,7 @@ class GitCommitLinker:
     """
     returns a dict of file -> list of line numbers modified. helper function for getModifiedRegions
     git diff doesn't provide a clean way of simply getting the specific lines that were modified, so we are doing so here 
-    manually using grep. A possible refactor in the future may be to use an external diff tool, so that this implementation 
+    manually. A possible refactor in the future may be to use an external diff tool, so that this implementation 
     wouldn't be scm (git) specific.
 
     if a file was merely deleted, then there was no chunk or region changed but we do capture the file.
@@ -93,7 +93,12 @@ class GitCommitLinker:
     modified means modified or deleted -- not added! We assume are lines of code modified is the location of a bug.
     """
     region_diff = {}
-    file_exts_to_ignore = ["txt", "pdf", "png", "jpg", "md", "html"] # not source code files and these can substentially slow algo
+
+    # only link code source files as any type of README, etc typically have HUGE changes and reduces 
+    # the performance to unacceptable levels. it's very hard to blacklist everything; much easier just to whitelist
+    # code source files endings.
+    list_ext_dir = os.path.join(os.path.dirname(__file__), "code_file_extentions.txt")
+    file_exts_to_include = open(list_ext_dir).read().splitlines()
 
     for file in files_modified:
 
@@ -105,8 +110,8 @@ class GitCommitLinker:
         if len(file_info) > 1:
           file_ext = (file_info[1]).lower()
 
-          # ensure these are not a readme/txt type file
-          if file_ext not in file_exts_to_ignore:
+          # ensure these source code file endings
+          if file_ext.upper() in file_exts_to_include:
             region_diff[file] = []
 
     # split all the different regions 
