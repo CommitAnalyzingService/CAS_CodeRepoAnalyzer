@@ -3,6 +3,7 @@ import os
 import subprocess
 from orm.commit import *
 from caslogging import logging
+import json
 import re
 
 class GitCommitLinker:
@@ -50,14 +51,11 @@ class GitCommitLinker:
 
       corrective_commit.linked = True # mark that we have linked this corrective commit.
 
-    # mark & link the buggy commits
-  #  logging.info("#### marking and linking the buggy commits ####")
-
     for commit in all_commits:
 
       if commit.commit_hash in linked_commits:
         commit.contains_bug = True
-        commit.fixes = str(linked_commits[commit.commit_hash])
+        commit.fixes = json.dumps(linked_commits[commit.commit_hash])
 
 
   def _linkCorrectiveCommit(self, commit):
