@@ -111,6 +111,7 @@ class CAS_Manager(threading.Thread):
 				raise
 
 			logging.info("Repo " + repo_id + " finished analyzing.")
+			repo.analysis_date = str(datetime.now().replace(microsecond=0))
 			repo.status = "Analyzed"
 			self.session.commit() # update status of repo
 			self.notify(repo)
