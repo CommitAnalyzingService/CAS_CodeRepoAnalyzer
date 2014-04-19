@@ -140,18 +140,6 @@ class GitCommitLinker:
         mod_line_info = chunks[chunk].split(" ")[0] # remove clutter
         mod_code_info = chunks[chunk+1].split("\\n")[1:-1] # remove clutter
 
-        # Ensure that mod_line_info size is not empty - if it is, 
-        # log this!
-        if len(mod_line_info[0]) == 0:
-          logging.error("Something went very wrong...")
-          logging.error("----- CHUNK ----- ")
-          logging.error(chunk)
-          logging.error("----- REGION ---- ")
-          logging.error(region)
-          logging.error("----- REGIONS ----")
-          logging.error(regions)
-          continue
-
         # make sure this is legitimate. expect modified line info to start with '-'
         # as one of my previous comments actually had an example using the exact delimiters
         # this became necessary :-).
@@ -166,6 +154,10 @@ class GitCommitLinker:
 
         # now only use the code line changes that MODIFIES (not adds) in the diff
         for section in mod_code_info:
+
+          # If there is a new line character inside this modified LOC, we'll simply skip it and move on to the next one.
+          if len(mod_code_info[0]) == 0:
+            continue
 
           # this lines modifies or deletes a line of code
           if section[0] == "-":
