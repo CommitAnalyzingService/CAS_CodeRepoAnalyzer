@@ -66,8 +66,6 @@ class GitCommitLinker:
     @commit - the corrective change to link w/ the changes that introduces the
     problems/issues it fixes.
     """
-   # logging.info(" #### Linking commit " + commit.commit_hash + " ####")
-
     region_chunks = self.getModifiedRegions(commit)
 
     # logging.info("Linkage for commit " + commit.commit_hash)
@@ -116,7 +114,7 @@ class GitCommitLinker:
     regions = diff.split("diff --git")[1:] # remove the clutter
 
     for region in regions:
-      chunks = re.split(r'@@ |@@\\n', region)
+      chunks = re.split(r'@@ |@@:CASDELIMITER:', region)
 
       # if a binary file it doesn't display the lines modified (a.k.a the '@@' part)
       if len(chunks) == 1:
@@ -127,7 +125,7 @@ class GitCommitLinker:
       # start with extracting the file name
       name_start_index = file_info.find("b/")
       file_name = file_info[name_start_index+2:]
-      name_end_index = file_name.find("\\n")
+      name_end_index = file_name.find(":CASDELIMITER:")
       file_name = file_name[:name_end_index]
 
       # it is possible there is a binary file being tracked or something we shouldn't care about  
@@ -138,11 +136,9 @@ class GitCommitLinker:
       for chunk in range(1, len(chunks), 2):
 
         mod_line_info = chunks[chunk].split(" ")[0] # remove clutter
-        mod_code_info = chunks[chunk+1].split("\\n")[1:-1] # remove clutter
+        mod_code_info = (chunks[chunk+1].replace("\\n","")).split(":CASDELIMITER:")[1:-1] # remove clutter
 
         # make sure this is legitimate. expect modified line info to start with '-'
-        # as one of my previous comments actually had an example using the exact delimiters
-        # this became necessary :-).
         if mod_line_info[0] != '-':
           continue
 
@@ -181,8 +177,12 @@ class GitCommitLinker:
     @commit - change to get the list of regions
     """
 
-    # diff cmd w/ no lines of context between current vs parent
-    diff_cmd = "git diff " + commit.commit_hash + "^ "+ commit.commit_hash + " --unified=0"
+    # diff cmd w/ no lines of context between current vs parent. 
+    # pipe it into bash and echo back with :CASDELIMITER: instead of new lines to seperate each line 
+    # of the git output to make parsing this a reality!
+    diff_cmd = "git diff " + commit.commit_hash + "^ "+ commit.commit_hash + " --unified=0 " \
+      + ' | while read; do echo "$REPLY:CASDELIMITER:"; done'
+
     diff = str(subprocess.check_output(diff_cmd, shell=True, cwd= self.repo_path ))
 
     # files changed, this is used by the getLineNumbersChanged function
