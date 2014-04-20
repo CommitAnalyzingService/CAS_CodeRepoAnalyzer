@@ -114,7 +114,7 @@ class GitCommitLinker:
     regions = diff.split("diff --git")[1:] # remove the clutter
 
     for region in regions:
-      chunks = re.split(r'@@ |@@:CASDELIMITER:', region)
+      chunks = re.split(r'@@ |@@:CAS_DELIMITER:', region)
 
       # if a binary file it doesn't display the lines modified (a.k.a the '@@' part)
       if len(chunks) == 1:
@@ -125,7 +125,7 @@ class GitCommitLinker:
       # start with extracting the file name
       name_start_index = file_info.find("b/")
       file_name = file_info[name_start_index+2:]
-      name_end_index = file_name.find(":CASDELIMITER:")
+      name_end_index = file_name.find(":CAS_DELIMITER:")
       file_name = file_name[:name_end_index]
 
       # it is possible there is a binary file being tracked or something we shouldn't care about  
@@ -136,7 +136,7 @@ class GitCommitLinker:
       for chunk in range(1, len(chunks), 2):
 
         mod_line_info = chunks[chunk].split(" ")[0] # remove clutter
-        mod_code_info = (chunks[chunk+1].replace("\\n","")).split(":CASDELIMITER:")[1:-1] # remove clutter
+        mod_code_info = (chunks[chunk+1].replace("\\n","")).split(":CAS_DELIMITER:")[1:-1] # remove clutter
 
         # make sure this is legitimate. expect modified line info to start with '-'
         if mod_line_info[0] != '-':
@@ -178,12 +178,12 @@ class GitCommitLinker:
     """
 
     # diff cmd w/ no lines of context between current vs parent. 
-    # pipe it into bash and echo back with :CASDELIMITER: instead of new lines to seperate each line 
+    # pipe it into bash and echo back with our own delimiter instead of new lines to seperate each line 
     # of the git output to make parsing this a reality!
     diff_cmd = "git diff " + commit.commit_hash + "^ "+ commit.commit_hash + " --unified=0 " \
-      + ' | while read; do echo "$REPLY:CASDELIMITER:"; done'
+      + ' | while read; do echo "$REPLY:CAS_DELIMITER:"; done'
 
-    diff = str(subprocess.check_output(diff_cmd, shell=True, cwd= self.repo_path ))
+    diff = str(subprocess.check_output(diff_cmd, shell=True, cwd= self.repo_path, executable="/bin/bash" ))
 
     # files changed, this is used by the getLineNumbersChanged function
     diff_cmd_lines_changed = "git diff " + commit.commit_hash + "^ "+ commit.commit_hash + " --name-only"
@@ -213,8 +213,6 @@ class GitCommitLinker:
 
     for file, lines in regions.items():
       for line in lines:
-
-   #     logging.info("I am " + self.repo_id + " and my cwd is: " + self.repo_path ) 
 
         # assume if region starts at beginning its a deletion or rename and ignore
         if line != 0 and line != "0" :
