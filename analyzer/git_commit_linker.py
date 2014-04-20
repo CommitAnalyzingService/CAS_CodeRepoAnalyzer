@@ -35,7 +35,6 @@ class GitCommitLinker:
     links all corrective changes/commits to the change that introduced the problem
     note: a bug introducing change may have introduced more than one bug.
     """
-
     linked_commits = {} # dict of buggy commit hash -> [corrective commits]
 
     # find all bug introducing commits
@@ -57,7 +56,6 @@ class GitCommitLinker:
         commit.contains_bug = True
         commit.fixes = json.dumps(linked_commits[commit.commit_hash])
 
-
   def _linkCorrectiveCommit(self, commit):
     """
     links the corrective change/commit to the change/commit which was the
@@ -66,8 +64,6 @@ class GitCommitLinker:
     @commit - the corrective change to link w/ the changes that introduces the
     problems/issues it fixes.
     """
-   # logging.info(" #### Linking commit " + commit.commit_hash + " ####")
-
     region_chunks = self.getModifiedRegions(commit)
 
     # logging.info("Linkage for commit " + commit.commit_hash)
@@ -78,97 +74,69 @@ class GitCommitLinker:
     bug_introducing_changes = self.gitAnnotate(region_chunks, commit)
     return bug_introducing_changes
 
-  def _getModifiedRegionsOnly(self, diff, files_modified):
+
+  def _isCodeFile(self, file_name):
+    """ 
+    Returns true if file name ending matches that of a code/script file name extentions, 
+    such as .py for python. This improves performance of the SZZ algorithm as READMEs 
+    and such typically have huge changes to annotate. 
+
+    Also returns false if the file name is /dev/null for obvious reason!
+    """
+    if file_name == "/dev/null":
+      return False
+
+    code_ext_dir = os.path.join(os.path.dirname(__file__), "code_file_extentions.txt")
+    code_exts = open(code_ext_dir).read().splitlines()
+
+    file_digestion = file_name.split(".")
+    if len(file_digestion) > 1:
+      file_extention = (file_digestion[1]).upper()
+      if file_extention in code_exts:
+        return True
+
+    return False # Not a code or script file to our best knowledge.
+
+  def _getModifiedRegionsOnly(self, diff):
     """
     returns a dict of file -> list of line numbers modified. helper function for getModifiedRegions
     git diff doesn't provide a clean way of simply getting the specific lines that were modified, so we are doing so here 
-    manually. A possible refactor in the future may be to use an external diff tool, so that this implementation 
-    wouldn't be scm (git) specific.
-
-    if a file was merely deleted, then there was no chunk or region changed but we do capture the file.
-    however, we do not assume this is a location of a bug.
+    manually by using our own bash script. It's output is what is being passed in here. Please see diff-lines.sh if curious
 
     modified means modified or deleted -- not added! We assume are lines of code modified is the location of a bug.
     """
     region_diff = {}
+    modifications = diff.split('\\n')[1:-1]
 
-    # only link code source files as any type of README, etc typically have HUGE changes and reduces 
-    # the performance to unacceptable levels. it's very hard to blacklist everything; much easier just to whitelist
-    # code source files endings.
-    list_ext_dir = os.path.join(os.path.dirname(__file__), "code_file_extentions.txt")
-    file_exts_to_include = open(list_ext_dir).read().splitlines()
+    for mod in modifications:
+      logging.info("MODIFICATION:")
+      logging.info(mod)
 
-    for file in files_modified:
+      region = mod.split(":CASDELIMITER:")
 
-      # weed out bad files/binary files/etc
-      if file != "'" and file != "":
-        file_info = file.split(".")
+      file_path = region[0]
+      line = region[1]
+      code = region[2] 
 
-        # get extentions
-        if len(file_info) > 1:
-          file_ext = (file_info[1]).lower()
+      logging.info("File path: " + str(file_path))
+      logging.info("Line: " + str(line))
+      logging.info("Code: " + str(code))
 
-          # ensure these source code file endings
-          if file_ext.upper() in file_exts_to_include:
-            region_diff[file] = []
-
-    # split all the different regions 
-    regions = diff.split("diff --git")[1:] # remove the clutter
-
-    for region in regions:
-      chunks = re.split(r'@@ |@@\\n', region)
-
-      # if a binary file it doesn't display the lines modified (a.k.a the '@@' part)
-      if len(chunks) == 1:
+      # Ignore files that are just completely deleted as we cannot annotate a file that does not exist 
+      # and also those that are file renames (this file won't exist yet)
+      if code == " No newline at end of file" or code == "--- /dev/null":
         continue
 
-      file_info = chunks[0] # file info is the first 'chunk', followed by the sections of code modified
-
-      # start with extracting the file name
-      name_start_index = file_info.find("b/")
-      file_name = file_info[name_start_index+2:]
-      name_end_index = file_name.find("\\n")
-      file_name = file_name[:name_end_index]
-
-      # it is possible there is a binary file being tracked or something we shouldn't care about  
-      if file_name == None or file_name not in region_diff:
+      # Ignore files that are not code/script files
+      if self._isCodeFile(file_path) == False:
         continue
 
-      # iterate through the following chunks to extract the section of code modified. 
-      for chunk in range(1, len(chunks), 2):
+      if file_path in region_diff:
+        region_diff[file_path].append(line)
+      else:
+        region_diff[file_path] = [line]
 
-        mod_line_info = chunks[chunk].split(" ")[0] # remove clutter
-        mod_code_info = chunks[chunk+1].split("\\n")[1:-1] # remove clutter
-
-        # make sure this is legitimate. expect modified line info to start with '-'
-        # as one of my previous comments actually had an example using the exact delimiters
-        # this became necessary :-).
-        if mod_line_info[0] != '-':
-          continue
-
-        # remove comma from mod_line_info as we only care about the start of the modification
-        if mod_line_info.find(",") != -1:
-          mod_line_info = mod_line_info[0:mod_line_info.find(",")]
-
-        current_line = abs(int(mod_line_info)) # remove the '-' in front of the line number by abs
-
-        # now only use the code line changes that MODIFIES (not adds) in the diff
-        for section in mod_code_info:
-
-          # If there is a new line character inside this modified LOC, we'll simply skip it and move on to the next one.
-          if len(mod_code_info[0]) == 0:
-            continue
-
-          # this lines modifies or deletes a line of code
-          if section[0] == "-":
-
-            # weed out false positives by ignoring new line/ deletion of lines modifications
-            if len(section) > 2:
-              region_diff[file_name].append(str(current_line))
-
-            # we only increment modified lines of code because we those lines did NOT exist
-            # in the previous commit!
-            current_line += 1 
+    logging.info(str(region_diff))
 
     return region_diff
 
@@ -182,18 +150,15 @@ class GitCommitLinker:
     """
 
     # diff cmd w/ no lines of context between current vs parent
-    diff_cmd = "git diff " + commit.commit_hash + "^ "+ commit.commit_hash + " --unified=0"
+    # we then pass this into a bash script that modifies the output to show
+    # only the modified lines of code changes in the following format. {file path}:{line number of code}:{code}
+    diff_cmd = "git diff " + commit.commit_hash + "^ "+ commit.commit_hash + " --unified=0 | " \
+                + os.path.dirname(os.path.abspath(__file__)) + "/diff-lines.sh"
+
     diff = str(subprocess.check_output(diff_cmd, shell=True, cwd= self.repo_path ))
 
-    # files changed, this is used by the getLineNumbersChanged function
-    diff_cmd_lines_changed = "git diff " + commit.commit_hash + "^ "+ commit.commit_hash + " --name-only"
-
-    # get the files modified -> use this to validate if we have arrived at a new file
-    # when grepping for the specific lines changed.
-    files_modified = str( subprocess.check_output( diff_cmd_lines_changed, shell=True, cwd= self.repo_path )).replace("b'", "").split("\\n")
-
     # now, let's get the file and the line number changed in the commit
-    return self._getModifiedRegionsOnly(diff, files_modified)
+    return self._getModifiedRegionsOnly(diff)
 
 
   def gitAnnotate(self, regions, commit):
