@@ -104,9 +104,17 @@ class CAS_Manager(threading.Thread):
 			try: 
 				metrics_generator = MetricsGenerator(repo_id, all_commits_modeling)
 				metrics_generator.buildAllModels()
+
+				# montly data dump
+				dump_refresh_date = str(datetime.utcnow() - timedelta(days=30))
+				if repo.last_data_dump == None or repo.last_data_dump < dump_refresh_date:
+					logging.info("Generating a monthly data dump for repository: " + repo_id)
+					metrics_generator.dumpData()
+					repo.last_data_dump = str(datetime.now().replace(microsecond=0))
+
 			except Exception as e:
 				logging.exception("Got an exception building model for repository " + repo_id)
-				repository_to_analyze.status = "Error"
+				repo.status = "Error"
 				session.commit() # update repo status
 				raise
 
