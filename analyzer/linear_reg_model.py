@@ -14,27 +14,29 @@ class LinearRegressionModel:
   probability: intercept + sum([metric_coefficient] * metric)
   """
 
-  def __init__(self, metrics, repo_id):
+  def __init__(self, metrics, repo_id, all_commits):
     self.metrics = metrics
     self.repo_id = repo_id
     self.stats = importr('stats')
     self.base = importr('base')
     self.readcsv = robjects.r['read.csv']
     self.sig_threshold = 0.05
-    self.coef = {} # a dict containing glm coefficients
-    self.ready = False
+    self.data = None 
+    self.commits = all_commits
 
   def buildModel(self):
+    """
+    Builds the GLM model, stores the coefficients, and calculates the probability based on model that a commit
+    will introduce a bug.
+    """
     self._buildDataSet()
-    self._getCoefficients()
+    self._buildModelIncrementally()
 
   def _buildDataSet(self):
     """
     builds the data set to be used for getting the linear regression model.
     saves datasets in the datasets folder as csv files to easily be imported
     or used by R.
-
-    @private
     """
 
     # to write dataset file in this directory (git ignored!)
@@ -86,94 +88,153 @@ class LinearRegressionModel:
       # end non buggy data
     # end file
 
-  def _getCoefficients(self):
+  def _isMetricSignificant(self, formula_metrics, metric):
     """
-    builds the linear regression model & stores them
-    @private
+    Checks if adding a metric to the already significant metrics in formula_metrics in a GLM model is significant. If significant,
+    and doesn't cause any previous metric in formula_metrics to become non significant, we return true. Otherwise, false.
+
+    Note: The p-value is always given in the 4th column of the summary matrix!
     """
+    sig_column = 4
+
+    # Case 1: no existing metrics in the formula
+    if len(formula_metrics) == 0:
+      formula = "is_buggy~" + metric
+      fit = self.stats.glm(formula, data=self.data, family="binomial")
+      summary = self.base.summary(fit)
+      # Note - first row is the intercept information so we start at second row!
+
+      try:
+        metric_sig = summary.rx2('coefficients').rx(2,sig_column)[0] # Second row, 4th column of the summary matrix.
+        if metric_sig <= self.sig_threshold:
+          return True
+        else:
+          return False
+
+      except:
+        # If we have two metrics that are perfectly collinear it will not build the model with the metrics
+        # and we will get an exception when trying to find the significance of *all values*. Indeed, do not add
+        # this value to the model!
+        return False
+
+    # Case 2: existing metrics in the formula    
+    else:
+      num_metrics = len(formula_metrics)+2 # plus one for the new metric we are adding and one for intercept
+      formula = "is_buggy~" + "+".join(formula_metrics) + "+" + metric
+      fit = self.stats.glm(formula, data=self.data, family="binomial")
+      summary = self.base.summary(fit)
+
+      # If any metric is now not significant, than we should not have added this metric to the formula
+      # There are (intercept) + num_metrics rows in the matrix to check - starts at second row skipping intercept
+      try: 
+        for row in range(2,num_metrics+1):
+          metric_sig = summary.rx2('coefficients').rx(row,sig_column)[0]
+          if metric_sig > self.sig_threshold:
+            return False
+        return True # old metrics added to model ARE significant still as well as the new one being tested
+
+      except:
+        # If we have two metrics that are perfectly collinear it will not build the model with the metrics
+        # and we will get an exception when trying to find the significance of *all values*. Indeed, do not add
+        # this value to the model!
+        return False
+
+  def _buildModelIncrementally(self):
+    """
+    Builds the linear regression model incrementally. It adds one metric at the time to the formula and keeps it
+    if it is significant. However, if adding it to the model casuses any other metric already added to the formula
+    to become not significant anymore, we do add it to the glm forumla.
+    """
+
+    metrics_list = ["la","ld","lt","ns","nd","nf","ndev","age","nuc","exp","rexp","sexp","entrophy"]
+    formula_metrics = []
     current_dir = os.path.dirname(__file__)
     dir_of_datasets = current_dir + "/datasets/"
+    self.data = self.readcsv(dir_of_datasets + self.repo_id + ".csv", header=True, sep = ",")
 
-    data = self.readcsv(dir_of_datasets + self.repo_id + ".csv", header=True, sep = ",")
-    formula = "is_buggy~ns+nd+nf+entrophy+la+ld+lt+ndev+age+nuc+exp+rexp+sexp"
-    fit = self.stats.glm(formula, data=data, family="binomial")
+    for metric in metrics_list:
+      if self._isMetricSignificant(formula_metrics, metric):
+        formula_metrics.append(metric)
+
+    # Store coefficients of our model w/ formula containing only the sig coefficients
+    self._storeCoefficients(formula_metrics)
+
+    # Calculate all probability for each commit to introduce a bug
+    self.calculateCommitRiskyness(self.commits, formula_metrics)
+
+
+  def _getCoefficients(self, formula_coefs):
+    """
+    Builds a GLM model with a formula based on the passed in coefficients and retuns a dictionary containing each
+    coefficient with its value.
+    """
+    coef_dict = {} # a dict containing glm coefficients {name -> value}
+    formula = "is_buggy~" + "+".join(formula_coefs)
+    fit = self.stats.glm(formula, data=self.data, family="binomial")
+
+    for coef in formula_coefs:
+      coef_dict[coef] = fit.rx2('coefficients').rx2(coef)[0]
+
+    return coef_dict
+
+  def _getInterceptValue(self, coefs):
+    """
+    Return the Intercept value of a GLM model and the p-value
+    Assumes that model can be built!
+    """
+    formula = "is_buggy~" + "+".join(coefs)
+    fit = self.stats.glm(formula, data=self.data, family="binomial")
     summary = self.base.summary(fit)
-
-    try:
-      self.coef['intercept'] = summary.rx2('coefficients').rx(1)[0]
-      self.coef['intercept_sig'] = summary.rx2('coefficients').rx(1,4)[0]
-      self.coef['ns'] = summary.rx2('coefficients').rx(2)[0]
-      self.coef['ns_sig'] = summary.rx2('coefficients').rx(2,4)[0]
-      self.coef['nd'] = summary.rx2('coefficients').rx(3)[0]
-      self.coef['nd_sig'] = summary.rx2('coefficients').rx(3,4)[0]
-      self.coef['nf'] = summary.rx2('coefficients').rx(4)[0]
-      self.coef['nf_sig'] = summary.rx2('coefficients').rx(4,4)[0]
-      self.coef['entrophy'] = summary.rx2('coefficients').rx(5)[0]
-      self.coef['entrophy_sig'] = summary.rx2('coefficients').rx(5,4)[0]
-      self.coef['la'] = summary.rx2('coefficients').rx(6)[0]
-      self.coef['la_sig'] = summary.rx2('coefficients').rx(6,4)[0]
-      self.coef['ld'] = summary.rx2('coefficients').rx(7)[0]
-      self.coef['ld_sig'] = summary.rx2('coefficients').rx(7,4)[0]
-      self.coef['lt'] = summary.rx2('coefficients').rx(8)[0]
-      self.coef['lt_sig'] = summary.rx2('coefficients').rx(8,4)[0]
-      self.coef['ndev'] = summary.rx2('coefficients').rx(9)[0]
-      self.coef['ndev_sig'] = summary.rx2('coefficients').rx(9,4)[0]
-      self.coef['age'] = summary.rx2('coefficients').rx(10)[0]
-      self.coef['age_sig'] = summary.rx2('coefficients').rx(10,4)[0]
-      self.coef['nuc'] = summary.rx2('coefficients').rx(11)[0]
-      self.coef['nuc_sig'] = summary.rx2('coefficients').rx(11,4)[0]
-      self.coef['exp'] = summary.rx2('coefficients').rx(12)[0]
-      self.coef['exp_sig'] = summary.rx2('coefficients').rx(12,4)[0]
-      self.coef['rexp'] = summary.rx2('coefficients').rx(13)[0]
-      self.coef['rexp_sig'] = summary.rx2('coefficients').rx(13,4)[0]
-      self.coef['sexp'] = summary.rx2('coefficients').rx(14)[0]
-      self.coef['sexp_sig'] = summary.rx2('coefficients').rx(14,4)[0]
-      self._storeCoefficients()
-
-    except:
-      logging.error("singularity found, skipping coefficients...")
+    return summary.rx2('coefficients').rx(1)[0], summary.rx2('coefficients').rx(1,4)[0]
 
   def _getCoefficientObject(self, coef_name, coef_value):
     """
-    returns a JSON object representation of coefficient given
-    the name and value. if coefficient significance, true or false
+    returns a JSON object representation of coefficient given the name and value. if coefficient significance, true or false
     is given depending on if it meets the significance threshold
     """
     coef_object = ""
-
-    # Is this a real coefficient or a p-value/sig coefficient?
-    if "sig" in coef_name:
-
-      if coef_value <= self.sig_threshold:
-        coef_object += '"' + str(coef_name) + '":"1'
-
-        # update the coeficient dict, as this is used when
-        # calcuating estimated probabilities
-        self.coef[coef_name] = 1
-
-      else:
-        coef_object += '"' + str(coef_name) + '":"0'
-
-        # update the coeficient dict, as this is used when
-        # calcuating estimated probabilities
-        self.coef[coef_name] = 0
-
-    else:
-      coef_object += '"' + str(coef_name) + '":"' + str(coef_value)
-
+    coef_object += '"' + str(coef_name) + '":"' + str(coef_value)
     return coef_object + '",'
 
-  def _storeCoefficients(self):
+  def _storeCoefficients(self, coefficient_names):
     """
     stores the glm coefficients in the database
-    @private
     """
+    # We are making this into JSON to simply store it in the database.
     coefs = ""
     coefs += '"repo":"' + str(self.repo_id) + '",'
 
+    # 2 Cases: where there are NO significant coefficients and the revese case.
+    if len(coefficient_names) == 0:
+      coefficient_dict = {}
+    else:
+      coefficient_dict = self._getCoefficients(coefficient_names)
+
+      # get the constant (aka intercept value)
+      intercept_value, intercept_pvalue = self._getInterceptValue(coefficient_names)
+      if intercept_pvalue <= self.sig_threshold:
+        intercept_sig = 1
+      else:
+        intercept_sig = 0
+
+      coefs += self._getCoefficientObject("intercept", intercept_value)
+      coefs += self._getCoefficientObject("intercept_sig", intercept_sig)
+
+    # Keep track of all and the subset of all that are significant as we need to record everything to the db
+    sig_coefs = [] 
+    all_coefs = ["ns", "nd", "nf", "entrophy", "la", "ld", "lt", "ndev", "age", "nuc", "exp", "rexp", "sexp"]
+
     # iterate through all the values in the dict containing coeficients
-    for coef_name, coef_value in self.coef.items():
+    for coef_name, coef_value in coefficient_dict.items():
       coefs += self._getCoefficientObject(coef_name, coef_value)
+      coefs += self._getCoefficientObject(coef_name + "_sig", 1) # keep track more easily which are statistically significant in db
+      sig_coefs.append(coef_name)
+
+    # append the non significant coefficents as -1 and not significant
+    for c in all_coefs:
+      if c not in sig_coefs:
+        coefs += self._getCoefficientObject(c, -1) 
+        coefs += self._getCoefficientObject(c + "_sig", 0)
 
     # remove the trailing comma
     coefs = coefs[:-1]
@@ -187,39 +248,33 @@ class LinearRegressionModel:
 
     # Write
     coefSession.commit()
-    self.ready = True
 
-  def calculateProbCommits(self, commits):
+  def calculateCommitRiskyness(self, commits, coefficient_names):
     """
     calcualte the probability of commits to be buggy or not
     using the linear regression model
 
     estimated probability = 1/[1 + exp(-a - BX)]
     """
-    if (self.ready != True):
-      return
+    # 2 cases: model cannot possibly be build if no signficant coefficients available
+    # in this case, we just insert -1 for the probability to indicate no glm prediction possible
+
+    if len(coefficient_names) == 0:
+      coefficient_dict = {}
+      model_available = False
+    else:
+      coefficient_dict = self._getCoefficients(coefficient_names)
+      model_available = True
+      intercept_value, intercept_pvalue = self._getInterceptValue(coefficient_names)
 
     for commit in commits:
 
+      if model_available == False:
+        commit.glm_probability = -1
+      else:
+        coefs_sum = 0
+        for coef_name, coef_value in coefficient_dict.items():
+          coefs_sum += (coef_value * getattr(commit, coef_name))
 
-        coefs =   (commit.ns * self.coef["ns"] * self.coef["ns_sig"]) \
-                + (commit.nd * self.coef["nd"] * self.coef["nd_sig"]) \
-                + (commit.nf * self.coef["nf"] * self.coef["nf_sig"]) \
-                + (commit.entrophy * self.coef["entrophy"] * self.coef["entrophy_sig"]) \
-                + (commit.la * self.coef["la"] * self.coef["la_sig"]) \
-                + (commit.ld * self.coef["ld"] * self.coef["ld_sig"]) \
-                + (commit.lt * self.coef["lt"] * self.coef["lt_sig"]) \
-                + (commit.ndev * self.coef["ndev"] * self.coef["ndev_sig"]) \
-                + (commit.age * self.coef["age"] * self.coef["age_sig"]) \
-                + (commit.nuc * self.coef["nuc"] * self.coef["nuc_sig"]) \
-                + (commit.exp * self.coef["exp"] * self.coef["exp_sig"]) \
-                + (commit.rexp * self.coef["rexp"] * self.coef["rexp_sig"]) \
-                + (commit.sexp * self.coef["sexp"] * self.coef["sexp_sig"])
-
-        try:
-          constant = (self.coef["intercept"] * self.coef["intercept_sig"])
-          est_probability = 1/(1 + math.exp(-constant-coefs))
-          commit.glm_probability = est_probability
-
-        except:
-          commit.glm_probability = 0.5
+        riskyness = 1/(1+ math.exp(-intercept_value-coefs_sum))
+        commit.glm_probability = riskyness

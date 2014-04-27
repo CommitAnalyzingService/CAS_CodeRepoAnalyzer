@@ -19,12 +19,13 @@ class MetricsGenerator:
 	"""
 	commits = None
 
-	def __init__(self, repo_id, commits):
+	def __init__(self, repo_id, commits, all_commits):
 		"""
 		Constructor
 		"""
 		self.repo_id = repo_id
 		self.commits = commits
+		self.all_commits = all_commits
 
 		# metrics
 		self.metrics = RepositoryMetrics()
@@ -36,16 +37,10 @@ class MetricsGenerator:
 		self.fetchAllMetrics() # first get all metrics
 
 		median_model = MedianModel(self.metrics, self.repo_id)
-		linear_reg_model = LinearRegressionModel(self.metrics, self.repo_id)
+		linear_reg_model = LinearRegressionModel(self.metrics, self.repo_id, self.all_commits)
 
-		# build the median model
-		median_model.buildModel()
-
-		# build the linear regression model
-		linear_reg_model.buildModel()
-
-		# calculate the probabilities of each commit based on linear regression
-		linear_reg_model.calculateProbCommits(self.commits)
+		median_model.buildModel() # build the median model
+		linear_reg_model.buildModel() # build the linear regression model & calculate the riskyness of each commit
 
 	def dumpData(self):
 		"""

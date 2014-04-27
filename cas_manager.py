@@ -100,9 +100,14 @@ class CAS_Manager(threading.Thread):
 						)
 						.order_by( Commit.author_date_unix_timestamp.desc() )
 						.all())
-		
+
+			all_commits = (self.session.query(Commit)
+						.filter(
+							( Commit.repository_id == repo_id ))
+						.all())
+	
 			try: 
-				metrics_generator = MetricsGenerator(repo_id, all_commits_modeling)
+				metrics_generator = MetricsGenerator(repo_id, all_commits_modeling, all_commits)
 				metrics_generator.buildAllModels()
 
 				# montly data dump

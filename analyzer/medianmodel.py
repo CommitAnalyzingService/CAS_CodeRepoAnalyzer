@@ -2,6 +2,7 @@ import rpy2.robjects as robjects # R integration to python
 from analyzer.repositorymetrics import * # metrics abstraction; holds all metric values for commits
 from db import *	# postgresql db information
 from orm.metrics import *	# orm metrics table
+from caslogging import logging
 
 class MedianModel:
   """
@@ -61,8 +62,8 @@ class MedianModel:
         median_props += '"' + metric + '_sig":"0", '
 
     except:
-      print("Skipping metric: " + metric +
-        ". Please make sure you have run the latest CAS_Reader")
+      # catch the case where we haven't made any observations to do this metric
+      logging.info("Metric " + metric + " could not be used in the median model for repo " + self.repo_id)
 
     return median_props
 
