@@ -68,10 +68,10 @@ class GitCommitLinker:
     """
     region_chunks = self.getModifiedRegions(commit)
 
-    # logging.info("Linkage for commit " + commit.commit_hash)
-    # for k,v in region_chunks.items():
-    #   logging.info("-- file: " + k)
-    #   logging.info("---- loc modified: " + str(v))
+    logging.info("Linkage for commit " + commit.commit_hash)
+    for k,v in region_chunks.items():
+      logging.info("-- file: " + k)
+      logging.info("---- loc modified: " + str(v))
 
     bug_introducing_changes = self.gitAnnotate(region_chunks, commit)
     return bug_introducing_changes
@@ -125,12 +125,8 @@ class GitCommitLinker:
         continue
 
       file_info = chunks_initial[0] # file info is the first 'chunk', followed by the line_info {double at characters} modified code
-
-      # start with extracting the file name
-      name_start_index = file_info.find("b/")
-      file_name = file_info[name_start_index+2:]
-      name_end_index = file_name.find(":CAS_DELIMITER:") # Our own line terminator instead of new lines.
-      file_name = file_name[:name_end_index]
+      file_info_split = file_info.split(" ")
+      file_name = file_info_split[1][2:] # remove the 'a/ character'
 
       # it is possible there is a binary file being tracked or something we shouldn't care about  
       if file_name == None or file_name not in region_diff:
@@ -145,6 +141,7 @@ class GitCommitLinker:
       for chunk in range(1, len(chunks_initial), 1):
 
         code_info_chunk = chunks_initial[chunk].split("@@",1) # split only on the first occurance of the double at characters
+
         line_info = code_info_chunk[0] # This now contains the -101,30 +102,30 part (info about the lines modified)
         code_info = code_info_chunk[1] # This now contains the modified lines of code seperated by the delimiter we set
 
@@ -167,10 +164,6 @@ class GitCommitLinker:
 
         # now only use the code line changes that MODIFIES (not adds) in the diff
         for section in mod_code_info:
-
-          # If there is a new line character inside this modified LOC, we'll simply skip it and move on to the next one.
-          if len(mod_code_info[0]) == 0:
-            continue
 
           # this lines modifies or deletes a line of code
           if section.startswith(":CAS_DELIMITER_START:-"):
