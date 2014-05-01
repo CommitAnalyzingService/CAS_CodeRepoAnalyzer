@@ -111,10 +111,17 @@ class GitCommitLinker:
             region_diff[file] = []
 
     # split all the different regions 
-    regions = diff.split(":CAS_DELIMITER_START:diff --git")[1:] # remove the clutter
+    regions = diff.split("diff --git")[1:] # remove the clutter
+
+    print("\n Regions: ")
+    print(str(regions))
 
     # Next, we study each region to get file that was modified & the lines modified so we can annotate them later
     for region in regions:
+
+      print("\n Region: ")
+      print(region)
+
 
       # We begin by splitting on the beginning of double at characters, which gives us an array looking like this:
       # [file info, line info {double at characters} modified code]
@@ -127,6 +134,8 @@ class GitCommitLinker:
       file_info = chunks_initial[0] # file info is the first 'chunk', followed by the line_info {double at characters} modified code
       file_info_split = file_info.split(" ")
       file_name = file_info_split[1][2:] # remove the 'a/ character'
+
+      print(file_name)
 
       # it is possible there is a binary file being tracked or something we shouldn't care about  
       if file_name == None or file_name not in region_diff:
@@ -141,6 +150,9 @@ class GitCommitLinker:
       for chunk in range(1, len(chunks_initial), 1):
 
         code_info_chunk = chunks_initial[chunk].split("@@",1) # split only on the first occurance of the double at characters
+
+        print("\n Code Chunk")
+        print(str(code_info_chunk))
 
         line_info = code_info_chunk[0] # This now contains the -101,30 +102,30 part (info about the lines modified)
         code_info = code_info_chunk[1] # This now contains the modified lines of code seperated by the delimiter we set
