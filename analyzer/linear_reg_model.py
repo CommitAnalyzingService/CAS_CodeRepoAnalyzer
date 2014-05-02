@@ -14,7 +14,12 @@ class LinearRegressionModel:
   probability: intercept + sum([metric_coefficient] * metric)
   """
 
-  def __init__(self, metrics, repo_id, all_commits):
+  def __init__(self, metrics, repo_id, testingCommits):
+    """
+    @metrics - this is the list of metrics from the TRAINING data set.
+    @repo_id - the repository repo_id
+    @testingCommits - this is commits from the TESTING data set
+    """
     self.metrics = metrics
     self.repo_id = repo_id
     self.stats = importr('stats')
@@ -22,7 +27,7 @@ class LinearRegressionModel:
     self.readcsv = robjects.r['read.csv']
     self.sig_threshold = 0.05
     self.data = None 
-    self.commits = all_commits
+    self.commits = testingCommits
 
   def buildModel(self):
     """

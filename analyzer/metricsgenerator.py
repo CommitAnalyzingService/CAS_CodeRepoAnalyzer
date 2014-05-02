@@ -17,15 +17,17 @@ class MetricsGenerator:
 	MetricsGenerator()
 	Generate the metrics for buggy & non-buggy commits
 	"""
-	commits = None
 
-	def __init__(self, repo_id, commits, all_commits):
+	def __init__(self, repo_id, trainingData, testData):
 		"""
 		Constructor
+		@repo_id : repository id
+		@training data : all commits that we are training the models on 
+		@testing data : all commits that we are testing the models on (i.e. glm model)
 		"""
 		self.repo_id = repo_id
-		self.commits = commits
-		self.all_commits = all_commits
+		self.trainingData = trainingData
+		self.testData = testData
 
 		# metrics
 		self.metrics = RepositoryMetrics()
@@ -36,13 +38,15 @@ class MetricsGenerator:
 		"""
 		self.fetchAllMetrics() # first get all metrics
 
+		# Only use training data b/c if new bugs are introduced in newer commits,
+		# then we do not know about it and therefore new data is unreliable. 
 		median_model = MedianModel(self.metrics, self.repo_id)
-		linear_reg_model = LinearRegressionModel(self.metrics, self.repo_id, self.all_commits)
+		linear_reg_model = LinearRegressionModel(self.metrics, self.repo_id, self.testData)
 
 		median_model.buildModel() # build the median model
 		linear_reg_model.buildModel() # build the linear regression model & calculate the riskyness of each commit
 
-	def dumpData(self):
+	def dumpData(self, commits):
 		"""
 		dumps all commit data into the monthly dataset folder.
 		dataset names after repository id
@@ -59,7 +63,7 @@ class MetricsGenerator:
 			csv_writer.writerow(columns)
 
 			# dump all commit data
-			for commit in self.commits:
+			for commit in commits:
 				commit_data = []
 				for col in columns:
 					commit_data.append(getattr(commit,col))
@@ -72,7 +76,7 @@ class MetricsGenerator:
 		to hold all metrics information necessary to build models.
 		@private
 		"""
-		for commit in self.commits:
+		for commit in self.trainingData:
 
 			# Exclude merge commits where no lines of code where changed
 			if commit.classification == "Merge" and commit.la == 0 and commit.ld == 0:

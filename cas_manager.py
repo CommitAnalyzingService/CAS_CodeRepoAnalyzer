@@ -94,9 +94,9 @@ class CAS_Manager(threading.Thread):
 			glm_model_time =  int(config['glm_modeling']['months']) 
 			data_months_datetime = datetime.utcnow() - MonthDelta(glm_model_time)
 			data_months_unixtime = calendar.timegm(data_months_datetime.utctimetuple())
-			print(data_months_unixtime)
-
-			all_commits_modeling = (self.session.query(Commit)
+		
+			# all commits for repo prior to current time - glm model time
+			training_commits = (self.session.query(Commit)
 						.filter( 
 							( Commit.repository_id == repo_id ) &
 							( Commit.author_date_unix_timestamp < str(data_months_unixtime))
@@ -104,20 +104,31 @@ class CAS_Manager(threading.Thread):
 						.order_by( Commit.author_date_unix_timestamp.desc() )
 						.all())
 
-			all_commits = (self.session.query(Commit)
+			# all commits for repo after or on current time - glm model time
+			testing_commits = (self.session.query(Commit)
 						.filter(
-							( Commit.repository_id == repo_id ))
+							( Commit.repository_id == repo_id ) &
+							( Commit.author_date_unix_timestamp >= str(data_months_unixtime)))
 						.all())
 	
 			try: 
-				metrics_generator = MetricsGenerator(repo_id, all_commits_modeling, all_commits)
+				metrics_generator = MetricsGenerator(repo_id, training_commits, testing_commits)
 				metrics_generator.buildAllModels()
 
 				# montly data dump - or rather, every 30 days.
 				dump_refresh_date = str(datetime.utcnow() - timedelta(days=30))
 				if repo.last_data_dump == None or repo.last_data_dump < dump_refresh_date:
 					logging.info("Generating a monthly data dump for repository: " + repo_id)
-					metrics_generator.dumpData()
+
+					# Get all commits for the repository
+					all_commits = (self.session.query(Commit)
+						.filter( 
+							( Commit.repository_id == repo_id )
+						)
+						.order_by( Commit.author_date_unix_timestamp.desc() )
+						.all())
+
+					metrics_generator.dumpData(all_commits)
 					repo.last_data_dump = str(datetime.now().replace(microsecond=0))
 
 			except Exception as e:
