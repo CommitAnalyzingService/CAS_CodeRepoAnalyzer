@@ -123,4 +123,4 @@ name. Make sure you are using python3, such as using a virtualenv if using Ubunt
 Set up the database for the first time by running `python script.py initDb`
 
 ##Usage
-In a terminal, type `python script.py & ' to start the code repo analyzer and run it in the background.
+In a terminal, type `nohup python script.py & ' to start the code repo analyzer and run it in the background.

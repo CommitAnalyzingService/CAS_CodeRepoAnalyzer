@@ -68,10 +68,10 @@ class GitCommitLinker:
     """
     region_chunks = self.getModifiedRegions(commit)
 
-    # logging.info("Linkage for commit " + commit.commit_hash)
-    # for k,v in region_chunks.items():
-    #   logging.info("-- file: " + k)
-    #   logging.info("---- loc modified: " + str(v))
+    logging.info("Linkage for commit " + commit.commit_hash)
+    for k,v in region_chunks.items():
+      logging.info("-- file: " + k)
+      logging.info("---- loc modified: " + str(v))
 
     bug_introducing_changes = self.gitAnnotate(region_chunks, commit)
     return bug_introducing_changes
@@ -113,30 +113,44 @@ class GitCommitLinker:
     # split all the different regions 
     regions = diff.split("diff --git")[1:] # remove the clutter
 
+    # Next, we study each region to get file that was modified & the lines modified so we can annotate them later
     for region in regions:
-      chunks = re.split(r'@@ |@@:CAS_DELIMITER:', region)
 
-      # if a binary file it doesn't display the lines modified (a.k.a the '@@' part)
-      if len(chunks) == 1:
+      # We begin by splitting on the beginning of double at characters, which gives us an array looking like this:
+      # [file info, line info {double at characters} modified code]
+      chunks_initial = region.split(":CAS_DELIMITER_START:@@")
+
+      # if a binary file it doesn't display the lines modified (a.k.a the 'line info {double at characters} modified code' part)
+      if len(chunks_initial) == 1:
         continue
 
-      file_info = chunks[0] # file info is the first 'chunk', followed by the sections of code modified
-
-      # start with extracting the file name
-      name_start_index = file_info.find("b/")
-      file_name = file_info[name_start_index+2:]
-      name_end_index = file_name.find(":CAS_DELIMITER:")
-      file_name = file_name[:name_end_index]
+      file_info = chunks_initial[0] # file info is the first 'chunk', followed by the line_info {double at characters} modified code
+      file_info_split = file_info.split(" ")
+      file_name = file_info_split[1][2:] # remove the 'a/ character'
 
       # it is possible there is a binary file being tracked or something we shouldn't care about  
       if file_name == None or file_name not in region_diff:
         continue
 
-      # iterate through the following chunks to extract the section of code modified. 
-      for chunk in range(1, len(chunks), 2):
+      # Next, we must know the lines modified so that we can annotate. To do this, we must further split the chunks_initial.
+      # Specifically, we must seperate the line info from the code info. The second part of the initial chunk looks like
+      # -101,30, +202,33 {double at characters} code modified info. We can be pretty certain that the line info doesnt contain
+      # any at characters, so we can safely split the first set of doule at characters seen to divide this info up.
 
-        mod_line_info = chunks[chunk].split(" ")[0] # remove clutter
-        mod_code_info = (chunks[chunk+1].replace("\\n","")).split(":CAS_DELIMITER:")[1:-1] # remove clutter
+      # Iterate through - as in one file we can multiple sections modified.  
+      for chunk in range(1, len(chunks_initial), 1):
+
+        code_info_chunk = chunks_initial[chunk].split("@@",1) # split only on the first occurance of the double at characters
+
+        line_info = code_info_chunk[0] # This now contains the -101,30 +102,30 part (info about the lines modified)
+        code_info = code_info_chunk[1] # This now contains the modified lines of code seperated by the delimiter we set
+
+        # As we only care about modified lines of code, we must ignore the +/additions as they do exist in previous versions
+        # and thus, we cannot even annotate them (they were added in this commit). So, we only care about the start where it was 
+        # modified and we will have to study which lines where modified and keep track of them.
+
+        mod_line_info = line_info.split(" ")[1] # remove clutter -> we only care about what line the modificatin started, first index is just empty
+        mod_code_info = code_info.replace("\\n","").split(":CAS_DELIMITER:")[1:-1] # remove clutter -> first line contains info on the class and last line irrelevant
 
         # make sure this is legitimate. expect modified line info to start with '-'
         if mod_line_info[0] != '-':
@@ -151,16 +165,9 @@ class GitCommitLinker:
         # now only use the code line changes that MODIFIES (not adds) in the diff
         for section in mod_code_info:
 
-          # If there is a new line character inside this modified LOC, we'll simply skip it and move on to the next one.
-          if len(mod_code_info[0]) == 0:
-            continue
-
           # this lines modifies or deletes a line of code
-          if section[0] == "-":
-
-            # weed out false positives by ignoring new line/ deletion of lines modifications
-            if len(section) > 2:
-              region_diff[file_name].append(str(current_line))
+          if section.startswith(":CAS_DELIMITER_START:-"):
+            region_diff[file_name].append(str(current_line))
 
             # we only increment modified lines of code because we those lines did NOT exist
             # in the previous commit!
@@ -181,7 +188,7 @@ class GitCommitLinker:
     # pipe it into bash and echo back with our own delimiter instead of new lines to seperate each line 
     # of the git output to make parsing this a reality!
     diff_cmd = "git diff " + commit.commit_hash + "^ "+ commit.commit_hash + " --unified=0 " \
-      + ' | while read; do echo "$REPLY:CAS_DELIMITER:"; done'
+      + ' | while read; do echo ":CAS_DELIMITER_START:$REPLY:CAS_DELIMITER:"; done'
 
     diff = str(subprocess.check_output(diff_cmd, shell=True, cwd= self.repo_path, executable="/bin/bash" ))
 
