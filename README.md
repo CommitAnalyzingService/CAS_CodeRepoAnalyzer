@@ -27,6 +27,7 @@ Additional Instructions are available in SETUP.md
 * sqlalchemy
 * py-postgresql
 * GNU grep
+* MonthDelta
 
 ###Setting up python3.3 virtual env on Ubuntu
 * Assumes you are working on Ubuntu 12.04
@@ -118,6 +119,8 @@ name. Make sure you are using python3, such as using a virtualenv if using Ubunt
 * Py-PostgreSQL (py-postgresql)
 * requests (requests)
 * python-dateutil (python-dateutil)
+
+To install the MonthDelta package, simply do: `pip install http://pypi.python.org/packages/source/M/MonthDelta/MonthDelta-1.0b.tar.bz2`
 
 ###First-Time Database Setup
 Set up the database for the first time by running `python script.py initDb`

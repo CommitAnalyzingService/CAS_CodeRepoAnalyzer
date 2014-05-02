@@ -14,6 +14,7 @@ from caslogging import logging
 from queue import *
 import threading
 import time
+from monthdelta import MonthDelta
 
 class CAS_Manager(threading.Thread):
 	""" 
@@ -87,16 +88,18 @@ class CAS_Manager(threading.Thread):
 			repo = self.modelQueue.get()
 			repo_id = repo.id 
 
-			# use data only up to 3 months prior we won't have sufficent data to build models
+			# use data only up to X months prior we won't have sufficent data to build models
 			# as there may be bugs introduced in those months that haven't been fixed, skewing
 			# our model.
-			three_months_datetime = datetime.utcnow() - timedelta(days=30)
-			three_months_unixtime = calendar.timegm(three_months_datetime.utctimetuple())
+			glm_model_time =  int(config['glm_modeling']['months']) 
+			data_months_datetime = datetime.utcnow() - MonthDelta(glm_model_time)
+			data_months_unixtime = calendar.timegm(data_months_datetime.utctimetuple())
+			print(data_months_unixtime)
 
 			all_commits_modeling = (self.session.query(Commit)
 						.filter( 
 							( Commit.repository_id == repo_id ) &
-							( Commit.author_date_unix_timestamp < str(three_months_unixtime))
+							( Commit.author_date_unix_timestamp < str(data_months_unixtime))
 						)
 						.order_by( Commit.author_date_unix_timestamp.desc() )
 						.all())
@@ -110,7 +113,7 @@ class CAS_Manager(threading.Thread):
 				metrics_generator = MetricsGenerator(repo_id, all_commits_modeling, all_commits)
 				metrics_generator.buildAllModels()
 
-				# montly data dump
+				# montly data dump - or rather, every 30 days.
 				dump_refresh_date = str(datetime.utcnow() - timedelta(days=30))
 				if repo.last_data_dump == None or repo.last_data_dump < dump_refresh_date:
 					logging.info("Generating a monthly data dump for repository: " + repo_id)
