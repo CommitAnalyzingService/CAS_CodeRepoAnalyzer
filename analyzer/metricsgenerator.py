@@ -53,7 +53,11 @@ class MetricsGenerator:
 		"""
 		# to write dataset file in this directory (git ignored!)
 		current_dir = os.path.dirname(__file__)
-		dir_of_datasets = current_dir + "/datasets/monthly/"
+
+		if config['data_dumps']['location'] != None or config['data_dumps']['location'] == "":
+			dir_of_datasets = config['data_dumps']['location']
+		else:
+			dir_of_datasets = current_dir + "/datasets/monthly/"
 
 		with open(dir_of_datasets + self.repo_id + ".csv", "w") as file:
 			csv_writer = csv.writer(file, dialect="excel")

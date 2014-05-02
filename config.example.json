@@ -27,5 +27,11 @@
 	"github": {
 		"user": "example_user",
 		"pass": "PASSWORD"
+	},
+	"glm_modeling":{
+		"months": "3"
+	},
+	"data_dumps": {
+		"location": ""
 	}
 }
