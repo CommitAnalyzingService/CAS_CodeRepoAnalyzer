@@ -281,5 +281,12 @@ class LinearRegressionModel:
         for coef_name, coef_value in coefficient_dict.items():
           coefs_sum += (coef_value * getattr(commit, coef_name))
 
-        riskyness = 1/(1+ math.exp(-intercept_value-coefs_sum))
+        try:
+          riskyness = 1/(1+ math.exp(-intercept_value-coefs_sum))
+        except OverflowError:
+          logging.error("Overflow error for repo " + self.repo_id)
+          logging.error("Calculating riskyness for " + commit.commit_hash)
+          logging.error("Sum of coefficients: " + str(coefs_sum))
+          logging.error("Coeffiecents: " + str(coefficient_dict))
+          
         commit.glm_probability = riskyness
