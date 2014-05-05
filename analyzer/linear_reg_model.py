@@ -288,5 +288,6 @@ class LinearRegressionModel:
           logging.error("Calculating riskyness for " + commit.commit_hash)
           logging.error("Sum of coefficients: " + str(coefs_sum))
           logging.error("Coeffiecents: " + str(coefficient_dict))
-          
+          riskyness = 0.01
+
         commit.glm_probability = riskyness
