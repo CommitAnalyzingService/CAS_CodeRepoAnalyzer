@@ -253,6 +253,7 @@ class LinearRegressionModel:
 
     # Write
     coefSession.commit()
+    coefSession.close()
 
   def calculateCommitRiskyness(self, commits, coefficient_names):
     """

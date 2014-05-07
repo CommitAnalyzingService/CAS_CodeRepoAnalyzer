@@ -79,4 +79,5 @@ class LocalRepository():
             commitDict['repository_id'] = self.repo.id
             commitsSession.merge(Commit(commitDict))
         commitsSession.commit()
+        commitsSession.close()
         logging.info('Done saving commits to the database.')

@@ -25,7 +25,6 @@ class CAS_Manager(threading.Thread):
 	def __init__(self):
 		"""Constructor"""
 		threading.Thread.__init__(self)
-		self.session = Session()
 		numOfWorkers = int(config['system']['workers'])
 		self.workQueue = ThreadPool(numOfWorkers)
 		self.modelQueue = Queue()
@@ -33,10 +32,11 @@ class CAS_Manager(threading.Thread):
 	def checkIngestion(self):
 		"""Check if any repo needs to be ingested"""
 
+		session = Session()
 		repo_update_freq = int(config['repoUpdates']['freqInDays'])
 		refresh_date = str(datetime.utcnow() - timedelta(days=repo_update_freq))
 
-		repos_to_get = (self.session.query(Repository) 
+		repos_to_get = (session.query(Repository) 
 							.filter( 
 								(Repository.status == "Waiting to be Ingested") | 
 								(Repository.ingestion_date < refresh_date) &
@@ -46,16 +46,19 @@ class CAS_Manager(threading.Thread):
 		for repo in repos_to_get:
 			logging.info("Adding repo " + repo.id + " to work queue for ingesting")
 			repo.status = "In Queue to be Ingested"
-			self.session.commit() # update the status of repo
+			session.commit() # update the status of repo
 			self.workQueue.add_task(ingest,repo.id)
+
+		session.close()
 
 	def checkAnalyzation(self):
 		"""Checks if any repo needs to be analyzed"""
 
+		session = Session()
 		repo_update_freq = int(config['repoUpdates']['freqInDays'])
 		refresh_date = str(datetime.utcnow() - timedelta(days=repo_update_freq))
 
-		repos_to_get = (self.session.query(Repository)
+		repos_to_get = (session.query(Repository)
 						  .filter( (Repository.status == "Waiting to be Analyzed") )
 						  .all()
 						)
@@ -63,13 +66,16 @@ class CAS_Manager(threading.Thread):
 		for repo in repos_to_get:
 			logging.info("Adding repo " + repo.id + " to work queue for analyzing.")
 			repo.status = "In Queue to be Analyzed"
-			self.session.commit() # update the status of repo
+			session.commit() # update the status of repo
 			self.workQueue.add_task(analyze, repo.id)
+
+		session.close()
 
 	def checkModel(self):
 		"""Check if any repo needs metrics to be generated"""
 
-		repos_to_get = (self.session.query(Repository) 
+		session = Session()
+		repos_to_get = (session.query(Repository) 
 							.filter( 
 								(Repository.status == "In Queue to Build Model") )
 							.all())
@@ -77,16 +83,20 @@ class CAS_Manager(threading.Thread):
 		for repo in repos_to_get:
 			logging.info("Adding repo " + repo.id + " to model queue to finish analyzing")
 			repo.status = "Building Model"
-			self.session.commit() # update status of repo
-			self.modelQueue.put(repo)
+			session.commit() # update status of repo
+			self.modelQueue.put(repo.id)
+
+		session.close()
 
 	def checkBuildModel(self):
 		""" Checks if any repo is awaiting to build model. 
 			We are using a queue because we can't concurrently access R """
 
+		session = Session()
+
 		if self.modelQueue.empty() != True:
-			repo = self.modelQueue.get()
-			repo_id = repo.id 
+			repo_id = self.modelQueue.get()
+			repo = (session.query(Repository).filter(Repository.id == repo_id).first())
 
 			# use data only up to X months prior we won't have sufficent data to build models
 			# as there may be bugs introduced in those months that haven't been fixed, skewing
@@ -96,7 +106,7 @@ class CAS_Manager(threading.Thread):
 			data_months_unixtime = calendar.timegm(data_months_datetime.utctimetuple())
 		
 			# all commits for repo prior to current time - glm model time
-			training_commits = (self.session.query(Commit)
+			training_commits = (session.query(Commit)
 						.filter( 
 							( Commit.repository_id == repo_id ) &
 							( Commit.author_date_unix_timestamp < str(data_months_unixtime))
@@ -105,7 +115,7 @@ class CAS_Manager(threading.Thread):
 						.all())
 
 			# all commits for repo after or on current time - glm model time
-			testing_commits = (self.session.query(Commit)
+			testing_commits = (session.query(Commit)
 						.filter(
 							( Commit.repository_id == repo_id ) &
 							( Commit.author_date_unix_timestamp >= str(data_months_unixtime)))
@@ -121,7 +131,7 @@ class CAS_Manager(threading.Thread):
 					logging.info("Generating a monthly data dump for repository: " + repo_id)
 
 					# Get all commits for the repository
-					all_commits = (self.session.query(Commit)
+					all_commits = (session.query(Commit)
 						.filter( 
 							( Commit.repository_id == repo_id )
 						)
@@ -133,20 +143,24 @@ class CAS_Manager(threading.Thread):
 
 			except Exception as e:
 				logging.exception("Got an exception building model for repository " + repo_id)
+
 				repo.status = "Error"
 				session.commit() # update repo status
+				session.close()
 				raise
 
 			logging.info("Repo " + repo_id + " finished analyzing.")
 			repo.analysis_date = str(datetime.now().replace(microsecond=0))
 			repo.status = "Analyzed"
-			self.session.commit() # update status of repo
+			session.commit() # update status of repo
 			self.notify(repo)
+			session.close()
 		# End of if statement
 
 	def notify(self, repo):
 		""" Send e-mail notifications if applicable to a repo 
 			used by checkBuildModel """
+
 		notify = False
 		notifier = None
 

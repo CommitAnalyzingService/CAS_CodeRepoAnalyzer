@@ -55,3 +55,5 @@ def ingest(repo_id):
   	ingestRepo(repo_to_analyze[0], session)
   else:
     logging.info('Repo with id ' + repo_id_to_analyze + ' not found!')
+
+  session.close()

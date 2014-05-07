@@ -37,6 +37,8 @@ def analyze(repo_id):
 	else:
 		logging.info('Repo with id ' + repo_id_to_analyze + ' not found!')
 
+	session.close()
+
 def analyzeRepo(repository_to_analyze, session):
 	"""
 	Analyzes the given repository
@@ -89,5 +91,3 @@ def analyzeRepo(repository_to_analyze, session):
 	if repository_to_analyze.status != "Error":
 		repository_to_analyze.status = "In Queue to Build Model"
 		session.commit() # update repo status
-
-	session.close()
