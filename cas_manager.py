@@ -149,11 +149,14 @@ class CAS_Manager(threading.Thread):
 				session.close()
 				raise
 
+			# Notify user if repo has never been analyzed previously
+			if repo.analysis_date is None:
+				self.notify(repo)
+
 			logging.info("Repo " + repo_id + " finished analyzing.")
 			repo.analysis_date = str(datetime.now().replace(microsecond=0))
 			repo.status = "Analyzed"
 			session.commit() # update status of repo
-			self.notify(repo)
 			session.close()
 		# End of if statement
 
@@ -163,22 +166,20 @@ class CAS_Manager(threading.Thread):
 
 		notify = False
 		notifier = None
+		logging.info("Notifying subscribed users for repository " + repo.id)
 
-		# Notify user if repo has never been analyzed previously
-		if repo.analysis_date is None:
+		# Create the Notifier
+		gmail_user = config['gmail']['user']
+		gmail_pass = config['gmail']['pass']
+		notifier = Notifier(gmail_user, gmail_pass, repo.name)
 
-			# Create the Notifier
-			gmail_user = config['gmail']['user']
-			gmail_pass = config['gmail']['pass']
-			notifier = Notifier(gmail_user, gmail_pass, repo.name)
+		# Add subscribers if applicable
+		if repo.email is not None:
+			notifier.addSubscribers([repo.email, gmail_user])
+		else:
+			notifier.addSubscribers([gmail_user])
 
-			# Add subscribers if applicable
-			if repo.email is not None:
-				notifier.addSubscribers([repo.email, gmail_user])
-			else:
-				notifier.addSubscribers([gmail_user])
-
-			notifier.notify()
+		notifier.notify()
 
 	def run(self):
 
