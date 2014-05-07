@@ -40,6 +40,7 @@ class Git():
 
     CLONE_CMD = 'git clone {!s} {!s}'     # git clone command w/o downloading src code
     PULL_CMD = 'git pull origin master'      # git pull command
+    RESET_CMD = 'git reset --hard'
     REPO_DIRECTORY = "/CASRepos/git/"        # directory in which to store repositories
 
     def getCommitStatsProperties( stats, commitFiles, devExperience, author, unixTimeStamp ):
@@ -360,6 +361,9 @@ class Git():
         """
 
         repo_dir = os.path.dirname(__file__) + self.REPO_DIRECTORY + repo.id
+
+        # Weird sceneario where something in repo gets modified - reset all changes before pulling
+        subprocess.call(self.RESET_CMD, shell=True, cwd= repo_dir)
 
         # Run the pull command and return the results
         logging.info('Pulling latest changes from repo: '+ str(repo) )
