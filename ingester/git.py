@@ -39,7 +39,7 @@ class Git():
     CAS_READER_STOPPRETTY \" --numstat --reverse '
 
     CLONE_CMD = 'git clone {!s} {!s}'     # git clone command w/o downloading src code
-    PULL_CMD = 'git pull origin master'      # git pull command
+    PULL_CMD = 'git pull'      # git pull command
     RESET_CMD = 'git reset --hard'
     REPO_DIRECTORY = "/CASRepos/git/"        # directory in which to store repositories
 
@@ -368,7 +368,7 @@ class Git():
         # Run the pull command and return the results
         logging.info('Pulling latest changes from repo: '+ str(repo) )
         fetchResult = str(subprocess.check_output(
-                  self.PULL_CMD,
+                  self.RESET_CMD + "\n" + self.PULL_CMD ,
                   shell=True,
                   cwd=  repo_dir  ) )
         logging.info('Done fetching.')
