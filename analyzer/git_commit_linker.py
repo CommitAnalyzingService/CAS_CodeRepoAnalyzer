@@ -190,18 +190,23 @@ class GitCommitLinker:
     diff_cmd = "git diff " + commit.commit_hash + "^ "+ commit.commit_hash + " --unified=0 " \
       + ' | while read; do echo ":CAS_DELIMITER_START:$REPLY:CAS_DELIMITER:"; done'
 
-    diff = str(subprocess.check_output(diff_cmd, shell=True, cwd= self.repo_path, executable="/bin/bash" ))
+    # It is possible that a commit doesn't have a parent! i.e., merged from a clean branch.
+    try:
+      diff = str(subprocess.check_output(diff_cmd, shell=True, cwd= self.repo_path, executable="/bin/bash" ))
 
-    # files changed, this is used by the getLineNumbersChanged function
-    diff_cmd_lines_changed = "git diff " + commit.commit_hash + "^ "+ commit.commit_hash + " --name-only"
+      # files changed, this is used by the getLineNumbersChanged function
+      diff_cmd_lines_changed = "git diff " + commit.commit_hash + "^ "+ commit.commit_hash + " --name-only"
 
-    # get the files modified -> use this to validate if we have arrived at a new file
-    # when grepping for the specific lines changed.
-    files_modified = str( subprocess.check_output( diff_cmd_lines_changed, shell=True, cwd= self.repo_path )).replace("b'", "").split("\\n")
+      # get the files modified -> use this to validate if we have arrived at a new file
+      # when grepping for the specific lines changed.
+      files_modified = str( subprocess.check_output( diff_cmd_lines_changed, shell=True, cwd= self.repo_path )).replace("b'", "").split("\\n")
 
-    # now, let's get the file and the line number changed in the commit
-    return self._getModifiedRegionsOnly(diff, files_modified)
+      # now, let's get the file and the line number changed in the commit
+      return self._getModifiedRegionsOnly(diff, files_modified)
 
+    except:
+      # The code change did not have a parent change!
+      return {}
 
   def gitAnnotate(self, regions, commit):
     """
