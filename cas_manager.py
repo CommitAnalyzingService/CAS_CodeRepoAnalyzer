@@ -40,6 +40,7 @@ class CAS_Manager(threading.Thread):
 							.filter( 
 								(Repository.status == "Waiting to be Ingested") | 
 								(Repository.ingestion_date < refresh_date) &
+								(Repository.status != "Error") &
 								(Repository.status != "Analyzing"))
 							.all())
 
@@ -147,7 +148,6 @@ class CAS_Manager(threading.Thread):
 				repo.status = "Error"
 				session.commit() # update repo status
 				session.close()
-				raise
 
 			# Notify user if repo has never been analyzed previously
 			if repo.analysis_date is None:
