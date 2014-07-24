@@ -141,24 +141,24 @@ class CAS_Manager(threading.Thread):
 
 					metrics_generator.dumpData(all_commits)
 					repo.last_data_dump = str(datetime.now().replace(microsecond=0))
+					
+				# Notify user if repo has never been analyzed previously
+				if repo.analysis_date is None:
+					self.notify(repo)
+	
+				logging.info("Repo " + repo_id + " finished analyzing.")
+				repo.analysis_date = str(datetime.now().replace(microsecond=0))
+				repo.status = "Analyzed"
+				session.commit() # update status of repo
+				session.close()
 
+			# uh-oh
 			except Exception as e:
 				logging.exception("Got an exception building model for repository " + repo_id)
 
 				repo.status = "Error"
 				session.commit() # update repo status
 				session.close()
-
-			# Notify user if repo has never been analyzed previously
-			if repo.analysis_date is None:
-				self.notify(repo)
-
-			logging.info("Repo " + repo_id + " finished analyzing.")
-			repo.analysis_date = str(datetime.now().replace(microsecond=0))
-			repo.status = "Analyzed"
-			session.commit() # update status of repo
-			session.close()
-		# End of if statement
 
 	def notify(self, repo):
 		""" Send e-mail notifications if applicable to a repo 
