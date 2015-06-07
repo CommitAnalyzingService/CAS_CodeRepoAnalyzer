@@ -12,9 +12,9 @@ import logging as root_logging
 logger = root_logging.getLogger()
 logger.setLevel(root_logging.INFO)
 
-logger_format = root_logging.Formatter('%(asctime)s %(levelname)s: %(message)s')
+logger_format = root_logging.Formatter('%(asctime)s %(levelname)s: %(message)s', '%Y-%m-%d %H:%M:%S')
 
-logging_file_handler = root_logging.FileHandler(config['logging']['filename'])
+logging_file_handler = root_logging.FileHandler(config['logging_system']['filename'])
 logging_file_handler.setLevel(root_logging.INFO)
 logging_file_handler.setFormatter(logger_format)
 logger.addHandler(logging_file_handler)
