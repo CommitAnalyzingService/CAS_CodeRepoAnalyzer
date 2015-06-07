@@ -32,6 +32,6 @@
 		"months": "3"
 	},
 	"data_dumps": {
-		"location": ""
+		"location": "THE FULL PATH TO /analyzer/datasets"
 	}
 }
