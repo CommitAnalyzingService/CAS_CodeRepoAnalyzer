@@ -297,7 +297,7 @@ class Git():
                     # Detects merges by counting the # of parent commits
                     
                     parents = values[1].split(' ')
-                    if len(parents) > 1:
+                    if len(parents) == 2:
                         isMerge = True
 
                 if(values[0] == '"author_name"'):
