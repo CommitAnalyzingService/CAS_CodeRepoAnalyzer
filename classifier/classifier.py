@@ -21,7 +21,6 @@ class Classifier():
 
 		# Create the categories - takes in the location of the csv that defines associated words
 		#for the category & classification name
-		merge = Category(dir_of_cats + "/merge.csv", "Merge")
 		corrective = Category(dir_of_cats + "/corrective.csv", "Corrective")
 		feature_addition = Category(dir_of_cats + "/feature_addition.csv", "Feature Addition")
 		non_functional = Category(dir_of_cats + "/non_functional.csv", "Non Functional")
@@ -29,7 +28,7 @@ class Classifier():
 		perventive = Category(dir_of_cats + "/preventative.csv", "Preventative")
 
 		# add to list of categories
-		self.categories.extend([merge, corrective,feature_addition,non_functional,perfective,perventive])
+		self.categories.extend([corrective,feature_addition,non_functional,perfective,perventive])
 
 	def categorize(self, commit_msg):
 		"""
