@@ -30,6 +30,7 @@ class Git():
     # We want the log in ascending order, so we call --reverse
     # Numstat is used to get statistics for each commit
     LOG_FORMAT = '--pretty=format:\" CAS_READER_STARTPRETTY\
+    \\"parent_hashes\\"CAS_READER_PROP_DELIMITER: \\"%P\\",CAS_READER_PROP_DELIMITER2\
     \\"commit_hash\\"CAS_READER_PROP_DELIMITER: \\"%H\\",CAS_READER_PROP_DELIMITER2\
     \\"author_name\\"CAS_READER_PROP_DELIMITER: \\"%an\\",CAS_READER_PROP_DELIMITER2\
     \\"author_email\\"CAS_READER_PROP_DELIMITER: \\"%ae\\",CAS_READER_PROP_DELIMITER2\
@@ -267,6 +268,7 @@ class Git():
             unixTimeStamp = 0                           # timestamp of commit
             fix = False                                 # whether or not the change is a defect fix
             classification = None                       # classification of the commit (i.e., corrective, feature addition, etc)
+            isMerge = False                             # whether or not the change is a merge
 
             commit = commit.replace('\\x', '\\u00')   # Remove invalid json escape characters
             splitCommitStat = commit.split("CAS_READER_STOPPRETTY")  # split the commit info and its stats
@@ -290,6 +292,14 @@ class Git():
 
                 values = propStr[0:-1].split(":")
 
+                if(values[0] == '"    parent_hashes"'):
+                    # Check to see if this is a merge change. Fix for Issue #26. 
+                    # Detects merges by counting the # of parent commits
+                    
+                    parents = values[1].split(' ')
+                    if len(parents) == 2:
+                        isMerge = True
+
                 if(values[0] == '"author_name"'):
                     author = values[1].replace('"', '')
 
@@ -298,7 +308,11 @@ class Git():
 
                 # Classify the commit
                 if(values[0] == '"commit_message"'):
-                    classification = classifier.categorize(values[1].lower())
+
+                    if (isMerge):
+                        classification = "Merge"
+                    else:
+                        classification = classifier.categorize(values[1].lower())
 
                     # If it is a corrective commit, we induce it fixes a bug somewhere in the system
                     if classification == "Corrective":
