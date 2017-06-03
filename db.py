@@ -17,6 +17,6 @@ engine = sqlalchemy.create_engine(config['db']['type'] + '+' +
                                   config['db']['password'] + '@' +
                                   config['db']['host'] + ':' +
                                   config['db']['port'] + '/' +
-                                  config['db']['database'])
+                                  config['db']['database'], pool_size=100, max_overflow=0) # the value of pool_size has to be less than the max_connections to postgres.
 Session.configure(bind=engine)
 Base = declarative_base()
