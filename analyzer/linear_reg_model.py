@@ -22,7 +22,7 @@ class LinearRegressionModel:
     """
     self.metrics = metrics
     self.repo_id = repo_id
-    self.stats = importr('stats')
+    self.stats = importr('stats', robject_translations={'format_perc': '_format_perc'})
     self.base = importr('base')
     self.readcsv = robjects.r['read.csv']
     self.sig_threshold = 0.05
