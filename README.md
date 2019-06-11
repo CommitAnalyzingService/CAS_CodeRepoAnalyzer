@@ -120,7 +120,7 @@ name. Make sure you are using python3, such as using a virtualenv if using Ubunt
 * requests (requests)
 * python-dateutil (python-dateutil)
 
-To install the MonthDelta package, simply do: `pip install http://pypi.python.org/packages/source/M/MonthDelta/MonthDelta-1.0b.tar.bz2`
+To install the MonthDelta package, simply do: `pip install https://pypi.python.org/packages/source/M/MonthDelta/MonthDelta-1.0b.tar.bz2`
 
 ###First-Time Database Setup
 Set up the database for the first time by running `python script.py initDb`
