@@ -1,0 +1,6 @@
+rpy2
+sqlalchemy
+py-postgresql
+requests
+python-dateutil
+MonthDelta==1.0b
