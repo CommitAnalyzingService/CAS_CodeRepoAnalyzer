@@ -112,8 +112,12 @@ pip install rpy2
 ```
 
 ### Additional Pip Packages
-Install the following packages by doing `pip install `  and then the package
-name. Make sure you are using python3, such as using a virtualenv if using Ubuntu.
+Install the following packages by doing `pip install -r requirements.txt`.
+
+Alternatively you can install them individually with `pip install ` and then the package
+name.
+
+Make sure you are using python3, such as using a virtualenv if using Ubuntu.
 
 * SQL Alchemy (sqlalchemy)
 * Py-PostgreSQL (py-postgresql)
