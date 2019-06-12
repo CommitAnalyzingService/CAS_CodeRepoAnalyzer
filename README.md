@@ -15,7 +15,7 @@ repoUpdates: how often repositories should be updated for new commits
 system: how many worker threads the cas system can use to analyze and ingest repos.
 
 ### Dependencies
-Additional Instructions are available in SETUP.md
+
 * Python  >= 3.3
 * Pip for Python Version > 3.3
 * Git > 1.7
