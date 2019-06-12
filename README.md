@@ -3,7 +3,7 @@ CAS_CodeRepoAnalyzer
 
 Ingests and analyzes code repositories
 
-##Installation
+## Installation
 1. Clone this repository in to an empty directory
 2. Copy the `./config.example.json` to `./config.json` and change the
 the configurations. All fields are required.
@@ -14,8 +14,8 @@ gmail: gmail account to be used to send cas notifications
 repoUpdates: how often repositories should be updated for new commits
 system: how many worker threads the cas system can use to analyze and ingest repos.
 
-###Dependencies
-Additional Instructions are available in SETUP.md
+### Dependencies
+
 * Python  >= 3.3
 * Pip for Python Version > 3.3
 * Git > 1.7
@@ -29,7 +29,7 @@ Additional Instructions are available in SETUP.md
 * GNU grep
 * MonthDelta
 
-###Setting up python3.3 virtual env on Ubuntu
+### Setting up python3.3 virtual env on Ubuntu
 * Assumes you are working on Ubuntu 12.04
 
 Install python3.3 using the deadsnakes PPA:
@@ -85,7 +85,7 @@ source /path/to/new/virtual/environemnt/bin/activate
 
 Type `deactiviate` to exit the virtual env
 
-###Installing rpy2
+### Installing rpy2
 * Assumes you are working on Ubuntu 12.04 and python 3.3
 
 Getting rpy2 to work can be a bit tricky. First, make sure R is installed. To do this, first
@@ -111,19 +111,23 @@ Now we are ready to install rpy2. Make sure python version 3 or greater is in us
 pip install rpy2
 ```
 
-###Additional Pip Packages
-Install the following packages by doing `pip install `  and then the package
-name. Make sure you are using python3, such as using a virtualenv if using Ubuntu.
+### Additional Pip Packages
+Install the following packages by doing `pip install -r requirements.txt`.
+
+Alternatively you can install them individually with `pip install ` and then the package
+name.
+
+Make sure you are using python3, such as using a virtualenv if using Ubuntu.
 
 * SQL Alchemy (sqlalchemy)
 * Py-PostgreSQL (py-postgresql)
 * requests (requests)
 * python-dateutil (python-dateutil)
 
-To install the MonthDelta package, simply do: `pip install http://pypi.python.org/packages/source/M/MonthDelta/MonthDelta-1.0b.tar.bz2`
+To install the MonthDelta package, simply do: `pip install http://pypi.python.org/packages/source/M/MonthDelta/MonthDelta-1.0b.tar.bz2` or `pip install MonthDelta==1.0b`
 
-###First-Time Database Setup
+### First-Time Database Setup
 Set up the database for the first time by running `python script.py initDb`
 
-##Usage
+## Usage
 In a terminal, type `nohup python script.py & ' to start the code repo analyzer and run it in the background.
