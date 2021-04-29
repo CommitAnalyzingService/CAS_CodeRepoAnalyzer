@@ -5,7 +5,7 @@ import logging
 import math                               # Required for the math.log function
 from ingester.commitFile import *         # Represents a file
 from classifier.classifier import *       # Used for classifying each commit
-import time
+import re
 
 """
 file: repository.py
@@ -109,6 +109,46 @@ class Git():
             fileName = (fileStat[2].replace("'",'').replace('"','').replace("\\",""))
 
             totalModified = fileLa + fileLd
+
+            # Check for filepath rename
+            oldpath, newpath, renamed = "", "", False
+
+            # check if the path was partially changed
+            match = re.search('^(.*)({.+=>.+})(.*)$', fileName)
+            if match:
+                oldpath = []
+                newpath = []
+                for group in match.groups():
+                    change = re.search('^{(.+)=>(.+)}$', group)
+                    if change:
+                        old, new = change.groups()
+                        oldpath.append(old.strip())
+                        newpath.append(new.strip())
+                    else:
+                        oldpath.append(group)
+                        newpath.append(group)
+                oldpath = "".join(oldpath).replace("//", "/").strip()
+                newpath = "".join(newpath).replace("//", "/").strip()
+                renamed = True
+
+            # If not, check if the path was fully changed
+            else:
+                match = re.search('^(.+)=>(.+)$', fileName)
+                if match:
+                    oldpath, newpath = match.groups()
+                    oldpath = oldpath.strip()
+                    newpath = newpath.strip()
+                    renamed = True
+
+            if renamed:
+                # In case of an error in the git history (e.g. due to rewrites),
+                # the old name may not exist in the dictionary. Therefore this extra
+                # check is required to avoid KeyErrors
+                if oldpath in commitFiles:
+                    commitFiles[newpath] = commitFiles[oldpath]
+                    setattr(commitFiles[newpath], 'name', newpath)
+
+                fileName = newpath
 
             # have we seen this file already?
             if(fileName in commitFiles):
